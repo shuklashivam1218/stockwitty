@@ -51,6 +51,11 @@ fi
 [[ -z "$PHP_BIN" ]] && fail "No PHP binary found."
 info "Using PHP binary: $PHP_BIN ($($PHP_BIN -r 'echo phpversion();'))"
 
+# ── Pull latest code ─────────────────────────────────────────
+info "Pulling latest code from git ..."
+git -C "$APP_DIR" pull origin main
+ok "Code updated"
+
 # ── Composer install ─────────────────────────────────────────
 # Run composer itself (and its @php post-install scripts, like
 # package:discover) under $PHP_BIN — the plain `composer` command
