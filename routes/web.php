@@ -23,17 +23,71 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
 
 // ── Public pages ─────────────────────────────────────────────────────────────
-Route::get('/', [PublicController::class, 'welcome'])->name('home');
+Route::view('/', 'sw.home')->name('home');
+
+Route::get('/v1', [PublicController::class, 'welcome'])->name('home.v1');
 
 Route::get('/unlisted', function () {
     return view('public.unlisted');
 });
 
+Route::view('/unlisted-shares/', 'sw.unlisted-shares.index')->name('sw.unlisted-shares');
+Route::view('/unlisted-shares/nse-india/', 'sw.unlisted-shares.nse-india.index')->name('sw.unlisted-shares.nse-india');
+Route::view('/unlisted-shares/nse-india/about/', 'sw.unlisted-shares.nse-india.about')->name('sw.unlisted-shares.nse-india.about');
+Route::view('/unlisted-shares/nse-india/thesis/', 'sw.unlisted-shares.nse-india.thesis')->name('sw.unlisted-shares.nse-india.thesis');
+
 Route::get('/unlisted-shares/{slug}', [StocksController::class, 'company'])->name('stocks.company');
 
-Route::get('/blog', function () {
+Route::view('/listed/', 'sw.listed.index')->name('sw.listed');
+Route::view('/listed/reliance/', 'sw.listed.reliance')->name('sw.listed.reliance');
+
+Route::view('/mutual-funds/', 'sw.mutual-funds.index')->name('sw.mutual-funds');
+
+Route::view('/pms/', 'sw.pms.index')->name('sw.pms');
+
+Route::view('/fixed-deposits/', 'sw.fixed-deposits.index')->name('sw.fixed-deposits');
+Route::view('/fixed-deposits/suryoday/', 'sw.fixed-deposits.suryoday')->name('sw.fixed-deposits.suryoday');
+
+Route::view('/digital-gold/', 'sw.digital-gold.index')->name('sw.digital-gold');
+
+Route::view('/digital-silver/', 'sw.digital-silver.index')->name('sw.digital-silver');
+
+Route::view('/etf/', 'sw.etf.index')->name('sw.etf');
+
+Route::view('/screener/', 'sw.screener.index')->name('sw.screener');
+
+Route::view('/compare/', 'sw.compare.index')->name('sw.compare');
+Route::view('/compare/nse-india-vs-nayara-energy/', 'sw.compare.nse-india-vs-nayara-energy')->name('sw.compare.nse-india-vs-nayara-energy');
+
+Route::view('/calculators/', 'sw.calculators.index')->name('sw.calculators');
+
+Route::view('/wittyscore/', 'sw.wittyscore.index')->name('sw.wittyscore');
+
+Route::view('/blog/', 'sw.blog.index')->name('sw.blog.slash');
+Route::view('/blog', 'sw.blog.index')->name('sw.blog');
+Route::view('/blog/how-to-buy-unlisted-shares/', 'sw.blog.how-to-buy-unlisted-shares')->name('sw.blog.how-to-buy-unlisted-shares');
+Route::view('/blog/how-to-sell-unlisted-shares/', 'sw.blog.how-to-sell-unlisted-shares')->name('sw.blog.how-to-sell-unlisted-shares');
+Route::view('/blog/is-it-safe-to-buy-unlisted-shares/', 'sw.blog.is-it-safe-to-buy-unlisted-shares')->name('sw.blog.is-it-safe-to-buy-unlisted-shares');
+Route::view('/blog/risks-of-investing-in-unlisted-shares/', 'sw.blog.risks-of-investing-in-unlisted-shares')->name('sw.blog.risks-of-investing-in-unlisted-shares');
+Route::view('/blog/tax-on-unlisted-shares/', 'sw.blog.tax-on-unlisted-shares')->name('sw.blog.tax-on-unlisted-shares');
+Route::view('/blog/unlisted-shares-vs-listed-shares/', 'sw.blog.unlisted-shares-vs-listed-shares')->name('sw.blog.unlisted-shares-vs-listed-shares');
+Route::view('/blog/what-are-unlisted-shares/', 'sw.blog.what-are-unlisted-shares')->name('sw.blog.what-are-unlisted-shares');
+
+Route::view('/news/', 'sw.news.index')->name('sw.news');
+Route::view('/news/nse-ipo-sebi-noc-2026/', 'sw.news.nse-ipo-sebi-noc-2026')->name('sw.news.nse-ipo-sebi-noc-2026');
+
+Route::view('/case-studies/', 'sw.case-studies.index')->name('sw.case-studies');
+Route::view('/case-studies/nse-pre-ipo-journey/', 'sw.case-studies.nse-pre-ipo-journey')->name('sw.case-studies.nse-pre-ipo-journey');
+Route::view('/case-studies/first-time-unlisted-kyc/', 'sw.case-studies.first-time-unlisted-kyc')->name('sw.case-studies.first-time-unlisted-kyc');
+Route::view('/case-studies/research-over-hype/', 'sw.case-studies.research-over-hype')->name('sw.case-studies.research-over-hype');
+
+Route::view('/why-witty/', 'sw.why-witty.index')->name('sw.why-witty');
+Route::view('/login-new/', 'sw.login.index')->name('sw.login');
+Route::view('/signup-new/', 'sw.signup.index')->name('sw.signup');
+
+Route::get('/blog-v1', function () {
     return view('public.blog');
-})->name('blog');
+})->name('blog.v1');
 
 Route::get('/disclaimer', [CmsPagesController::class, 'showDisclaimer'])->name('disclaimer');
 

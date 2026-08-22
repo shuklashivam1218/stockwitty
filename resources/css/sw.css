@@ -1,0 +1,333 @@
+@import "tailwindcss" source(none);
+@source "../views/sw/**/*.blade.php";
+@source "../views/components/sw/**/*.blade.php";
+@source "../views/partials/sw/**/*.blade.php";
+@source "../js/sw.js";
+
+/*
+ * StockWitty design system — green + mint only.
+ * All brand colors are defined here as tokens. Never hardcode hex in components.
+ * Ported from the Lovable design (src/styles.css).
+ */
+
+[x-cloak] {
+  display: none !important;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+
+  /* Brand */
+  --color-brand: var(--brand);
+  --color-mint: var(--mint);
+  --color-mint-bright: var(--mint-bright);
+  --color-beige: var(--beige);
+  --color-ink: var(--ink);
+
+  /* Green scale */
+  --color-green-50: var(--green-50);
+  --color-green-100: var(--green-100);
+  --color-green-200: var(--green-200);
+  --color-green-500: var(--green-500);
+  --color-green-600: var(--green-600);
+  --color-green-700: var(--green-700);
+  --color-green-800: var(--green-800);
+  --color-green-900: var(--green-900);
+  --color-green-950: var(--green-950);
+  --color-green-990: var(--green-990);
+
+  --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Brand palette (exact) */
+  --brand: #076550;
+  --mint: #0ecba1;
+  --mint-bright: #11f1c4;
+  --beige: #f5f0e8;
+  --ink: #1a1a1a;
+
+  --green-50: #e7f1eb;
+  --green-100: #dbebe1;
+  --green-200: #b4d5c2;
+  --green-500: #0d7739;
+  --green-600: #0c6b33;
+  --green-700: #0a5f2e;
+  --green-800: #0a592b;
+  --green-900: #084722;
+  --green-950: #06361a;
+  --green-990: #052a14;
+
+  --gradient-cta: linear-gradient(90deg, #0c7031 0%, #11f1c4 100%);
+  --gradient-price-card: linear-gradient(135deg, #0d3d2b 0%, #1a5c40 60%, #1e7a50 100%);
+  --gradient-mesh:
+    radial-gradient(closest-side at 20% 25%, color-mix(in oklab, #0ecba1 26%, transparent), transparent),
+    radial-gradient(closest-side at 78% 18%, color-mix(in oklab, #076550 20%, transparent), transparent),
+    radial-gradient(closest-side at 60% 80%, color-mix(in oklab, #11f1c4 18%, transparent), transparent);
+
+  --shadow-soft: 0 1px 2px color-mix(in oklab, #06361a 6%, transparent),
+    0 12px 32px -12px color-mix(in oklab, #06361a 14%, transparent);
+  --shadow-glow: 0 18px 44px -16px color-mix(in oklab, #0ecba1 55%, transparent),
+    0 2px 0 0 color-mix(in oklab, #076550 12%, transparent);
+
+  /* Semantic (light only — no dark toggle) */
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #076550;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f0e8;
+  --secondary-foreground: #06361a;
+  --muted: #e7f1eb;
+  --muted-foreground: #4a5b52;
+  --accent: #dbebe1;
+  --accent-foreground: #06361a;
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: #ffffff;
+  --border: #dbebe1;
+  --input: #b4d5c2;
+  --ring: #0ecba1;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility bg-cta {
+  background-image: var(--gradient-cta);
+  background-size: 160% 100%;
+  background-position: 0% 0%;
+  transition: background-position 0.5s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  &:hover {
+    background-position: 100% 0%;
+  }
+}
+
+@utility bg-price-card {
+  background-image: var(--gradient-price-card);
+}
+
+@utility bg-mesh {
+  background-image: var(--gradient-mesh);
+}
+
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+@utility eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+
+@utility text-gradient {
+  background-image: var(--gradient-cta);
+  background-clip: text;
+  color: transparent;
+}
+
+@utility card-lift {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease,
+    border-color 0.3s ease;
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-glow);
+    border-color: color-mix(in oklab, var(--mint) 55%, transparent);
+  }
+}
+
+@utility marquee-track {
+  animation: sw-marquee 32s linear infinite;
+  &:hover,
+  &:focus-within {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes sw-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes sw-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes sw-kenburns {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.14) translate3d(1%, -1.5%, 0);
+  }
+}
+
+@utility ken-burns {
+  animation: sw-kenburns 18s ease-in-out infinite alternate;
+}
+
+@keyframes sw-fade-up-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-fade-up-in {
+  animation: sw-fade-up-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--fade-delay, 0s);
+}
+
+@utility animate-mesh-pulse {
+  animation: sw-mesh-pulse 22s ease-in-out infinite;
+}
+
+@keyframes sw-mesh-pulse {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.08) rotate(6deg);
+  }
+}
+
+@utility animate-badge-float {
+  animation: sw-float 5.5s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+/* Shared scroll-reveal (replaces framer-motion Reveal/fadeUp/stagger) */
+@utility reveal {
+  opacity: 0;
+  transform: translateY(1.75rem);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: var(--reveal-delay, 0s);
+  &.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sw-faq-item summary {
+  list-style: none;
+}
+
+.sw-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.sw-faq-item[open] {
+  border-color: color-mix(in oklab, var(--mint) 60%, transparent);
+}
+
+.sw-faq-item .sw-faq-chevron {
+  transition: transform 0.2s ease;
+}
+
+.sw-faq-item[open] .sw-faq-chevron {
+  transform: rotate(180deg);
+}
+
+.sw-score-fill {
+  stroke-dashoffset: var(--circumference);
+  transition: stroke-dashoffset 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+[data-reveal].is-visible .sw-score-fill {
+  stroke-dashoffset: var(--target-offset);
+}
+
+.sw-pillar-bar {
+  width: 0;
+  transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+[data-reveal].is-visible .sw-pillar-bar {
+  width: var(--target-width);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

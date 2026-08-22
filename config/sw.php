@@ -1,0 +1,265 @@
+<?php
+
+return [
+
+    'products' => [
+        ['title' => 'Unlisted Shares', 'desc' => 'Buy pre-IPO shares of NSE, Tata Capital, OYO & 250+ companies.', 'href' => '/unlisted-shares/', 'icon' => 'trending-up'],
+        ['title' => 'Listed Stocks', 'desc' => 'Track live prices, financials & analysis of listed companies.', 'href' => '/listed/', 'icon' => 'bar-chart-3'],
+        ['title' => 'Mutual Funds', 'desc' => 'Explore and compare top mutual funds & NFOs.', 'href' => '/mutual-funds/', 'icon' => 'pie-chart'],
+        ['title' => 'PMS', 'desc' => 'Professionally managed portfolios for serious investors.', 'href' => '/pms/', 'icon' => 'briefcase'],
+        ['title' => 'Fixed Deposits', 'desc' => 'Compare high-interest corporate & bank FDs.', 'href' => '/fixed-deposits/', 'icon' => 'landmark'],
+        ['title' => 'Digital Gold', 'desc' => 'Buy 24K certified gold online, from ₹1.', 'href' => '/digital-gold/', 'icon' => 'coins'],
+        ['title' => 'Digital Silver', 'desc' => 'Invest in pure silver digitally, anytime.', 'href' => '/digital-silver/', 'icon' => 'gem'],
+        ['title' => 'ETFs', 'desc' => 'Low-cost index & thematic ETFs in one place.', 'href' => '/etf/', 'icon' => 'layers'],
+    ],
+
+    'tools' => [
+        ['title' => 'Screener', 'desc' => 'Filter unlisted & listed companies by your criteria.', 'href' => '/screener/', 'icon' => 'bar-chart-3'],
+        ['title' => 'Compare', 'desc' => 'Compare any two companies side by side.', 'href' => '/compare/', 'icon' => 'git-compare-arrows'],
+        ['title' => 'Calculators', 'desc' => 'SIP, FD, lumpsum, brokerage & more.', 'href' => '/calculators/', 'icon' => 'calculator'],
+        ['title' => 'Blog', 'desc' => 'Honest guides on unlisted shares, tax & investing.', 'href' => '/blog/', 'icon' => 'file-text'],
+        ['title' => 'News', 'desc' => 'IPO, unlisted, startup-funding & MF news.', 'href' => '/news/', 'icon' => 'newspaper'],
+        ['title' => 'Case Studies', 'desc' => 'Real investor journeys, told straight.', 'href' => '/case-studies/', 'icon' => 'sparkles'],
+        ['title' => 'WittyScore', 'desc' => 'How we grade unlisted companies out of 10.', 'href' => '/wittyscore/', 'icon' => 'gauge'],
+    ],
+
+    'showcase_companies' => [
+        ['slug' => 'nse-india', 'name' => 'NSE India Limited', 'initials' => 'NSE', 'price' => 1960, 'changeAbs' => 40, 'changePct' => 2.08, 'high52' => 2470, 'low52' => 1705, 'lot' => 250, 'mktCap' => '₹4.85L Cr', 'pe' => '40.0x', 'wittyScore' => 8.4, 'tag' => 'Pre-IPO', 'series' => [2180, 2360, 2490, 2080, 1885, 1960]],
+        ['slug' => 'tata-capital', 'name' => 'Tata Capital', 'initials' => 'TA', 'price' => 1075, 'changeAbs' => 12, 'changePct' => 1.13, 'high52' => 1150, 'low52' => 720, 'lot' => 100, 'mktCap' => '₹3.9L Cr', 'pe' => '32.0x', 'wittyScore' => 8.1, 'tag' => 'Pre-IPO', 'series' => [840, 910, 980, 1020, 1050, 1075]],
+        ['slug' => 'sbi-mutual-fund', 'name' => 'SBI Mutual Fund', 'initials' => 'SB', 'price' => 2890, 'changeAbs' => 26, 'changePct' => 0.91, 'high52' => 3050, 'low52' => 2100, 'lot' => 50, 'mktCap' => '₹2.1L Cr', 'pe' => '36.0x', 'wittyScore' => 8.0, 'tag' => 'Trending', 'series' => [2300, 2480, 2650, 2760, 2840, 2890]],
+        ['slug' => 'oyo', 'name' => 'OYO (Oravel Stays)', 'initials' => 'OY', 'price' => 58, 'changeAbs' => -1, 'changePct' => -0.85, 'high52' => 75, 'low52' => 38, 'lot' => 1000, 'mktCap' => '₹52,000 Cr', 'pe' => 'NA', 'wittyScore' => 6.4, 'tag' => 'Unicorn', 'series' => [46, 52, 63, 70, 60, 58]],
+        ['slug' => 'swiggy', 'name' => 'Swiggy', 'initials' => 'SW', 'price' => 425, 'changeAbs' => 6, 'changePct' => 1.43, 'high52' => 520, 'low52' => 300, 'lot' => 200, 'mktCap' => '₹98,000 Cr', 'pe' => 'NA', 'wittyScore' => 7.0, 'tag' => 'Trending', 'series' => [300, 340, 390, 460, 410, 425]],
+        ['slug' => 'phonepe', 'name' => 'PhonePe', 'initials' => 'PH', 'price' => 1240, 'changeAbs' => 37, 'changePct' => 3.07, 'high52' => 1310, 'low52' => 820, 'lot' => 100, 'mktCap' => '₹1.05L Cr', 'pe' => 'NA', 'wittyScore' => 7.6, 'tag' => 'Pre-IPO', 'series' => [820, 940, 1050, 1180, 1200, 1240]],
+        ['slug' => 'razorpay', 'name' => 'Razorpay', 'initials' => 'RA', 'price' => 910, 'changeAbs' => 4, 'changePct' => 0.44, 'high52' => 980, 'low52' => 640, 'lot' => 100, 'mktCap' => '₹68,000 Cr', 'pe' => 'NA', 'wittyScore' => 7.4, 'tag' => 'Unicorn', 'series' => [640, 720, 800, 870, 905, 910]],
+        ['slug' => 'zepto', 'name' => 'Zepto', 'initials' => 'ZE', 'price' => 340, 'changeAbs' => 9, 'changePct' => 2.72, 'high52' => 380, 'low52' => 180, 'lot' => 300, 'mktCap' => '₹42,000 Cr', 'pe' => 'NA', 'wittyScore' => 6.8, 'tag' => 'Unicorn', 'series' => [180, 220, 270, 320, 330, 340]],
+        ['slug' => 'chennai-super-kings', 'name' => 'Chennai Super Kings', 'initials' => 'CSK', 'price' => 185, 'changeAbs' => 2, 'changePct' => 1.09, 'high52' => 225, 'low52' => 150, 'lot' => 500, 'mktCap' => '₹7,500 Cr', 'pe' => '28.0x', 'wittyScore' => 7.2, 'tag' => 'Trending', 'series' => [150, 168, 205, 190, 180, 185]],
+        ['slug' => 'nsdl', 'name' => 'NSDL', 'initials' => 'NS', 'price' => 1050, 'changeAbs' => 6, 'changePct' => 0.57, 'high52' => 1180, 'low52' => 760, 'lot' => 100, 'mktCap' => '₹21,000 Cr', 'pe' => '34.0x', 'wittyScore' => 7.8, 'tag' => 'Pre-IPO', 'series' => [760, 850, 940, 1010, 1040, 1050]],
+    ],
+
+    'new_arrival_companies' => [
+        ['name' => 'NSE India', 'slug' => 'nse-india', 'short' => 'NSE', 'price' => 1960, 'change' => 2.08, 'tags' => ['Pre-IPO', 'DRHP', 'Trending']],
+        ['name' => 'Tata Capital', 'slug' => 'tata-capital', 'short' => 'TC', 'price' => 1075, 'change' => 1.13, 'tags' => ['Pre-IPO', 'DRHP']],
+        ['name' => 'SBI Mutual Fund', 'slug' => 'sbi-mutual-fund', 'short' => 'SBI', 'price' => 2890, 'change' => 0.91, 'tags' => ['Pre-IPO', 'Trending']],
+        ['name' => 'OYO Rooms', 'slug' => 'oyo', 'short' => 'OYO', 'price' => 58, 'change' => -0.85, 'tags' => ['DRHP', 'Unicorn']],
+        ['name' => 'Swiggy', 'slug' => 'swiggy', 'short' => 'SW', 'price' => 425, 'change' => 1.43, 'tags' => ['Unicorn', 'Trending']],
+        ['name' => 'PhonePe', 'slug' => 'phonepe', 'short' => 'PP', 'price' => 1240, 'change' => 3.07, 'tags' => ['Pre-IPO', 'Unicorn', 'DRHP']],
+        ['name' => 'Zepto', 'slug' => 'zepto', 'short' => 'ZP', 'price' => 340, 'change' => 2.72, 'tags' => ['Unicorn', 'Trending']],
+        ['name' => 'Razorpay', 'slug' => 'razorpay', 'short' => 'RZ', 'price' => 910, 'change' => 0.44, 'tags' => ['Unicorn', 'Pre-IPO']],
+        ['name' => 'NSDL', 'slug' => 'nsdl', 'short' => 'ND', 'price' => 1050, 'change' => 0.57, 'tags' => ['DRHP', 'Trending']],
+        ['name' => 'Chennai Super Kings', 'slug' => 'chennai-super-kings', 'short' => 'CSK', 'price' => 185, 'change' => 1.09, 'tags' => ['Trending']],
+    ],
+
+    'faqs' => [
+        ['q' => 'What are unlisted shares?', 'a' => 'Unlisted shares are equity shares of companies that are not yet traded on the NSE or BSE. They change hands privately — between employees holding ESOPs, early investors and buyers like you — at a negotiated price. Once the company completes an IPO, those same shares become listed and tradeable on the exchange.'],
+        ['q' => 'How do I buy unlisted shares on StockWitty?', 'a' => 'Share your CML copy, PAN, Aadhaar and a cancelled cheque for KYC, confirm the quantity and price on your quote, then transfer the amount to our verified company bank account. We credit the shares to your demat account off-market, usually the same working day.'],
+        ['q' => 'Is it safe to buy unlisted shares?', 'a' => 'The transaction itself is safe when it is done properly: payments only to a verified company account, shares delivered into your own demat account, and ISIN verified independently on CDSL or NSDL. The investment risk is separate — unlisted shares are illiquid, prices are negotiated, and an IPO may be delayed or never happen. Invest only what you can hold for years.'],
+        ['q' => 'What is the minimum investment?', 'a' => 'It depends on the lot size of the company. For NSE India, the minimum lot is 250 shares, which is about ₹4.90 lakh at the current price of ₹1,960. Other names start much lower — some lots are under ₹25,000.'],
+        ['q' => 'How long does share delivery take?', 'a' => 'For payments received before 2:00 PM on a working day, shares are typically credited to your demat the same day. Payments after cut-off or on holidays are settled the next working day. You get the delivery instruction reference on WhatsApp as soon as it is executed.'],
+        ['q' => 'How is the price decided?', 'a' => 'Unlisted prices are negotiated, not quoted by an exchange. We track live dealer bids and asks, recent block deal levels and secondary demand, then publish one all-inclusive price. There is no hidden markup added at the end — the price you accept is the price you pay.'],
+    ],
+
+    'sectors' => [
+        'Financial Services',
+        'Fintech',
+        'Technology',
+        'Consumer & Retail',
+        'Capital Markets',
+    ],
+
+    'unlisted_companies' => [
+        ['slug' => 'nse-india', 'name' => 'NSE India Limited', 'initials' => 'NSE', 'price' => 1960, 'changeAbs' => 40, 'changePct' => 2.08, 'high52' => 2470, 'low52' => 1705, 'lot' => 250, 'mktCap' => '₹4.85L Cr', 'pe' => '40.0x', 'wittyScore' => 8.4, 'tag' => 'Pre-IPO', 'series' => [2180, 2360, 2490, 2080, 1885, 1960], 'sector' => 'Capital Markets', 'drhp' => true],
+        ['slug' => 'tata-capital', 'name' => 'Tata Capital', 'initials' => 'TA', 'price' => 1075, 'changeAbs' => 12, 'changePct' => 1.13, 'high52' => 1150, 'low52' => 720, 'lot' => 100, 'mktCap' => '₹3.9L Cr', 'pe' => '32.0x', 'wittyScore' => 8.1, 'tag' => 'Pre-IPO', 'series' => [840, 910, 980, 1020, 1050, 1075], 'sector' => 'Financial Services', 'drhp' => true],
+        ['slug' => 'sbi-mutual-fund', 'name' => 'SBI Mutual Fund', 'initials' => 'SB', 'price' => 2890, 'changeAbs' => 26, 'changePct' => 0.91, 'high52' => 3050, 'low52' => 2100, 'lot' => 50, 'mktCap' => '₹2.1L Cr', 'pe' => '36.0x', 'wittyScore' => 8.0, 'tag' => 'Trending', 'series' => [2300, 2480, 2650, 2760, 2840, 2890], 'sector' => 'Financial Services', 'drhp' => false],
+        ['slug' => 'oyo', 'name' => 'OYO (Oravel Stays)', 'initials' => 'OY', 'price' => 58, 'changeAbs' => -1, 'changePct' => -0.85, 'high52' => 75, 'low52' => 38, 'lot' => 1000, 'mktCap' => '₹52,000 Cr', 'pe' => 'NA', 'wittyScore' => 6.4, 'tag' => 'Unicorn', 'series' => [46, 52, 63, 70, 60, 58], 'sector' => 'Consumer & Retail', 'drhp' => false],
+        ['slug' => 'swiggy', 'name' => 'Swiggy', 'initials' => 'SW', 'price' => 425, 'changeAbs' => 6, 'changePct' => 1.43, 'high52' => 520, 'low52' => 300, 'lot' => 200, 'mktCap' => '₹98,000 Cr', 'pe' => 'NA', 'wittyScore' => 7.0, 'tag' => 'Trending', 'series' => [300, 340, 390, 460, 410, 425], 'sector' => 'Consumer & Retail', 'drhp' => false],
+        ['slug' => 'phonepe', 'name' => 'PhonePe', 'initials' => 'PH', 'price' => 1240, 'changeAbs' => 37, 'changePct' => 3.07, 'high52' => 1310, 'low52' => 820, 'lot' => 100, 'mktCap' => '₹1.05L Cr', 'pe' => 'NA', 'wittyScore' => 7.6, 'tag' => 'Pre-IPO', 'series' => [820, 940, 1050, 1180, 1200, 1240], 'sector' => 'Fintech', 'drhp' => true],
+        ['slug' => 'razorpay', 'name' => 'Razorpay', 'initials' => 'RA', 'price' => 910, 'changeAbs' => 4, 'changePct' => 0.44, 'high52' => 980, 'low52' => 640, 'lot' => 100, 'mktCap' => '₹68,000 Cr', 'pe' => 'NA', 'wittyScore' => 7.4, 'tag' => 'Unicorn', 'series' => [640, 720, 800, 870, 905, 910], 'sector' => 'Fintech', 'drhp' => false],
+        ['slug' => 'zepto', 'name' => 'Zepto', 'initials' => 'ZE', 'price' => 340, 'changeAbs' => 9, 'changePct' => 2.72, 'high52' => 380, 'low52' => 180, 'lot' => 300, 'mktCap' => '₹42,000 Cr', 'pe' => 'NA', 'wittyScore' => 6.8, 'tag' => 'Unicorn', 'series' => [180, 220, 270, 320, 330, 340], 'sector' => 'Consumer & Retail', 'drhp' => false],
+        ['slug' => 'chennai-super-kings', 'name' => 'Chennai Super Kings', 'initials' => 'CSK', 'price' => 185, 'changeAbs' => 2, 'changePct' => 1.09, 'high52' => 225, 'low52' => 150, 'lot' => 500, 'mktCap' => '₹7,500 Cr', 'pe' => '28.0x', 'wittyScore' => 7.2, 'tag' => 'Trending', 'series' => [150, 168, 205, 190, 180, 185], 'sector' => 'Consumer & Retail', 'drhp' => false],
+        ['slug' => 'nsdl', 'name' => 'NSDL', 'initials' => 'NS', 'price' => 1050, 'changeAbs' => 6, 'changePct' => 0.57, 'high52' => 1180, 'low52' => 760, 'lot' => 100, 'mktCap' => '₹21,000 Cr', 'pe' => '34.0x', 'wittyScore' => 7.8, 'tag' => 'Pre-IPO', 'series' => [760, 850, 940, 1010, 1040, 1050], 'sector' => 'Capital Markets', 'drhp' => true],
+        ['slug' => 'bse-ltd', 'name' => 'BSE Limited (pre-listing)', 'initials' => 'BSE', 'price' => 2450, 'changeAbs' => 18, 'changePct' => 0.74, 'high52' => 2700, 'low52' => 1600, 'lot' => 50, 'mktCap' => '₹33,000 Cr', 'pe' => '38.0x', 'wittyScore' => 7.9, 'tag' => 'Trending', 'series' => [1600, 1850, 2100, 2320, 2400, 2450], 'sector' => 'Capital Markets', 'drhp' => false],
+        ['slug' => 'cdsl-unlisted', 'name' => 'CDSL (unlisted lots)', 'initials' => 'CD', 'price' => 1580, 'changeAbs' => -9, 'changePct' => -0.57, 'high52' => 1780, 'low52' => 1120, 'lot' => 100, 'mktCap' => '₹33,000 Cr', 'pe' => '42.0x', 'wittyScore' => 7.5, 'tag' => 'Trending', 'series' => [1120, 1290, 1450, 1620, 1600, 1580], 'sector' => 'Capital Markets', 'drhp' => false],
+        ['slug' => 'hexaware-technologies', 'name' => 'Hexaware Technologies', 'initials' => 'HX', 'price' => 795, 'changeAbs' => 11, 'changePct' => 1.4, 'high52' => 860, 'low52' => 520, 'lot' => 100, 'mktCap' => '₹48,000 Cr', 'pe' => '30.0x', 'wittyScore' => 7.3, 'tag' => 'Pre-IPO', 'series' => [520, 600, 680, 740, 780, 795], 'sector' => 'Technology', 'drhp' => true],
+        ['slug' => 'capgemini-technology', 'name' => 'Capgemini Technology Services', 'initials' => 'CG', 'price' => 14200, 'changeAbs' => 120, 'changePct' => 0.85, 'high52' => 15800, 'low52' => 10500, 'lot' => 10, 'mktCap' => '₹84,000 Cr', 'pe' => '26.0x', 'wittyScore' => 7.7, 'tag' => 'Trending', 'series' => [10500, 11800, 12900, 13700, 14050, 14200], 'sector' => 'Technology', 'drhp' => false],
+    ],
+
+    'fds' => [
+        ['slug' => 'suryoday', 'issuer' => 'Suryoday Small Finance Bank', 'type' => 'Bank', 'general' => '9.10%', 'senior' => '9.60%', 'tenure' => '5 years', 'insured' => true],
+        ['slug' => 'unity-sfb', 'issuer' => 'Unity Small Finance Bank', 'type' => 'Bank', 'general' => '9.00%', 'senior' => '9.50%', 'tenure' => '1001 days', 'insured' => true],
+        ['slug' => 'north-east-sfb', 'issuer' => 'North East Small Finance Bank', 'type' => 'Bank', 'general' => '9.40%', 'senior' => '9.90%', 'tenure' => '546 days', 'insured' => true],
+        ['slug' => 'bajaj-finance', 'issuer' => 'Bajaj Finance (corporate FD)', 'type' => 'Corporate', 'general' => '8.20%', 'senior' => '8.45%', 'tenure' => '44 months', 'insured' => false],
+        ['slug' => 'shriram-finance', 'issuer' => 'Shriram Finance (corporate FD)', 'type' => 'Corporate', 'general' => '8.47%', 'senior' => '8.97%', 'tenure' => '60 months', 'insured' => false],
+    ],
+
+    'etfs' => [
+        ['name' => 'Nippon India Nifty 50 ETF', 'type' => 'Index', 'expense' => '0.05%', 'r1y' => '13.8%', 'aum' => '₹18,400 Cr'],
+        ['name' => 'SBI Nifty Next 50 ETF', 'type' => 'Index', 'expense' => '0.15%', 'r1y' => '16.1%', 'aum' => '₹3,100 Cr'],
+        ['name' => 'Nippon India Gold ETF', 'type' => 'Gold', 'expense' => '0.32%', 'r1y' => '21.4%', 'aum' => '₹12,900 Cr'],
+        ['name' => 'ICICI Pru Nifty Bank ETF', 'type' => 'Sectoral', 'expense' => '0.15%', 'r1y' => '12.2%', 'aum' => '₹6,800 Cr'],
+        ['name' => 'Motilal Oswal Nasdaq 100 ETF', 'type' => 'International', 'expense' => '0.58%', 'r1y' => '18.6%', 'aum' => '₹7,300 Cr'],
+        ['name' => 'Bharat Bond ETF April 2033', 'type' => 'Debt', 'expense' => '0.0005%', 'r1y' => '7.6%', 'aum' => '₹9,500 Cr'],
+    ],
+
+    'case_studies_disclaimer' => 'Illustrative journey. Past performance is not indicative. Not investment advice.',
+
+    'case_studies' => [
+        [
+            'slug' => 'nse-pre-ipo-journey',
+            'title' => 'Tracking NSE India from unlisted to the IPO doorstep',
+            'tag' => 'Pre-IPO · Financial Infra',
+            'statChip' => 'Held 24 months',
+            'summary' => 'A long-term investor bought NSE India unlisted shares, verified the ISIN before paying, and sat through a listing timeline that kept moving.',
+            'meta' => ['investor' => 'Long-term investor', 'holding' => '24 months', 'products' => 'Unlisted equity', 'region' => 'India'],
+            'stats' => [
+                ['value' => '24', 'label' => 'Months held', 'count' => 24],
+                ['value' => '1', 'label' => 'IPO process in progress', 'count' => 1],
+                ['value' => '5', 'label' => 'Checks before buying', 'count' => 5],
+                ['value' => '3', 'label' => 'Tranches accumulated', 'count' => 3],
+            ],
+            'overview' => [
+                'Rohan, a salaried professional in his late thirties, wanted exposure to Indian market infrastructure — the businesses that earn from activity rather than from picking winners. NSE India was the obvious candidate, and it was available only in the unlisted market.',
+                'This case study follows the process he used: how he verified the security before paying, how he sized the position for illiquidity, and how he behaved during a long, uncertain wait for a listing that had already slipped more than once.',
+            ],
+            'situation' => [
+                "NSE India had been talked about as an IPO candidate for years. Prices in the unlisted market moved on news flow — regulatory updates, ownership changes, DRHP chatter — and quotes varied noticeably between dealers on the same day.",
+                "Rohan's concerns were practical rather than exciting: was the ISIN he was being quoted the correct one, would the shares actually land in his demat account, and what happens to his money if the listing never arrives. He treated the last question as the base case, not the worst case.",
+            ],
+            'approach' => [
+                ['title' => 'Verified the security, not just the price', 'body' => 'He matched the ISIN quoted by the dealer against the depository record and asked for a CML copy to confirm the demat details before any transfer of funds.'],
+                ['title' => 'Paid only into a company account', 'body' => 'Payment went to a registered company bank account against an invoice, never to an individual. The delivery instruction slip reference was matched back to the invoice afterwards.'],
+                ['title' => 'Sized the position for illiquidity', 'body' => 'He capped the holding at a small single-digit share of his portfolio on the assumption that he might not be able to exit quickly — or at a price he liked — for years.'],
+                ['title' => 'Accumulated in tranches, not in one go', 'body' => 'Three purchases across the holding period, each after comparing quotes from more than one counterparty rather than accepting the first number offered.'],
+                ['title' => 'Tracked process milestones, not price targets', 'body' => 'His review checklist watched real events — regulatory no-objection, DRHP filing progress, segment revenue disclosures — instead of daily quote movement.'],
+                ['title' => 'Wrote down an exit rule in advance', 'body' => "A one-page note recorded why he owned it and what would make him sell, so the decision wasn't made emotionally during a news cycle."],
+            ],
+            'chart' => [
+                ['label' => 'Month 0', 'value' => 100], ['label' => 'Month 4', 'value' => 104], ['label' => 'Month 8', 'value' => 99],
+                ['label' => 'Month 12', 'value' => 112], ['label' => 'Month 16', 'value' => 108], ['label' => 'Month 20', 'value' => 121], ['label' => 'Month 24', 'value' => 118],
+            ],
+            'chartNote' => 'Illustrative index of quoted price levels rebased to 100 at entry. Unlisted quotes are indicative, vary between dealers, and are not a traded market price.',
+            'outcome' => [
+                'The shares were credited to his demat account and the ISIN matched the one he verified before payment.',
+                'The listing had still not happened at the 24-month mark; the IPO process was in progress and the timeline remained outside his control.',
+                'Two flat stretches of several months each tested patience more than the paperwork did.',
+                'Because the position was small, the wait was uncomfortable rather than damaging — the sizing decision mattered more than the entry price.',
+                'He has not attempted an exit, and accepts that selling before a listing would likely need a negotiated discount.',
+            ],
+            'table' => [
+                ['row' => 'Verification steps before paying', 'before' => 'None (first attempt)', 'after' => '5-point checklist'],
+                ['row' => 'Counterparty quotes compared', 'before' => '1', 'after' => '3 per purchase'],
+                ['row' => 'Position size vs portfolio', 'before' => 'Undecided', 'after' => 'Small, capped allocation'],
+                ['row' => 'Exit plan', 'before' => 'Unwritten', 'after' => 'Written one-pager'],
+                ['row' => 'Listing status', 'before' => 'Rumoured', 'after' => 'IPO process in progress'],
+            ],
+            'quote' => ['text' => 'The paperwork took two days. The patience took two years. Only one of those is a skill you can buy.', 'author' => 'Rohan, long-term investor (anonymised)'],
+        ],
+        [
+            'slug' => 'first-time-unlisted-kyc',
+            'title' => "A first-time investor's safe route into unlisted shares",
+            'tag' => 'Beginner · Process',
+            'statChip' => 'KYC → demat in 2 days',
+            'summary' => 'A first-time buyer went from zero paperwork to shares in her demat account in two working days — by doing the boring checks in the right order.',
+            'meta' => ['investor' => 'First-time investor', 'holding' => 'Ongoing', 'products' => 'Unlisted equity', 'region' => 'India'],
+            'stats' => [
+                ['value' => '2', 'label' => 'Days KYC to demat', 'count' => 2],
+                ['value' => '4', 'label' => 'Documents collected', 'count' => 4],
+                ['value' => '1', 'label' => 'Lot purchased', 'count' => 1],
+                ['value' => '0', 'label' => 'Cash payments made', 'count' => 0],
+            ],
+            'overview' => [
+                'Meera, a 29-year-old chartered accountant, had only ever bought listed shares through an app. The unlisted market looked opaque to her: no exchange screen, no order book, and quotes that arrived over chat.',
+                'Her aim was not a clever trade. It was to complete one small transaction correctly, end to end, so she would know what a legitimate process looks like before committing more money.',
+            ],
+            'situation' => [
+                'The mechanics were unfamiliar. Off-market transfers, delivery instruction slips and CML copies were terms she had read about but never used, and the settlement had no automatic guarantee behind it.',
+                'She was also being pitched several names at once, with urgency attached to each. She decided the first transaction would deliberately be small and in a well-documented company rather than the most exciting one.',
+            ],
+            'approach' => [
+                ['title' => 'Completed KYC before shortlisting anything', 'body' => 'PAN, Aadhaar, a cancelled cheque and her client master list (CML) copy were ready on day one, so nothing had to be rushed later under price pressure.'],
+                ['title' => 'Confirmed the ISIN against the depository', 'body' => 'She checked that the ISIN on the quote matched the company she believed she was buying — the single check that prevents the most common mix-up.'],
+                ['title' => 'Asked for the price in writing', 'body' => 'A written quote with quantity, price per share, total consideration and validity window, instead of a number agreed verbally over a call.'],
+                ['title' => 'Paid by bank transfer to a company account', 'body' => 'No cash, no individual accounts, and an invoice retained against the payment reference for her records and future tax reporting.'],
+                ['title' => 'Matched the delivery to the invoice', 'body' => 'When the shares were credited, she reconciled the demat entry, the ISIN and the quantity against the invoice before considering the deal closed.'],
+                ['title' => 'Started small on purpose', 'body' => 'One minimum lot. Enough to learn the process, small enough that a bad outcome would be a lesson rather than a setback.'],
+            ],
+            'chart' => [
+                ['label' => 'Day 0', 'value' => 0], ['label' => 'Day 1 KYC', 'value' => 40], ['label' => 'Day 1 quote', 'value' => 60],
+                ['label' => 'Day 2 payment', 'value' => 80], ['label' => 'Day 2 demat', 'value' => 100],
+            ],
+            'chartNote' => 'Illustrative timeline showing process completion, not returns. Timelines vary by company, depository and counterparty.',
+            'outcome' => [
+                'Shares were credited to her demat account on the second working day, with the ISIN and quantity matching the invoice.',
+                'Every payment left a bank trail, which made her tax records straightforward from the start.',
+                'She declined two of the three names she was pitched, because documentation questions were not answered clearly.',
+                'She now treats the checklist, not the price, as the reason to proceed or walk away.',
+                'The holding remains illiquid; she has no expectation of a quick exit and has not sought one.',
+            ],
+            'table' => [
+                ['row' => 'KYC readiness', 'before' => 'Not started', 'after' => 'Complete before quoting'],
+                ['row' => 'Quote format', 'before' => 'Verbal over chat', 'after' => 'Written, with validity'],
+                ['row' => 'Payment method', 'before' => 'Unclear', 'after' => 'Bank transfer, company account'],
+                ['row' => 'Post-trade reconciliation', 'before' => 'None planned', 'after' => 'Invoice matched to demat entry'],
+                ['row' => 'Names shortlisted', 'before' => '3 pitched', 'after' => '1 purchased'],
+            ],
+            'quote' => ['text' => 'I stopped asking what the price would do and started asking who I was paying. That one change made the whole thing feel manageable.', 'author' => 'Meera, first-time investor (anonymised)'],
+        ],
+        [
+            'slug' => 'research-over-hype',
+            'title' => 'Choosing research over hype: passing on a trending name',
+            'tag' => 'Risk-aware · Diligence',
+            'statChip' => 'Diligence first',
+            'summary' => 'A trending consumer name was quoted well above its last primary round. After the diligence questions went unanswered, the investor walked away.',
+            'meta' => ['investor' => 'Risk-aware investor', 'holding' => 'No position taken', 'products' => 'Unlisted equity research', 'region' => 'India'],
+            'stats' => [
+                ['value' => '1', 'label' => 'Deal declined', 'count' => 1],
+                ['value' => '6', 'label' => 'Diligence questions asked', 'count' => 6],
+                ['value' => '0', 'label' => 'Rupees committed', 'count' => 0],
+                ['value' => '2', 'label' => 'Alternatives reviewed', 'count' => 2],
+            ],
+            'overview' => [
+                'Arjun had been sent the same unlisted name by three different sources inside a fortnight, each with a screenshot of a rising quote and a reminder that allocation was limited.',
+                'This case study is about a decision not to invest. It is included because passing is a legitimate outcome of research, and it is the outcome most case studies quietly leave out.',
+            ],
+            'situation' => [
+                "The quoted price sat meaningfully above the company's last known primary funding round, with no disclosed transaction to justify the gap. Volume claims were anecdotal, and the spread between buy and sell quotes was wide.",
+                "The story attached to the name was strong; the documentation behind the price was not. Arjun's task was to separate the two.",
+            ],
+            'approach' => [
+                ['title' => 'Asked what the price was based on', 'body' => 'He requested the reference for the quote — a recent transaction, a primary round or a valuation report. No specific reference was provided.'],
+                ['title' => 'Checked the last funded valuation', 'body' => 'Publicly reported round details set a sanity anchor. The quote implied a large step-up with no disclosed event in between.'],
+                ['title' => 'Tested the spread and the exit', 'body' => 'He asked for an indicative buy-side quote as if he were selling. The gap between the two numbers told him what an early exit would cost.'],
+                ['title' => 'Read the risk factors, not the pitch deck', 'body' => 'Concentration of revenue, cash burn and governance disclosures received more attention than the growth narrative.'],
+                ['title' => 'Applied a WittyScore-style scorecard', 'body' => 'Business quality, financial strength, valuation, liquidity and transparency were scored separately, so a strong story could not mask a weak valuation and disclosure score.'],
+                ['title' => 'Set a walk-away trigger before negotiating', 'body' => 'Unanswered documentation questions were defined in advance as a reason to stop — which removed the pressure to decide in the moment.'],
+            ],
+            'chart' => [
+                ['label' => 'Business', 'value' => 8], ['label' => 'Financials', 'value' => 6], ['label' => 'Valuation', 'value' => 3],
+                ['label' => 'Liquidity', 'value' => 4], ['label' => 'Transparency', 'value' => 3],
+            ],
+            'chartNote' => 'Illustrative scorecard out of 10 for a hypothetical trending name. Scores are for demonstration and are not a rating of any real company.',
+            'outcome' => [
+                'No position was taken, and no capital was committed to the name.',
+                'The diligence questions that went unanswered were the deciding factor, not the price level itself.',
+                'He redirected the same amount to two names where transaction references and disclosures were available.',
+                'The declined name may still do well — passing was a decision about the information available, not a prediction.',
+                'The scorecard is now reused for every subsequent enquiry, which makes comparisons consistent.',
+            ],
+            'table' => [
+                ['row' => 'Price reference requested', 'before' => 'Not asked', 'after' => 'Asked, not provided'],
+                ['row' => 'Valuation anchor', 'before' => 'Quote screenshot', 'after' => 'Last primary round'],
+                ['row' => 'Exit test', 'before' => 'Ignored', 'after' => 'Buy-side quote compared'],
+                ['row' => 'Decision framework', 'before' => 'Narrative-led', 'after' => '5-pillar scorecard'],
+                ['row' => 'Outcome', 'before' => 'Under pressure to buy', 'after' => 'Declined, capital redeployed'],
+            ],
+            'quote' => ['text' => 'Nobody could tell me which transaction the price came from. That silence was the most useful piece of research I got all month.', 'author' => 'Arjun, risk-aware investor (anonymised)'],
+        ],
+    ],
+
+    'listed_stocks' => [
+        ['slug' => 'reliance', 'name' => 'Reliance Industries', 'initials' => 'RIL', 'price' => 2847.5, 'changeAbs' => 38.45, 'changePct' => 1.37, 'wittyScore' => 8.2, 'sector' => 'Energy & Retail', 'mktCap' => '₹19.26L Cr', 'pe' => '23.8x'],
+        ['slug' => 'tcs', 'name' => 'Tata Consultancy Services', 'initials' => 'TCS', 'price' => 3912.8, 'changeAbs' => -18.6, 'changePct' => -0.47, 'wittyScore' => 8.0, 'sector' => 'IT Services', 'mktCap' => '₹14.2L Cr', 'pe' => '27.4x'],
+        ['slug' => 'hdfc-bank', 'name' => 'HDFC Bank', 'initials' => 'HDB', 'price' => 1684.2, 'changeAbs' => 9.1, 'changePct' => 0.54, 'wittyScore' => 8.4, 'sector' => 'Banking', 'mktCap' => '₹12.8L Cr', 'pe' => '18.9x'],
+        ['slug' => 'infosys', 'name' => 'Infosys', 'initials' => 'INFY', 'price' => 1562.4, 'changeAbs' => 6.7, 'changePct' => 0.43, 'wittyScore' => 7.8, 'sector' => 'IT Services', 'mktCap' => '₹6.5L Cr', 'pe' => '24.1x'],
+    ],
+
+];
