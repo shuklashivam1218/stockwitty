@@ -28,6 +28,67 @@ class CompanyController extends Controller
             ->firstOrFail();
     }
 
+    public function directory()
+    {
+        $stocks = UnlistedStock::where('UL_STOCKS_STATUS', '1')
+            ->orderBy('UL_STOCKS_COMPNAME')
+            ->get();
+        $fincodes = $stocks->pluck('UL_STOCKS_FINCODE');
+
+        $latestPrices = DB::table('unlisted_price_data as pd')
+            ->joinSub(
+                DB::table('unlisted_price_data')
+                    ->selectRaw('UL_PD_FINCODE, MAX(UL_PD_DATE) as max_date')
+                    ->where('UL_PD_INVALID_FLAG', 0)
+                    ->whereIn('UL_PD_FINCODE', $fincodes)
+                    ->groupBy('UL_PD_FINCODE'),
+                'latest',
+                fn ($j) => $j->on('pd.UL_PD_FINCODE', '=', 'latest.UL_PD_FINCODE')
+                              ->on('pd.UL_PD_DATE', '=', 'latest.max_date')
+            )
+            ->select('pd.UL_PD_FINCODE', 'pd.UL_PD_BID_PRICE')
+            ->get()
+            ->keyBy('UL_PD_FINCODE');
+
+        $weekAgoPrices = DB::table('unlisted_price_data')
+            ->whereIn('UL_PD_FINCODE', $fincodes)
+            ->where('UL_PD_INVALID_FLAG', 0)
+            ->where('UL_PD_DATE', '<=', now()->subDays(7))
+            ->orderByDesc('UL_PD_DATE')
+            ->get(['UL_PD_FINCODE', 'UL_PD_BID_PRICE'])
+            ->groupBy('UL_PD_FINCODE')
+            ->map(fn ($rows) => $rows->first()->UL_PD_BID_PRICE);
+
+        $wittyScores = UnlistedWittyScore::whereIn('UL_WS_FINCODE', $fincodes)
+            ->where('UL_WS_ACTIVE', '1')
+            ->get()
+            ->groupBy('UL_WS_FINCODE')
+            ->map(fn ($rows) => $rows->sortByDesc('UL_WS_ID')->first());
+
+        $companies = $stocks->map(function ($stock) use ($latestPrices, $weekAgoPrices, $wittyScores) {
+            $fincode = $stock->UL_STOCKS_FINCODE;
+            $price   = (float) ($latestPrices->get($fincode)?->UL_PD_BID_PRICE ?? 0);
+            $weekAgo = $weekAgoPrices->get($fincode);
+
+            return [
+                'slug'       => $stock->UL_STOCKS_SLUG,
+                'name'       => $stock->UL_STOCKS_COMPNAME,
+                'initials'   => $this->initials($stock->UL_STOCKS_COMPNAME),
+                'price'      => $price,
+                'changePct'  => $weekAgo ? round((($price - (float) $weekAgo) / (float) $weekAgo) * 100, 2) : 0,
+                'tag'        => $stock->UL_STOCKS_TAG,
+                'sector'     => $stock->UL_STOCKS_INDUSTRY,
+                'lot'        => (int) ($stock->UL_STOCKS_LOT_SIZE ?: 1),
+                'wittyScore' => $wittyScores->get($fincode)?->overall() ?? 0,
+                'drhp'       => $stock->UL_STOCKS_DRHP_FLAG === 'Yes',
+            ];
+        })->values();
+
+        $sectors = $stocks->pluck('UL_STOCKS_INDUSTRY')->filter()->unique()->sort()->values();
+
+        return view('sw.unlisted-shares.index', compact('companies', 'sectors'));
+    }
+
     public function index(string $slug)
     {
         $stock   = $this->findStock($slug);

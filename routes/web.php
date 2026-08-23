@@ -32,7 +32,7 @@ Route::get('/unlisted', function () {
     return view('public.unlisted');
 });
 
-Route::view('/unlisted-shares/', 'sw.unlisted-shares.index')->name('sw.unlisted-shares');
+Route::get('/unlisted-shares/', [CompanyController::class, 'directory'])->name('sw.unlisted-shares');
 
 Route::get('/unlisted-shares/{slug}/', [CompanyController::class, 'index'])->name('sw.unlisted-shares.company');
 Route::get('/unlisted-shares/{slug}/about/', [CompanyController::class, 'about'])->name('sw.unlisted-shares.company.about');

@@ -1,7 +1,7 @@
 @extends('layouts.sw')
 
 @section('title', 'Unlisted & Pre-IPO Shares in India — Live Prices | StockWitty')
-@section('description', 'Browse 250+ unlisted and pre-IPO shares in India — NSE India, Tata Capital, PhonePe, Swiggy and more. Prices, WittyScore and lot sizes in one honest directory.')
+@section('description', 'Browse unlisted and pre-IPO shares in India — NSE India, Tata Capital, Reliance Retail and more. Prices, WittyScore and lot sizes in one honest directory.')
 
 @section('content')
 <div class="min-h-screen bg-background">
@@ -10,10 +10,10 @@
     </div>
 
     <main>
-        <x-sw.page-hero eyebrow="250+ companies tracked" title="Unlisted &amp; Pre-IPO Shares in India"
+        <x-sw.page-hero eyebrow="{{ count($companies) }} companies tracked" title="Unlisted &amp; Pre-IPO Shares in India"
                         subtitle="Every name we deal in, with an honest WittyScore, current indicative price and the minimum lot you'd need. No hype, no hidden spread talk." />
 
-        <section class="py-14 sm:py-20" x-data="unlistedShares()" data-companies="{{ json_encode(config('sw.unlisted_companies')) }}">
+        <section class="py-14 sm:py-20" x-data="unlistedShares()" data-companies="{{ json_encode($companies) }}">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <x-sw.chips :options="['All', 'Pre-IPO', 'Unicorn', 'DRHP-Filed', 'Trending']" model="filter" />
@@ -26,7 +26,7 @@
                         <select x-model="sector" aria-label="Filter by sector"
                                 class="rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-semibold text-foreground outline-none focus:border-primary">
                             <option>All sectors</option>
-                            @foreach (config('sw.sectors') as $s)
+                            @foreach ($sectors as $s)
                                 <option value="{{ $s }}">{{ $s }}</option>
                             @endforeach
                         </select>
@@ -40,7 +40,7 @@
                 </div>
 
                 <p class="mt-6 text-sm text-muted-foreground">
-                    Showing <span class="font-bold text-foreground" x-text="list.length"></span> of 250+ companies
+                    Showing <span class="font-bold text-foreground" x-text="list.length"></span> of {{ count($companies) }} companies
                 </p>
 
                 <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
