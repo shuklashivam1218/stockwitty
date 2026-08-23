@@ -16,10 +16,16 @@ function cssVar(name) {
 }
 
 export function nsePriceChart() {
+    // Kept as a plain closure variable, NOT an x-data property: Chart.js
+    // instances hold circular internal references (scales <-> chart <-> canvas),
+    // and if Alpine wraps one in its reactive Proxy it blows the call stack on
+    // creation and later corrupts Chart.js's internal state (the classic
+    // "Cannot read properties of undefined (reading 'axis')" crash on update()).
+    let chart = null;
+
     return {
         period: '6M',
         series: {},
-        chart: null,
 
         init() {
             this.series = JSON.parse(this.$el.dataset.series || '{}');
@@ -39,7 +45,7 @@ export function nsePriceChart() {
 
             const data = this.series[this.period] || [];
 
-            this.chart = new Chart(ctx, {
+            chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map((d) => d.label),
@@ -76,11 +82,11 @@ export function nsePriceChart() {
         },
 
         updateChart() {
-            if (!this.chart) return;
+            if (!chart) return;
             const data = this.series[this.period] || [];
-            this.chart.data.labels = data.map((d) => d.label);
-            this.chart.data.datasets[0].data = data.map((d) => d.price);
-            this.chart.update();
+            chart.data.labels = data.map((d) => d.label);
+            chart.data.datasets[0].data = data.map((d) => d.price);
+            chart.update();
         },
     };
 }

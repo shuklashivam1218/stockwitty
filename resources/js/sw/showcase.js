@@ -18,13 +18,19 @@ function cssVar(name) {
 }
 
 export function showcase() {
+    // Kept as a plain closure variable, NOT an x-data property: Chart.js
+    // instances hold circular internal references (scales <-> chart <-> canvas),
+    // and if Alpine wraps one in its reactive Proxy it blows the call stack on
+    // creation and later corrupts Chart.js's internal state (the classic
+    // "Cannot read properties of undefined (reading 'axis')" crash on update()).
+    let chart = null;
+
     return {
         companies: [],
         slug: null,
         side: 'Buy',
         qty: 1,
         paused: false,
-        chart: null,
 
         init() {
             this.companies = JSON.parse(this.$el.dataset.companies || '[]');
@@ -74,7 +80,7 @@ export function showcase() {
             gradient.addColorStop(0, `${mint}55`);
             gradient.addColorStop(1, `${mint}00`);
 
-            this.chart = new Chart(ctx, {
+            chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: SERIES_LABELS.slice(0, (this.company.series || []).length),
@@ -117,11 +123,11 @@ export function showcase() {
         },
 
         updateChart() {
-            if (!this.chart) return;
+            if (!chart) return;
             const series = this.company.series || [];
-            this.chart.data.labels = SERIES_LABELS.slice(0, series.length);
-            this.chart.data.datasets[0].data = series;
-            this.chart.update();
+            chart.data.labels = SERIES_LABELS.slice(0, series.length);
+            chart.data.datasets[0].data = series;
+            chart.update();
         },
     };
 }

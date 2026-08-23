@@ -28,10 +28,16 @@ function cssVar(name) {
 }
 
 export function reliancePage() {
+    // Kept as plain closure variables, NOT x-data properties: Chart.js
+    // instances hold circular internal references (scales <-> chart <-> canvas),
+    // and if Alpine wraps one in its reactive Proxy it blows the call stack on
+    // creation and later corrupts Chart.js's internal state (the classic
+    // "Cannot read properties of undefined (reading 'axis')" crash on update()).
+    let perfChart = null;
+    let pieChart = null;
+
     return {
         tab: 'Performance',
-        perfChart: null,
-        pieChart: null,
 
         init() {
             this.$nextTick(() => this.renderPerfChart());
@@ -40,10 +46,10 @@ export function reliancePage() {
         selectTab(t) {
             this.tab = t;
             this.$nextTick(() => {
-                if (t === 'Performance' && !this.perfChart) this.renderPerfChart();
-                if (t === 'Shareholding' && !this.pieChart) this.renderPieChart();
-                if (this.perfChart) this.perfChart.resize();
-                if (this.pieChart) this.pieChart.resize();
+                if (t === 'Performance' && !perfChart) this.renderPerfChart();
+                if (t === 'Shareholding' && !pieChart) this.renderPieChart();
+                if (perfChart) perfChart.resize();
+                if (pieChart) pieChart.resize();
             });
         },
 
@@ -59,7 +65,7 @@ export function reliancePage() {
             gradient.addColorStop(0, `${mint}80`);
             gradient.addColorStop(1, `${mint}05`);
 
-            this.perfChart = new Chart(ctx, {
+            perfChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: series.map((s) => s.m),
@@ -97,7 +103,7 @@ export function reliancePage() {
             const holding = JSON.parse(this.$refs.pieData.dataset.holding);
             const colors = [cssVar('--brand'), cssVar('--mint'), cssVar('--green-200'), cssVar('--beige')];
 
-            this.pieChart = new Chart(canvas.getContext('2d'), {
+            pieChart = new Chart(canvas.getContext('2d'), {
                 type: 'doughnut',
                 data: {
                     labels: holding.map((h) => h.name),

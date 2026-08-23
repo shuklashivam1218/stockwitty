@@ -38,12 +38,18 @@ function compact(n) {
 }
 
 export function sipCalculator() {
+    // Kept as plain closure variables, NOT x-data properties: Chart.js
+    // instances hold circular internal references (scales <-> chart <-> canvas),
+    // and if Alpine wraps one in its reactive Proxy it blows the call stack on
+    // creation and later corrupts Chart.js's internal state (the classic
+    // "Cannot read properties of undefined (reading 'axis')" crash on update()).
+    let growthChart = null;
+    let donutChart = null;
+
     return {
         monthly: 10000,
         rate: 12,
         years: 10,
-        growthChart: null,
-        donutChart: null,
 
         init() {
             this.$nextTick(() => {
@@ -95,7 +101,7 @@ export function sipCalculator() {
             gradient.addColorStop(1, `${mint}08`);
 
             const data = this.series;
-            this.growthChart = new Chart(ctx, {
+            growthChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map((d) => d.y),
@@ -142,7 +148,7 @@ export function sipCalculator() {
             const brand = cssVar('--brand') || '#076550';
             const green200 = cssVar('--green-200') || '#b4d5c2';
 
-            this.donutChart = new Chart(canvas.getContext('2d'), {
+            donutChart = new Chart(canvas.getContext('2d'), {
                 type: 'doughnut',
                 data: {
                     labels: ['Invested amount', 'Est. returns'],
@@ -167,16 +173,16 @@ export function sipCalculator() {
         },
 
         update() {
-            if (this.growthChart) {
+            if (growthChart) {
                 const data = this.series;
-                this.growthChart.data.labels = data.map((d) => d.y);
-                this.growthChart.data.datasets[0].data = data.map((d) => d.invested);
-                this.growthChart.data.datasets[1].data = data.map((d) => d.value);
-                this.growthChart.update();
+                growthChart.data.labels = data.map((d) => d.y);
+                growthChart.data.datasets[0].data = data.map((d) => d.invested);
+                growthChart.data.datasets[1].data = data.map((d) => d.value);
+                growthChart.update();
             }
-            if (this.donutChart) {
-                this.donutChart.data.datasets[0].data = [Math.round(this.invested), Math.max(0, Math.round(this.returns))];
-                this.donutChart.update();
+            if (donutChart) {
+                donutChart.data.datasets[0].data = [Math.round(this.invested), Math.max(0, Math.round(this.returns))];
+                donutChart.update();
             }
         },
     };
