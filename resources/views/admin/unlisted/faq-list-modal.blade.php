@@ -88,7 +88,7 @@
 
         <div class="fql-header">
             <h3>FAQs &mdash; {{ $stock->UL_STOCKS_COMPNAME }}</h3>
-            <button class="fql-add-btn" type="button" onclick="openFaqAddModal()">
+            <button class="fql-add-btn" type="button" onclick="openFaqAddModal(window.fqFincode)">
                 <i class="fa-solid fa-plus"></i> Add FAQ
             </button>
             <button class="fql-close" onclick="closeFaqListModal()" type="button">
@@ -102,6 +102,7 @@
                     <tr>
                         <th>Question</th>
                         <th>Linked To</th>
+                        <th>Tab</th>
                         <th>Sort</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -116,6 +117,7 @@
                                 {{ $targetLabels[$faq->UL_FAQ_TARGET] ?? $faq->UL_FAQ_TARGET }}
                             </span>
                         </td>
+                        <td>{{ $faq->UL_FAQ_TAB ?: '—' }}</td>
                         <td>{{ $faq->UL_FAQ_SORT_ORDER }}</td>
                         <td>
                             <span class="fql-status {{ $faq->UL_FAQ_ACTIVE == '1' ? 'fql-badge-active' : 'fql-badge-inactive' }}">
@@ -135,7 +137,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" style="text-align:center;padding:32px;color:#aaa">
+                        <td colspan="6" style="text-align:center;padding:32px;color:#aaa">
                             <i class="fa-regular fa-circle-question" style="font-size:22px;display:block;margin-bottom:8px"></i>
                             No FAQs added yet.
                         </td>
@@ -154,19 +156,8 @@
     var CSRF        = $('meta[name="csrf-token"]').attr('content');
     var $tbody      = $('.fql-table tbody');
 
-    window.openFaqAddModal = function () {
-        $('#faqEditModalWrap').html(loadingSpinner());
-        $.get(STOCKS_BASE + '/' + window.fqFincode + '/faqs')
-            .done(function (html) { $('#faqEditModalWrap').html(html); })
-            .fail(function ()     { $('#faqEditModalWrap').empty(); alert('Failed to load.'); });
-    };
-
     $tbody.on('click', '.fql-edit-btn', function () {
-        var faqId = $(this).data('faq-id');
-        $('#faqEditModalWrap').html(loadingSpinner());
-        $.get(STOCKS_BASE + '/' + window.fqFincode + '/faqs/' + faqId + '/edit')
-            .done(function (html) { $('#faqEditModalWrap').html(html); })
-            .fail(function ()     { $('#faqEditModalWrap').empty(); alert('Failed to load.'); });
+        window.openFaqEditModal(window.fqFincode, $(this).data('faq-id'));
     });
 
     $tbody.on('click', '.fql-delete-btn', function () {

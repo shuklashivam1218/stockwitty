@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SafeUpload;
 use App\Models\CmsPage;
 use Illuminate\Http\Request;
 
@@ -40,11 +41,16 @@ class CmsPagesController extends Controller
     {
         $request->validate(['file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:5120']);
 
-        $folder = public_path('images/cms-pages-images');
+        $file = $request->file('file');
+        $ext  = SafeUpload::imageExtension($file);
+        if ($ext === null) {
+            return response()->json(['message' => 'Uploaded file is not a recognised image type.'], 422);
+        }
+
+        $folder = SafeUpload::webRoot() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'cms-pages-images';
         if (!is_dir($folder)) mkdir($folder, 0755, true);
 
-        $file     = $request->file('file');
-        $filename = $slug . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $filename = $slug . '_' . time() . '_' . uniqid() . '.' . $ext;
         $file->move($folder, $filename);
 
         return response()->json(['location' => asset('images/cms-pages-images/' . $filename)]);

@@ -1,6 +1,8 @@
-﻿<style>
+@once
+@push('styles')
+<style>
 .th-overlay {
-    display: flex;
+    display: none;
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, .55);
@@ -10,6 +12,7 @@
     padding: 16px;
     backdrop-filter: blur(2px);
 }
+.th-overlay.open { display: flex; }
 .th-modal {
     background: #fff;
     border-radius: 12px;
@@ -107,27 +110,29 @@
 .tox-tinymce-aux,
 .tox-dialog-wrap { z-index: 2300 !important; }
 </style>
+@endpush
+@endonce
 
 <div class="th-overlay" onclick="if(event.target===this)closeThesisModal()">
 <div class="th-modal">
 
     <div class="th-header">
-        <h3>Investment Thesis &mdash; {{ $stock->UL_STOCKS_COMPNAME }}</h3>
+        <h3 id="thCompanyName">Investment Thesis</h3>
         <button class="th-close" onclick="closeThesisModal()" type="button">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
     <div class="th-body">
-        <textarea id="UL_THESIS_CONTENT1">{{ $thesis?->UL_THESIS_CONTENT ?? '' }}</textarea>
+        <textarea id="UL_THESIS_CONTENT1"></textarea>
     </div>
 
     <div class="th-footer">
         <div class="th-active-row">
             <span>Active:</span>
             <select id="thesisActive">
-                <option value="1" @selected(($thesis?->UL_THESIS_ACTIVE ?? '1') == '1')>Active</option>
-                <option value="0" @selected(($thesis?->UL_THESIS_ACTIVE ?? '1') == '0')>Inactive</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
             </select>
         </div>
         <div class="th-footer-right">
@@ -139,22 +144,22 @@
 </div>
 </div>
 
+@push('scripts')
 <script>
 (function () {
-    var STOCKS_BASE = window.STOCKS_BASE;
-    var CSRF        = $('meta[name="csrf-token"]').attr('content');
-    var fincode     = '{{ $stock->UL_STOCKS_FINCODE }}';
+    var fincode = null;
 
     var isSmallScreen = window.matchMedia('(max-width: 1023.5px)').matches;
 
     function thesis_image_upload_handler(blobInfo) {
         return new Promise(function (resolve, reject) {
+            var CSRF     = $('meta[name="csrf-token"]').attr('content');
             var formData = new FormData();
             formData.append('file', blobInfo.blob(), blobInfo.filename());
             formData.append('_token', CSRF);
 
             $.ajax({
-                url:         STOCKS_BASE + '/' + fincode + '/thesis/upload-image',
+                url:         window.STOCKS_BASE + '/' + fincode + '/thesis/upload-image',
                 method:      'POST',
                 data:        formData,
                 processData: false,
@@ -195,13 +200,34 @@
         promotion: false,
     });
 
+    window.openThesisModal = function (fc, companyName) {
+        fincode = fc;
+        $('#thCompanyName').text('Investment Thesis — ' + companyName);
+        $('#thSaveMsg').text('');
+
+        $.get(window.STOCKS_BASE + '/' + fincode + '/thesis')
+            .done(function (data) {
+                var editor = tinymce.get('UL_THESIS_CONTENT1');
+                if (editor) editor.setContent(data.UL_THESIS_CONTENT || '');
+                $('#thesisActive').val(data.UL_THESIS_ACTIVE || '1');
+                $('.th-overlay').addClass('open');
+            })
+            .fail(function () {
+                alert('Failed to load thesis.');
+            });
+    };
+
+    function closeThesisModal() { $('.th-overlay').removeClass('open'); }
+    window.closeThesisModal = closeThesisModal;
+
     $('#thesisSubmitBtn').on('click', function () {
+        var CSRF    = $('meta[name="csrf-token"]').attr('content');
         var content = tinymce.get('UL_THESIS_CONTENT1').getContent();
         var active  = $('#thesisActive').val();
         var $btn    = $(this).prop('disabled', true).text('Saving…');
 
         $.ajax({
-            url:         STOCKS_BASE + '/' + fincode + '/thesis',
+            url:         window.STOCKS_BASE + '/' + fincode + '/thesis',
             method:      'POST',
             contentType: 'application/json',
             headers:     { 'X-CSRF-TOKEN': CSRF },
@@ -221,4 +247,4 @@
     });
 }());
 </script>
-
+@endpush

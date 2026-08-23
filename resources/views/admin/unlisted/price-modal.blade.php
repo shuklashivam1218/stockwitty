@@ -1,6 +1,8 @@
-﻿<style>
+@once
+@push('styles')
+<style>
 .pm-overlay {
-    display: flex;
+    display: none;
     position: fixed;
     inset: 0;
     background: rgba(15,23,42,0.55);
@@ -10,11 +12,15 @@
     padding: 16px;
     backdrop-filter: blur(2px);
 }
+.pm-overlay.open { display: flex; }
 .pm-modal {
     background: #fff;
     border-radius: 12px;
     width: 100%;
     max-width: 500px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 24px 60px rgba(0,0,0,0.22);
     animation: privSlideIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
     overflow: hidden;
@@ -25,6 +31,7 @@
     justify-content: space-between;
     padding: 16px 22px;
     border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
 }
 .pm-header h3 { margin:0; font-size:16px; font-weight:700; color:#1a1a1a; }
 .pm-close {
@@ -34,7 +41,8 @@
     transition:background 0.15s;
 }
 .pm-close:hover { background:#e2e8f0; color:#1a1a1a; }
-.pm-body { padding:20px 22px; display:flex; flex-direction:column; gap:16px; }
+#priceForm { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.pm-body { padding:20px 22px; display:flex; flex-direction:column; gap:16px; flex: 1; min-height: 0; overflow-y: auto; }
 .pm-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .pm-field label {
     display:block; font-size:12px; font-weight:600; color:#64748b;
@@ -56,6 +64,7 @@
 .pm-footer {
     display:flex; align-items:center; justify-content:space-between;
     padding:14px 22px; border-top:1px solid #e2e8f0; background:#fafafa;
+    flex-shrink: 0;
 }
 .pm-msg { font-size:13px; font-weight:500; }
 .pm-submit {
@@ -68,25 +77,26 @@
 .pm-submit:hover { background:#054d3c; }
 .pm-submit:active { transform:scale(0.98); }
 </style>
+@endpush
+@endonce
 
 <div class="pm-overlay" id="priceOverlay" onclick="if(event.target===this)closePriceModal()">
 <div class="pm-modal">
 
     <div class="pm-header">
-        <h3>Add Price &mdash; {{ $stock->UL_STOCKS_COMPNAME }}</h3>
+        <h3 id="pmCompanyName">Add Price</h3>
         <button class="pm-close" onclick="closePriceModal()" type="button">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
-    <form id="priceForm" data-fincode="{{ $stock->UL_STOCKS_FINCODE }}">
-        @csrf
+    <form id="priceForm">
         <div class="pm-body">
 
             <div class="pm-row">
                 <div class="pm-field">
                     <label>Fincode</label>
-                    <div class="pm-display">{{ $stock->UL_STOCKS_FINCODE }}</div>
+                    <div class="pm-display" id="pmFincodeDisplay"></div>
                 </div>
                 <div class="pm-field">
                     <label>Date</label>
@@ -115,19 +125,32 @@
 </div>
 </div>
 
+@push('scripts')
 <script>
 (function () {
-    var STOCKS_BASE = window.STOCKS_BASE;
-    var CSRF        = $('meta[name="csrf-token"]').attr('content');
+    var fincode = null;
+
+    window.openPriceModal = function (fc, companyName) {
+        fincode = fc;
+        $('#pmCompanyName').text('Add Price — ' + companyName);
+        $('#pmFincodeDisplay').text(fincode);
+        $('#pmDate').val('');
+        $('#pmBidPrice').val('');
+        $('#pmMsg').text('');
+        $('#priceOverlay').addClass('open');
+    };
+
+    function closePriceModal() { $('#priceOverlay').removeClass('open'); }
+    window.closePriceModal = closePriceModal;
 
     $('#priceForm').on('submit', function (e) {
         e.preventDefault();
-        var fincode = $(this).data('fincode');
-        var $btn    = $(this).find('.pm-submit').prop('disabled', true)
-                             .html('<i class="fa-solid fa-spinner fa-spin"></i> Saving…');
+        var CSRF = $('meta[name="csrf-token"]').attr('content');
+        var $btn = $(this).find('.pm-submit').prop('disabled', true)
+                          .html('<i class="fa-solid fa-spinner fa-spin"></i> Saving…');
 
         $.ajax({
-            url:         STOCKS_BASE + '/' + fincode + '/price',
+            url:         window.STOCKS_BASE + '/' + fincode + '/price',
             method:      'POST',
             contentType: 'application/json',
             headers:     { 'X-CSRF-TOKEN': CSRF },
@@ -158,5 +181,4 @@
     });
 }());
 </script>
-
-
+@endpush

@@ -13,6 +13,7 @@ class UnlistedFaq extends Model
     protected $fillable = [
         'UL_FAQ_FINCODE',
         'UL_FAQ_TARGET',
+        'UL_FAQ_TAB',
         'UL_FAQ_QUESTION',
         'UL_FAQ_ANSWER',
         'UL_FAQ_SORT_ORDER',

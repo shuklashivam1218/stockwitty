@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Privilege;
+use App\Helpers\SafeUpload;
 use App\Models\UnlistedStock;
 use App\Models\UnlistedPriceData;
 use App\Models\UnlistedFinancials;
 use App\Models\UnlistedThesis;
 use App\Models\UnlistedAbout;
 use App\Models\UnlistedFaq;
+use App\Models\UnlistedWittyScore;
+use App\Models\UnlistedAboutExtra;
+use App\Models\UnlistedCompanyInsight;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -38,7 +42,13 @@ class UnlistedStocksController extends Controller
             ->get()
             ->keyBy('UL_PD_FINCODE');
 
-        return view('admin.unlisted.index', compact('stocks', 'latestPrices'));
+        $industries = DB::table('industry_master')
+            ->where('IM_FLAG', 'A')
+            ->where('IM_IND_CODE', '>', 0)
+            ->orderBy('IM_INDUSTRY')
+            ->get(['IM_IND_CODE', 'IM_INDUSTRY']);
+
+        return view('admin.unlisted.index', compact('stocks', 'latestPrices', 'industries'));
     }
 
     public function storeStock(Request $request)
@@ -115,15 +125,6 @@ class UnlistedStocksController extends Controller
         return response()->json(['success' => true, 'status' => $newStatus]);
     }
 
-    public function getPriceModal(string $fincode)
-    {
-        $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)
-                    ->select('UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME')
-                    ->firstOrFail();
-
-        return view('admin.unlisted.price-modal', compact('stock'));
-    }
-
     public function storePriceData(Request $request, string $fincode)
     {
         UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
@@ -195,15 +196,6 @@ class UnlistedStocksController extends Controller
         abort_if(!$updated, 404, 'Record not found.');
 
         return response()->json(['success' => true, 'message' => 'Marked as invalid.']);
-    }
-
-    public function getFinancialsModal(string $fincode)
-    {
-        $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)
-                    ->select('UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME')
-                    ->firstOrFail();
-
-        return view('admin.unlisted.financials-modal', compact('stock'));
     }
 
     public function storeFinancialsData(Request $request, string $fincode)
@@ -296,9 +288,7 @@ class UnlistedStocksController extends Controller
 
     public function getFinancialsEditModal(string $fincode, string $periodEnd, string $type, string $noMonths)
     {
-        $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)
-                    ->select('UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME')
-                    ->firstOrFail();
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
 
         $financial = UnlistedFinancials::where('UL_FIN_FINCODE',   $fincode)
                         ->where('UL_FIN_Period_end', $periodEnd)
@@ -306,7 +296,7 @@ class UnlistedStocksController extends Controller
                         ->where('UL_FIN_No_months',  $noMonths)
                         ->firstOrFail();
 
-        return view('admin.unlisted.financials-modal', compact('stock', 'financial'));
+        return response()->json($financial->toArray());
     }
 
     public function updateFinancialsData(Request $request, string $fincode, string $periodEnd, string $type, string $noMonths)
@@ -395,13 +385,17 @@ class UnlistedStocksController extends Controller
     {
         $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
 
-        $industries = DB::table('industry_master')
-            ->where('IM_FLAG', 'A')
-            ->where('IM_IND_CODE', '>', 0)
-            ->orderBy('IM_INDUSTRY')
-            ->get(['IM_IND_CODE', 'IM_INDUSTRY']);
+        $data = \Illuminate\Support\Arr::only($stock->toArray(), [
+            'UL_STOCKS_COMPNAME', 'UL_STOCKS_LOGO_LINK', 'UL_STOCKS_IND_CODE', 'UL_STOCKS_SLUG',
+            'UL_STOCKS_ISIN', 'UL_STOCKS_S_NAME', 'UL_STOCKS_CATEGORY', 'UL_STOCKS_TAG',
+            'UL_STOCKS_DRHP_FLAG', 'UL_STOCKS_INC_MONTH', 'UL_STOCKS_INC_YEAR', 'UL_STOCKS_WEBSITE',
+            'UL_STOCKS_STATUS', 'UL_STOCKS_COMP_RATING', 'UL_STOCKS_VALUATION_RATING',
+            'UL_STOCKS_BUY_SELL_FLAG', 'UL_STOCKS_LOT_SIZE', 'UL_STOCKS_ROFR_FLAG',
+            'UL_STOCKS_DEMAT_ACCOUNT_REQ', 'UL_STOCKS_Qtr_Data_Publish', 'UL_STOCKS_ABOUT',
+        ]);
+        $data['logoUrl'] = $stock->UL_STOCKS_LOGO_LINK ? asset($stock->UL_STOCKS_LOGO_LINK) : null;
 
-        return view('admin.unlisted.overview-modal', compact('stock', 'industries'));
+        return response()->json($data);
     }
 
     public function updateOverview(Request $request, string $fincode)
@@ -432,6 +426,8 @@ class UnlistedStocksController extends Controller
             'UL_STOCKS_ISIN'              => $request->input('UL_STOCKS_ISIN'),
             'UL_STOCKS_S_NAME'            => $request->input('UL_STOCKS_S_NAME'),
             'UL_STOCKS_CATEGORY'          => $request->input('UL_STOCKS_CATEGORY'),
+            'UL_STOCKS_TAG'               => $request->input('UL_STOCKS_TAG'),
+            'UL_STOCKS_DRHP_FLAG'         => $request->input('UL_STOCKS_DRHP_FLAG'),
             'UL_STOCKS_INC_MONTH'         => $request->input('UL_STOCKS_INC_MONTH'),
             'UL_STOCKS_INC_YEAR'          => $request->input('UL_STOCKS_INC_YEAR'),
             'UL_STOCKS_WEBSITE'           => $request->input('UL_STOCKS_WEBSITE'),
@@ -447,15 +443,14 @@ class UnlistedStocksController extends Controller
         ];
 
         if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
-            $ext  = strtolower($request->file('logo')->getClientOriginalExtension());
-            $ext  = ['jfif' => 'jpg', 'jpeg' => 'jpg'][$ext] ?? $ext;
-            $slug = $stock->UL_STOCKS_SLUG;
+            $ext = SafeUpload::imageExtension($request->file('logo'));
+            if ($ext === null) {
+                return response()->json(['success' => false, 'message' => 'Uploaded file is not a recognised image type.']);
+            }
+
+            $slug     = $stock->UL_STOCKS_SLUG;
             $filename = $slug . '.' . $ext;
-            // On Hostinger, public_html/ sits next to the app dir (stockwitty-new/../public_html)
-            // public_path() returns stockwitty-new/public/ which is NOT web-accessible there
-            $parentPublicHtml = dirname(base_path()) . DIRECTORY_SEPARATOR . 'public_html';
-            $webRoot  = is_dir($parentPublicHtml) ? $parentPublicHtml : public_path();
-            $destDir  = $webRoot . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'company-logo';
+            $destDir  = SafeUpload::webRoot() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'company-logo';
 
             if (!is_dir($destDir)) {
                 mkdir($destDir, 0755, true);
@@ -484,14 +479,16 @@ class UnlistedStocksController extends Controller
 
     public function getThesisModal(string $fincode)
     {
-        $stock  = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)
-                    ->select('UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME')
-                    ->firstOrFail();
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
         $thesis = UnlistedThesis::where('UL_THESIS_FINCODE', $fincode)
                     ->orderByDesc('UL_THESIS_ID')
                     ->first();
 
-        return view('admin.unlisted.thesis-modal', compact('stock', 'thesis'));
+        return response()->json([
+            'UL_THESIS_CONTENT' => $thesis?->UL_THESIS_CONTENT,
+            'UL_THESIS_ACTIVE'  => $thesis?->UL_THESIS_ACTIVE ?? '1',
+        ]);
     }
 
     public function saveThesis(Request $request, string $fincode)
@@ -524,11 +521,16 @@ class UnlistedStocksController extends Controller
     {
         $request->validate(['file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:5120']);
 
-        $folder = public_path('images/unlisted-thesis-images');
+        $file = $request->file('file');
+        $ext  = SafeUpload::imageExtension($file);
+        if ($ext === null) {
+            return response()->json(['message' => 'Uploaded file is not a recognised image type.'], 422);
+        }
+
+        $folder = SafeUpload::webRoot() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'unlisted-thesis-images';
         if (!is_dir($folder)) mkdir($folder, 0755, true);
 
-        $file     = $request->file('file');
-        $filename = 'thesis_' . $fincode . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $filename = 'thesis_' . $fincode . '_' . time() . '_' . uniqid() . '.' . $ext;
         $file->move($folder, $filename);
 
         return response()->json(['location' => asset('images/unlisted-thesis-images/' . $filename)]);
@@ -536,14 +538,16 @@ class UnlistedStocksController extends Controller
 
     public function getAboutModal(string $fincode)
     {
-        $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)
-                    ->select('UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME')
-                    ->firstOrFail();
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
         $about = UnlistedAbout::where('UL_ABOUT_FINCODE', $fincode)
                     ->orderByDesc('UL_ABOUT_ID')
                     ->first();
 
-        return view('admin.unlisted.about-modal', compact('stock', 'about'));
+        return response()->json([
+            'UL_ABOUT_CONTENT' => $about?->UL_ABOUT_CONTENT,
+            'UL_ABOUT_ACTIVE'  => $about?->UL_ABOUT_ACTIVE ?? '1',
+        ]);
     }
 
     public function saveAbout(Request $request, string $fincode)
@@ -576,11 +580,16 @@ class UnlistedStocksController extends Controller
     {
         $request->validate(['file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:5120']);
 
-        $folder = public_path('images/unlisted-about-images');
+        $file = $request->file('file');
+        $ext  = SafeUpload::imageExtension($file);
+        if ($ext === null) {
+            return response()->json(['message' => 'Uploaded file is not a recognised image type.'], 422);
+        }
+
+        $folder = SafeUpload::webRoot() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'unlisted-about-images';
         if (!is_dir($folder)) mkdir($folder, 0755, true);
 
-        $file     = $request->file('file');
-        $filename = 'about_' . $fincode . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $filename = 'about_' . $fincode . '_' . time() . '_' . uniqid() . '.' . $ext;
         $file->move($folder, $filename);
 
         return response()->json(['location' => asset('images/unlisted-about-images/' . $filename)]);
@@ -600,26 +609,13 @@ class UnlistedStocksController extends Controller
         return view('admin.unlisted.faq-list-modal', compact('stock', 'faqs'));
     }
 
-    public function getFaqModal(string $fincode)
-    {
-        $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)
-                    ->select('UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME')
-                    ->firstOrFail();
-
-        return view('admin.unlisted.faq-modal', compact('stock'));
-    }
-
     public function getFaqEditModal(string $fincode, string $faqId)
     {
-        $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)
-                    ->select('UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME')
-                    ->firstOrFail();
-
         $faq = UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)
                     ->where('UL_FAQ_ID', $faqId)
                     ->firstOrFail();
 
-        return view('admin.unlisted.faq-modal', compact('stock', 'faq'));
+        return response()->json($faq->toArray());
     }
 
     public function storeFaq(Request $request, string $fincode)
@@ -638,6 +634,7 @@ class UnlistedStocksController extends Controller
         UnlistedFaq::create([
             'UL_FAQ_FINCODE'     => $fincode,
             'UL_FAQ_TARGET'      => $request->input('UL_FAQ_TARGET'),
+            'UL_FAQ_TAB'         => $request->input('UL_FAQ_TAB') ?: null,
             'UL_FAQ_QUESTION'    => $request->input('UL_FAQ_QUESTION'),
             'UL_FAQ_ANSWER'      => $request->input('UL_FAQ_ANSWER'),
             'UL_FAQ_SORT_ORDER'  => (int) $request->input('UL_FAQ_SORT_ORDER', 0),
@@ -666,6 +663,7 @@ class UnlistedStocksController extends Controller
 
         $faq->update([
             'UL_FAQ_TARGET'      => $request->input('UL_FAQ_TARGET'),
+            'UL_FAQ_TAB'         => $request->input('UL_FAQ_TAB') ?: null,
             'UL_FAQ_QUESTION'    => $request->input('UL_FAQ_QUESTION'),
             'UL_FAQ_ANSWER'      => $request->input('UL_FAQ_ANSWER'),
             'UL_FAQ_SORT_ORDER'  => (int) $request->input('UL_FAQ_SORT_ORDER', 0),
@@ -685,5 +683,184 @@ class UnlistedStocksController extends Controller
         abort_if(!$deleted, 404, 'FAQ not found.');
 
         return response()->json(['success' => true, 'message' => 'FAQ deleted.']);
+    }
+
+    public function getWittyScoreModal(string $fincode)
+    {
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $score = UnlistedWittyScore::where('UL_WS_FINCODE', $fincode)
+                    ->orderByDesc('UL_WS_ID')
+                    ->first();
+
+        return response()->json([
+            'UL_WS_FINANCIAL_HEALTH' => $score?->UL_WS_FINANCIAL_HEALTH,
+            'UL_WS_VALUATION'        => $score?->UL_WS_VALUATION,
+            'UL_WS_GROWTH_POTENTIAL' => $score?->UL_WS_GROWTH_POTENTIAL,
+            'UL_WS_IPO_PROBABILITY'  => $score?->UL_WS_IPO_PROBABILITY,
+            'UL_WS_LIQUIDITY_SAFETY' => $score?->UL_WS_LIQUIDITY_SAFETY,
+            'UL_WS_ACTIVE'           => $score?->UL_WS_ACTIVE ?? '1',
+        ]);
+    }
+
+    public function saveWittyScore(Request $request, string $fincode)
+    {
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $request->validate([
+            'UL_WS_FINANCIAL_HEALTH' => 'nullable|numeric|min:0|max:10',
+            'UL_WS_VALUATION'        => 'nullable|numeric|min:0|max:10',
+            'UL_WS_GROWTH_POTENTIAL' => 'nullable|numeric|min:0|max:10',
+            'UL_WS_IPO_PROBABILITY'  => 'nullable|numeric|min:0|max:10',
+            'UL_WS_LIQUIDITY_SAFETY' => 'nullable|numeric|min:0|max:10',
+        ], [
+            '*.numeric' => 'Each pillar must be a number.',
+            '*.max'     => 'Each pillar is scored out of 10.',
+        ]);
+
+        $score = UnlistedWittyScore::where('UL_WS_FINCODE', $fincode)
+                    ->orderByDesc('UL_WS_ID')
+                    ->first();
+
+        $data = [
+            'UL_WS_FINANCIAL_HEALTH' => $request->input('UL_WS_FINANCIAL_HEALTH'),
+            'UL_WS_VALUATION'        => $request->input('UL_WS_VALUATION'),
+            'UL_WS_GROWTH_POTENTIAL' => $request->input('UL_WS_GROWTH_POTENTIAL'),
+            'UL_WS_IPO_PROBABILITY'  => $request->input('UL_WS_IPO_PROBABILITY'),
+            'UL_WS_LIQUIDITY_SAFETY' => $request->input('UL_WS_LIQUIDITY_SAFETY'),
+            'UL_WS_ACTIVE'           => $request->input('UL_WS_ACTIVE', '1'),
+            'UL_WS_UPDATE_TIME'      => now(),
+        ];
+
+        if ($score) {
+            UnlistedWittyScore::where('UL_WS_ID', $score->UL_WS_ID)->update($data);
+        } else {
+            UnlistedWittyScore::insert(array_merge($data, [
+                'UL_WS_FINCODE'     => $fincode,
+                'UL_WS_INSERT_TIME' => now(),
+            ]));
+        }
+
+        return response()->json(['success' => true, 'message' => 'WittyScore saved successfully.']);
+    }
+
+    public function getAboutExtraModal(string $fincode)
+    {
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $extra = UnlistedAboutExtra::where('UL_ABX_FINCODE', $fincode)
+                    ->orderByDesc('UL_ABX_ID')
+                    ->first();
+
+        $fields = [
+            'UL_ABX_OVERVIEW', 'UL_ABX_OPERATIONS', 'UL_ABX_GEOGRAPHY', 'UL_ABX_INDUSTRY_POSITION',
+            'UL_ABX_SHAREHOLDING', 'UL_ABX_INVESTOR_INTEREST', 'UL_ABX_MARKET_LANDSCAPE',
+            'UL_ABX_COMPETITIVE_STRENGTH', 'UL_ABX_VERTICALS', 'UL_ABX_REVENUE_SEGMENTS',
+            'UL_ABX_HISTORY', 'UL_ABX_PRODUCTS_SERVICES', 'UL_ABX_SOURCES',
+            'UL_ABX_SWOT_STRENGTHS', 'UL_ABX_SWOT_WEAKNESSES', 'UL_ABX_SWOT_OPPORTUNITIES', 'UL_ABX_SWOT_THREATS',
+        ];
+
+        $data = [];
+        foreach ($fields as $field) {
+            $data[$field] = $extra?->{$field};
+        }
+        $data['UL_ABX_ACTIVE'] = $extra?->UL_ABX_ACTIVE ?? '1';
+
+        return response()->json($data);
+    }
+
+    public function saveAboutExtra(Request $request, string $fincode)
+    {
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $fields = [
+            'UL_ABX_OVERVIEW', 'UL_ABX_OPERATIONS', 'UL_ABX_GEOGRAPHY', 'UL_ABX_INDUSTRY_POSITION',
+            'UL_ABX_SHAREHOLDING', 'UL_ABX_INVESTOR_INTEREST', 'UL_ABX_MARKET_LANDSCAPE',
+            'UL_ABX_COMPETITIVE_STRENGTH', 'UL_ABX_VERTICALS', 'UL_ABX_REVENUE_SEGMENTS',
+            'UL_ABX_HISTORY', 'UL_ABX_PRODUCTS_SERVICES', 'UL_ABX_SOURCES',
+            'UL_ABX_SWOT_STRENGTHS', 'UL_ABX_SWOT_WEAKNESSES', 'UL_ABX_SWOT_OPPORTUNITIES', 'UL_ABX_SWOT_THREATS',
+        ];
+
+        $extra = UnlistedAboutExtra::where('UL_ABX_FINCODE', $fincode)
+                    ->orderByDesc('UL_ABX_ID')
+                    ->first();
+
+        $data = [];
+        foreach ($fields as $field) {
+            $data[$field] = $request->input($field);
+        }
+        $data['UL_ABX_ACTIVE']      = $request->input('UL_ABX_ACTIVE', '1');
+        $data['UL_ABX_UPDATE_TIME'] = now();
+
+        if ($extra) {
+            UnlistedAboutExtra::where('UL_ABX_ID', $extra->UL_ABX_ID)->update($data);
+        } else {
+            UnlistedAboutExtra::insert(array_merge($data, [
+                'UL_ABX_FINCODE'     => $fincode,
+                'UL_ABX_INSERT_TIME' => now(),
+            ]));
+        }
+
+        return response()->json(['success' => true, 'message' => 'About page sections saved successfully.']);
+    }
+
+    public function getCompanyInsightsModal(string $fincode)
+    {
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $insight = UnlistedCompanyInsight::where('UL_CI_FINCODE', $fincode)
+                    ->orderByDesc('UL_CI_ID')
+                    ->first();
+
+        return response()->json([
+            'UL_CI_AI_SUMMARY'       => $insight?->UL_CI_AI_SUMMARY,
+            'UL_CI_TLDR'             => $insight?->UL_CI_TLDR,
+            'UL_CI_FOUNDERS_INTRO'   => $insight?->UL_CI_FOUNDERS_INTRO,
+            'UL_CI_FOUNDERS_QUOTE'   => $insight?->UL_CI_FOUNDERS_QUOTE,
+            'UL_CI_FOUNDERS_VERDICT' => $insight?->UL_CI_FOUNDERS_VERDICT,
+            'UL_CI_IPO_TIMELINE'     => $insight?->UL_CI_IPO_TIMELINE,
+            'UL_CI_IPO_FACTS'        => $insight?->UL_CI_IPO_FACTS,
+            'UL_CI_BULL_CASE'        => $insight?->UL_CI_BULL_CASE,
+            'UL_CI_BEAR_CASE'        => $insight?->UL_CI_BEAR_CASE,
+            'UL_CI_SUITS_IF'         => $insight?->UL_CI_SUITS_IF,
+            'UL_CI_NOT_SUITS_IF'     => $insight?->UL_CI_NOT_SUITS_IF,
+            'UL_CI_RISKS'            => $insight?->UL_CI_RISKS,
+            'UL_CI_VERDICT_LONG'     => $insight?->UL_CI_VERDICT_LONG,
+            'UL_CI_ACTIVE'           => $insight?->UL_CI_ACTIVE ?? '1',
+        ]);
+    }
+
+    public function saveCompanyInsights(Request $request, string $fincode)
+    {
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $fields = [
+            'UL_CI_AI_SUMMARY', 'UL_CI_TLDR', 'UL_CI_FOUNDERS_INTRO', 'UL_CI_FOUNDERS_QUOTE',
+            'UL_CI_FOUNDERS_VERDICT', 'UL_CI_IPO_TIMELINE', 'UL_CI_IPO_FACTS',
+            'UL_CI_BULL_CASE', 'UL_CI_BEAR_CASE', 'UL_CI_SUITS_IF', 'UL_CI_NOT_SUITS_IF',
+            'UL_CI_RISKS', 'UL_CI_VERDICT_LONG',
+        ];
+
+        $insight = UnlistedCompanyInsight::where('UL_CI_FINCODE', $fincode)
+                    ->orderByDesc('UL_CI_ID')
+                    ->first();
+
+        $data = [];
+        foreach ($fields as $field) {
+            $data[$field] = $request->input($field);
+        }
+        $data['UL_CI_ACTIVE']      = $request->input('UL_CI_ACTIVE', '1');
+        $data['UL_CI_UPDATE_TIME'] = now();
+
+        if ($insight) {
+            UnlistedCompanyInsight::where('UL_CI_ID', $insight->UL_CI_ID)->update($data);
+        } else {
+            UnlistedCompanyInsight::insert(array_merge($data, [
+                'UL_CI_FINCODE'     => $fincode,
+                'UL_CI_INSERT_TIME' => now(),
+            ]));
+        }
+
+        return response()->json(['success' => true, 'message' => 'Company insights saved successfully.']);
     }
 }

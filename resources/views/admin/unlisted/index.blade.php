@@ -108,7 +108,7 @@
                     <tr>
                         <td>{{ $stock->UL_STOCKS_FINCODE }}</td>
                         <td>
-                            <a href="{{ route('stocks.company', $stock->UL_STOCKS_SLUG) }}" target="_blank" rel="noopener"
+                            <a href="{{ route('sw.unlisted-shares.company', $stock->UL_STOCKS_SLUG) }}" target="_blank" rel="noopener"
                                style="color:inherit;text-decoration:none;font-weight:inherit;">
                                 {{ $stock->UL_STOCKS_COMPNAME }}
                                 <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;color:#94a3b8;margin-left:4px;"></i>
@@ -126,11 +126,13 @@
                             <span class="ptf-label">Overview</span>
                             <i class="fa-solid fa-pen ptf-icon-edit overview-btn"
                                 data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                                data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
                                 style="cursor:pointer" title="Edit overview"></i>
                             <span class="ptf-sep">|</span>
                             <span class="ptf-label">Price</span>
                             <i class="fa-solid fa-plus ptf-icon-add price-add-btn"
                                 data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                                data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
                                 style="cursor:pointer" title="Add price"></i>
                             <i class="fa-regular fa-eye ptf-icon-view price-view-btn"
                                 data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
@@ -139,6 +141,7 @@
                             <span class="ptf-label">Financials</span>
                             <i class="fa-solid fa-plus ptf-icon-add fin-add-btn"
                                data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                               data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
                                style="cursor:pointer" title="Add financials"></i>
                             <i class="fa-regular fa-eye ptf-icon-view fin-view-btn"
                                data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
@@ -147,12 +150,32 @@
                             <span class="ptf-label">Thesis</span>
                             <i class="fa-solid fa-pen ptf-icon-edit thesis-btn"
                                data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                               data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
                                style="cursor:pointer" title="Edit thesis"></i>
                             <span class="ptf-sep">|</span>
                             <span class="ptf-label">About</span>
                             <i class="fa-solid fa-pen ptf-icon-edit about-btn"
                                data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                               data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
                                style="cursor:pointer" title="Edit about"></i>
+                            <span class="ptf-sep">|</span>
+                            <span class="ptf-label">WittyScore</span>
+                            <i class="fa-solid fa-pen ptf-icon-edit witty-score-btn"
+                               data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                               data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
+                               style="cursor:pointer" title="Edit WittyScore"></i>
+                            <span class="ptf-sep">|</span>
+                            <span class="ptf-label">About Sections</span>
+                            <i class="fa-solid fa-pen ptf-icon-edit about-extra-btn"
+                               data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                               data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
+                               style="cursor:pointer" title="Edit About page sections"></i>
+                            <span class="ptf-sep">|</span>
+                            <span class="ptf-label">Insights</span>
+                            <i class="fa-solid fa-pen ptf-icon-edit insights-btn"
+                               data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                               data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
+                               style="cursor:pointer" title="Edit AI Summary / Founder's Take / IPO Roadmap"></i>
                             <span class="ptf-sep">|</span>
                             <span class="ptf-label">FAQ</span>
                             <i class="fa-regular fa-eye ptf-icon-view faq-view-btn"
@@ -193,38 +216,31 @@
 
 </div>
 
+{{-- Must load before any modal's tinymce.init() call — those now run at
+     page-load (via @push('scripts')) rather than on first click, so the
+     library itself has to be present in the DOM earlier than the stack. --}}
+<script src="{{ asset('js/tinymce_6.1.2/tinymce.min.js') }}"></script>
+
 @include('admin.unlisted.stocks-modal')
 @include('admin.unlisted.industry-modal')
+@include('admin.unlisted.overview-modal', ['industries' => $industries])
+@include('admin.unlisted.price-modal')
+@include('admin.unlisted.financials-modal')
+@include('admin.unlisted.thesis-modal')
+@include('admin.unlisted.about-modal')
+@include('admin.unlisted.witty-score-modal')
+@include('admin.unlisted.about-extra-modal')
+@include('admin.unlisted.insights-modal')
+@include('admin.unlisted.faq-modal')
 
-{{-- Overview modal container —  injected via AJAX --}}
-<div id="overviewModalWrap"></div>
-
-{{-- Price modal container — injected via AJAX --}}
-<div id="priceModalWrap"></div>
-
-{{-- Price list modal container --}}
+{{-- Price list modal container — still server-rendered on demand (paginated table) --}}
 <div id="priceListModalWrap"></div>
 
-{{-- Financials modal container — injected via AJAX --}}
-<div id="finModalWrap"></div>
-
-{{-- Financials list modal container --}}
+{{-- Financials list modal container — still server-rendered on demand (paginated table) --}}
 <div id="finListModalWrap"></div>
 
-{{-- Financials edit modal container (opens on top of list) --}}
-<div id="finEditModalWrap"></div>
-
-{{-- Thesis modal container — injected via AJAX --}}
-<div id="thesisModalWrap"></div>
-
-{{-- About modal container — injected via AJAX --}}
-<div id="aboutModalWrap"></div>
-
-{{-- FAQ list modal container --}}
+{{-- FAQ list modal container — still server-rendered on demand (table) --}}
 <div id="faqListModalWrap"></div>
-
-{{-- FAQ add/edit modal container (opens on top of list) --}}
-<div id="faqEditModalWrap"></div>
 @endsection
 
 @push('scripts')
@@ -252,26 +268,13 @@
 
     // ── Overview modal ─────────────────────────────────────
     $(document).on('click', '.overview-btn', function () {
-        var fincode = $(this).data('fincode');
-        $('#overviewModalWrap').html(loadingSpinner());
-        $.get(window.STOCKS_BASE + '/' + fincode + '/overview')
-            .done(function (html) { $('#overviewModalWrap').html(html); })
-            .fail(function ()     { $('#overviewModalWrap').empty(); alert('Failed to load.'); });
+        window.openOverviewModal($(this).data('fincode'), $(this).data('name'));
     });
-    function closeOverviewModal() {
-        if (typeof tinymce !== 'undefined') tinymce.remove('#OV_ABOUT_EDITOR');
-        $('#overviewModalWrap').empty();
-    }
 
     // ── Price add modal ────────────────────────────────────
     $(document).on('click', '.price-add-btn', function () {
-        var fincode = $(this).data('fincode');
-        $('#priceModalWrap').html(loadingSpinner());
-        $.get(window.STOCKS_BASE + '/' + fincode + '/price')
-            .done(function (html) { $('#priceModalWrap').html(html); })
-            .fail(function ()     { $('#priceModalWrap').empty(); alert('Failed to load.'); });
+        window.openPriceModal($(this).data('fincode'), $(this).data('name'));
     });
-    function closePriceModal() { $('#priceModalWrap').empty(); }
 
     // ── Price list modal ───────────────────────────────────
     window.plFincode = null;
@@ -307,13 +310,8 @@
 
     // ── Financials add modal ───────────────────────────────
     $(document).on('click', '.fin-add-btn', function () {
-        var fincode = $(this).data('fincode');
-        $('#finModalWrap').html(loadingSpinner());
-        $.get(window.STOCKS_BASE + '/' + fincode + '/financials')
-            .done(function (html) { $('#finModalWrap').html(html); })
-            .fail(function ()     { $('#finModalWrap').empty(); alert('Failed to load.'); });
+        window.openFinancialsModal($(this).data('fincode'), $(this).data('name'));
     });
-    function closeFinancialsModal() { $('#finModalWrap').empty(); }
 
     // ── Financials list modal ──────────────────────────────
     window.flFincode = null;
@@ -340,33 +338,30 @@
         window.flFincode = null;
     }
 
-    function closeFinancialsEditModal() { $('#finEditModalWrap').empty(); loadFinancialsListPage(1); }
-
     // ── Thesis modal ───────────────────────────────────────
     $(document).on('click', '.thesis-btn', function () {
-        var fincode = $(this).data('fincode');
-        $('#thesisModalWrap').html(loadingSpinner());
-        $.get(window.STOCKS_BASE + '/' + fincode + '/thesis')
-            .done(function (html) { $('#thesisModalWrap').html(html); })
-            .fail(function ()     { $('#thesisModalWrap').empty(); alert('Failed to load.'); });
+        window.openThesisModal($(this).data('fincode'), $(this).data('name'));
     });
-    function closeThesisModal() {
-        if (typeof tinymce !== 'undefined') tinymce.remove('#UL_THESIS_CONTENT1');
-        $('#thesisModalWrap').empty();
-    }
 
     // ── About modal ─────────────────────────────────────────
     $(document).on('click', '.about-btn', function () {
-        var fincode = $(this).data('fincode');
-        $('#aboutModalWrap').html(loadingSpinner());
-        $.get(window.STOCKS_BASE + '/' + fincode + '/about')
-            .done(function (html) { $('#aboutModalWrap').html(html); })
-            .fail(function ()     { $('#aboutModalWrap').empty(); alert('Failed to load.'); });
+        window.openAboutModal($(this).data('fincode'), $(this).data('name'));
     });
-    function closeAboutModal() {
-        if (typeof tinymce !== 'undefined') tinymce.remove('#UL_ABOUT_CONTENT1');
-        $('#aboutModalWrap').empty();
-    }
+
+    // ── WittyScore modal ────────────────────────────────────
+    $(document).on('click', '.witty-score-btn', function () {
+        window.openWittyScoreModal($(this).data('fincode'), $(this).data('name'));
+    });
+
+    // ── About Sections (structured About page) modal ───────
+    $(document).on('click', '.about-extra-btn', function () {
+        window.openAboutExtraModal($(this).data('fincode'), $(this).data('name'));
+    });
+
+    // ── Company Insights modal ─────────────────────────────
+    $(document).on('click', '.insights-btn', function () {
+        window.openInsightsModal($(this).data('fincode'), $(this).data('name'));
+    });
 
     // ── FAQ list modal ──────────────────────────────────────
     window.fqFincode = null;
@@ -389,17 +384,11 @@
         window.fqFincode = null;
     }
 
-    function closeFaqEditModal() {
-        $('#faqEditModalWrap').empty();
-        loadFaqList();
-    }
-
     // ── Shared loading spinner ─────────────────────────────
     function loadingSpinner() {
         return '<div style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:2100;display:flex;align-items:center;justify-content:center">' +
                '<div style="background:#fff;border-radius:12px;padding:40px;color:#888;font-size:14px">Loading…</div></div>';
     }
 </script>
-<script src="{{ asset('js/tinymce_6.1.2/tinymce.min.js') }}"></script>
 @endpush
 

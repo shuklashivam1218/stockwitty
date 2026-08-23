@@ -1,16 +1,16 @@
-﻿@php
+@php
     $months = ['January','February','March','April','May','June',
                'July','August','September','October','November','December'];
     $currentYear = date('Y');
     $yesNo = ['Yes' => 'Yes', 'No' => 'No'];
     $ratings = ['1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5'];
-
-    $sel = fn($val, $option) => $val == $option ? 'selected' : '';
 @endphp
 
+@once
+@push('styles')
 <style>
 .ov-overlay {
-    display: flex;
+    display: none;
     position: fixed;
     inset: 0;
     background: rgba(15,23,42,0.55);
@@ -20,6 +20,7 @@
     padding: 16px;
     backdrop-filter: blur(2px);
 }
+.ov-overlay.open { display: flex; }
 .ov-modal {
     background: #fff;
     border-radius: 12px;
@@ -52,6 +53,7 @@
     padding: 20px 22px;
     overflow-y: auto;
     flex: 1;
+    min-height: 0;
 }
 .ov-footer {
     display: flex;
@@ -139,18 +141,20 @@
 .tox-tinymce-aux,
 .tox-dialog-wrap { z-index: 2300 !important; }
 </style>
+@endpush
+@endonce
 
 <div class="ov-overlay" id="overviewOverlay" onclick="if(event.target===this)closeOverviewModal()">
 <div class="ov-modal">
 
     <div class="ov-header">
-        <h3>Edit — {{ $stock->UL_STOCKS_COMPNAME }}</h3>
+        <h3 id="ovCompanyName">Edit Overview</h3>
         <button class="ov-close" onclick="closeOverviewModal()" type="button">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
-    <form id="overviewForm" data-fincode="{{ $stock->UL_STOCKS_FINCODE }}">
+    <form id="overviewForm">
         @csrf
         <div class="ov-body">
 
@@ -169,23 +173,15 @@
             <div class="ov-row ov-cols-3">
                 <div class="ov-field">
                     <label>Company Name</label>
-                    <input type="text" name="UL_STOCKS_COMPNAME"
-                           value="{{ $stock->UL_STOCKS_COMPNAME }}">
+                    <input type="text" name="UL_STOCKS_COMPNAME">
                 </div>
                 <div class="ov-field">
                     <label>Upload Logo</label>
                     <div class="ov-logo-wrap">
                         <input type="file" name="logo" accept="image/*">
-                        @if($stock->UL_STOCKS_LOGO_LINK)
-                            <a href="{{ asset($stock->UL_STOCKS_LOGO_LINK) }}" target="_blank"
-                               class="ov-logo-dl" title="View current logo">
-                                <i class="fa-solid fa-download"></i>
-                            </a>
-                        @else
-                            <span class="ov-logo-dl" style="color:#ccc">
-                                <i class="fa-solid fa-download"></i>
-                            </span>
-                        @endif
+                        <a href="#" target="_blank" rel="noopener" id="ovLogoLink" class="ov-logo-dl" style="display:none" title="View current logo">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="ov-field">
@@ -193,10 +189,7 @@
                     <select name="UL_STOCKS_IND_CODE">
                         <option value="">— Select —</option>
                         @foreach($industries as $ind)
-                            <option value="{{ $ind->IM_IND_CODE }}"
-                                @selected($stock->UL_STOCKS_IND_CODE == $ind->IM_IND_CODE)>
-                                {{ $ind->IM_INDUSTRY }}
-                            </option>
+                            <option value="{{ $ind->IM_IND_CODE }}">{{ $ind->IM_INDUSTRY }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -206,23 +199,45 @@
             <div class="ov-row ov-cols-4">
                 <div class="ov-field">
                     <label>Slug</label>
-                    <input type="text" name="UL_STOCKS_SLUG" id="OV_SLUG_INPUT" value="{{ $stock->UL_STOCKS_SLUG }}">
+                    <input type="text" name="UL_STOCKS_SLUG" id="OV_SLUG_INPUT">
                 </div>
                 <div class="ov-field">
                     <label>ISIN</label>
-                    <input type="text" name="UL_STOCKS_ISIN" value="{{ $stock->UL_STOCKS_ISIN }}">
+                    <input type="text" name="UL_STOCKS_ISIN">
                 </div>
                 <div class="ov-field">
                     <label>Short Name</label>
-                    <input type="text" name="UL_STOCKS_S_NAME" value="{{ $stock->UL_STOCKS_S_NAME }}">
+                    <input type="text" name="UL_STOCKS_S_NAME">
                 </div>
                 <div class="ov-field">
                     <label>Category</label>
                     <select name="UL_STOCKS_CATEGORY">
                         <option value="">— Select —</option>
-                        <option value="startup_funding" {{ $sel($stock->UL_STOCKS_CATEGORY, 'startup_funding') }}>Startup Funding</option>
-                        <option value="pre_ipo"         {{ $sel($stock->UL_STOCKS_CATEGORY, 'pre_ipo') }}>Pre IPO</option>
-                        <option value="delisted"        {{ $sel($stock->UL_STOCKS_CATEGORY, 'delisted') }}>Delisted</option>
+                        <option value="startup_funding">Startup Funding</option>
+                        <option value="pre_ipo">Pre IPO</option>
+                        <option value="delisted">Delisted</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Row: Tag | DRHP Filed --}}
+            <div class="ov-row ov-cols-2">
+                <div class="ov-field">
+                    <label>Tag</label>
+                    <select name="UL_STOCKS_TAG">
+                        <option value="">— None —</option>
+                        @foreach (['Pre-IPO', 'Trending', 'Unicorn', 'Hot', 'New'] as $tag)
+                            <option value="{{ $tag }}">{{ $tag }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="ov-field">
+                    <label>DRHP Filed</label>
+                    <select name="UL_STOCKS_DRHP_FLAG">
+                        <option value="">Select</option>
+                        @foreach($yesNo as $v => $l)
+                            <option value="{{ $v }}">{{ $l }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -234,7 +249,7 @@
                     <select name="UL_STOCKS_INC_MONTH">
                         <option value="">— Select —</option>
                         @foreach($months as $month)
-                            <option value="{{ $month }}" {{ $sel($stock->UL_STOCKS_INC_MONTH, $month) }}>{{ $month }}</option>
+                            <option value="{{ $month }}">{{ $month }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -243,20 +258,19 @@
                     <select name="UL_STOCKS_INC_YEAR">
                         <option value="">— Select —</option>
                         @for($y = $currentYear; $y >= 1900; $y--)
-                            <option value="{{ $y }}" {{ $sel($stock->UL_STOCKS_INC_YEAR, $y) }}>{{ $y }}</option>
+                            <option value="{{ $y }}">{{ $y }}</option>
                         @endfor
                     </select>
                 </div>
                 <div class="ov-field">
                     <label>Website</label>
-                    <input type="text" name="UL_STOCKS_WEBSITE" value="{{ $stock->UL_STOCKS_WEBSITE }}"
-                           placeholder="www.example.com">
+                    <input type="text" name="UL_STOCKS_WEBSITE" placeholder="www.example.com">
                 </div>
                 <div class="ov-field">
                     <label>Status</label>
                     <select name="UL_STOCKS_STATUS">
-                        <option value="1" {{ $sel($stock->UL_STOCKS_STATUS, '1') }}>Active</option>
-                        <option value="0" {{ $sel($stock->UL_STOCKS_STATUS, '0') }}>Inactive</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
                     </select>
                 </div>
             </div>
@@ -268,7 +282,7 @@
                     <select name="UL_STOCKS_COMP_RATING">
                         <option value="">Select</option>
                         @foreach($ratings as $r)
-                            <option value="{{ $r }}" {{ $sel($stock->UL_STOCKS_COMP_RATING, $r) }}>{{ $r }}</option>
+                            <option value="{{ $r }}">{{ $r }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -277,7 +291,7 @@
                     <select name="UL_STOCKS_VALUATION_RATING">
                         <option value="">Select</option>
                         @foreach($ratings as $r)
-                            <option value="{{ $r }}" {{ $sel($stock->UL_STOCKS_VALUATION_RATING, $r) }}>{{ $r }}</option>
+                            <option value="{{ $r }}">{{ $r }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -285,13 +299,13 @@
                     <label>Buy-Sell Flag</label>
                     <select name="UL_STOCKS_BUY_SELL_FLAG">
                         @foreach($yesNo as $v => $l)
-                            <option value="{{ $v }}" {{ $sel($stock->UL_STOCKS_BUY_SELL_FLAG ?? 'Yes', $v) }}>{{ $l }}</option>
+                            <option value="{{ $v }}">{{ $l }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="ov-field">
                     <label>Lot Size</label>
-                    <input type="text" name="UL_STOCKS_LOT_SIZE" value="{{ $stock->UL_STOCKS_LOT_SIZE }}">
+                    <input type="text" name="UL_STOCKS_LOT_SIZE">
                 </div>
             </div>
 
@@ -302,7 +316,7 @@
                     <select name="UL_STOCKS_ROFR_FLAG">
                         <option value="">Select</option>
                         @foreach($yesNo as $v => $l)
-                            <option value="{{ $v }}" {{ $sel($stock->UL_STOCKS_ROFR_FLAG, $v) }}>{{ $l }}</option>
+                            <option value="{{ $v }}">{{ $l }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -310,16 +324,16 @@
                     <label>Demat Account Required</label>
                     <select name="UL_STOCKS_DEMAT_ACCOUNT_REQ">
                         <option value="">Select</option>
-                        <option value="NSDL"           {{ $sel($stock->UL_STOCKS_DEMAT_ACCOUNT_REQ, 'NSDL') }}>NSDL</option>
-                        <option value="CDSL"           {{ $sel($stock->UL_STOCKS_DEMAT_ACCOUNT_REQ, 'CDSL') }}>CDSL</option>
-                        <option value="Both" {{ $sel($stock->UL_STOCKS_DEMAT_ACCOUNT_REQ, 'Both') }}>Both (NSDL/CDSL)</option>
+                        <option value="NSDL">NSDL</option>
+                        <option value="CDSL">CDSL</option>
+                        <option value="Both">Both (NSDL/CDSL)</option>
                     </select>
                 </div>
                 <div class="ov-field">
                     <label>Qtr Data Publish</label>
                     <select name="UL_STOCKS_Qtr_Data_Publish">
                         @foreach($yesNo as $v => $l)
-                            <option value="{{ $v }}" {{ $sel($stock->UL_STOCKS_Qtr_Data_Publish ?? 'Yes', $v) }}>{{ $l }}</option>
+                            <option value="{{ $v }}">{{ $l }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -328,7 +342,7 @@
             {{-- About --}}
             <div class="ov-field">
                 <label>About</label>
-                <textarea name="UL_STOCKS_ABOUT" id="OV_ABOUT_EDITOR">{{ $stock->UL_STOCKS_ABOUT }}</textarea>
+                <textarea name="UL_STOCKS_ABOUT" id="OV_ABOUT_EDITOR"></textarea>
             </div>
 
         </div>
@@ -344,10 +358,10 @@
 </div>
 </div>
 
+@push('scripts')
 <script>
 (function () {
-    var STOCKS_BASE = window.STOCKS_BASE;
-    var CSRF        = $('meta[name="csrf-token"]').attr('content');
+    var fincode = null;
 
     // Init TinyMCE on the About field — same config as Thesis editor
     var isSmallScreen = window.matchMedia('(max-width: 1023.5px)').matches;
@@ -387,17 +401,53 @@
         this.value = this.value.replace(/^-+|-+$/g, '');
     });
 
+    window.openOverviewModal = function (fc, companyName) {
+        fincode = fc;
+        $('#ovCompanyName').text('Edit — ' + companyName);
+        $('#ovSaveMsg').text('');
+        $('#overviewForm')[0].reset();
+
+        $.get(window.STOCKS_BASE + '/' + fincode + '/overview')
+            .done(function (data) {
+                $('#overviewForm input[type=text], #overviewForm select').each(function () {
+                    var name = $(this).attr('name');
+                    if (name && data[name] !== undefined && data[name] !== null) $(this).val(data[name]);
+                });
+
+                var editor = tinymce.get('OV_ABOUT_EDITOR');
+                if (editor) editor.setContent(data.UL_STOCKS_ABOUT || '');
+
+                if (data.UL_STOCKS_LOGO_LINK) {
+                    $('#ovLogoLink').attr('href', data.logoUrl).show();
+                } else {
+                    $('#ovLogoLink').hide();
+                }
+
+                $('#overviewOverlay').addClass('open');
+            })
+            .fail(function () {
+                alert('Failed to load overview.');
+            });
+    };
+
+    function closeOverviewModal() {
+        var editor = tinymce.get('OV_ABOUT_EDITOR');
+        if (editor) editor.setContent('');
+        $('#overviewOverlay').removeClass('open');
+    }
+    window.closeOverviewModal = closeOverviewModal;
+
     $('#overviewForm').on('submit', function (e) {
         e.preventDefault();
+        var CSRF = $('meta[name="csrf-token"]').attr('content');
         // Sync TinyMCE content back to the textarea before FormData collects it
         tinymce.triggerSave();
-        var fincode = $(this).data('fincode');
-        var fd      = new FormData(this);
-        var $btn    = $(this).find('.ov-save-btn').prop('disabled', true)
-                             .html('<i class="fa-solid fa-spinner fa-spin"></i> Saving…');
+        var fd   = new FormData(this);
+        var $btn = $(this).find('.ov-save-btn').prop('disabled', true)
+                          .html('<i class="fa-solid fa-spinner fa-spin"></i> Saving…');
 
         $.ajax({
-            url:         STOCKS_BASE + '/' + fincode + '/overview',
+            url:         window.STOCKS_BASE + '/' + fincode + '/overview',
             method:      'POST',
             data:        fd,
             processData: false,
@@ -427,5 +477,4 @@
     });
 }());
 </script>
-
-
+@endpush

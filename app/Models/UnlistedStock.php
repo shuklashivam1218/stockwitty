@@ -21,6 +21,8 @@ class UnlistedStock extends Model
         'UL_STOCKS_ISIN',
         'UL_STOCKS_S_NAME',
         'UL_STOCKS_CATEGORY',
+        'UL_STOCKS_TAG',
+        'UL_STOCKS_DRHP_FLAG',
         'UL_STOCKS_INC_MONTH',
         'UL_STOCKS_INC_YEAR',
         'UL_STOCKS_WEBSITE',

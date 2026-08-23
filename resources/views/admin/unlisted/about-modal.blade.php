@@ -1,6 +1,8 @@
+@once
+@push('styles')
 <style>
 .ab-overlay {
-    display: flex;
+    display: none;
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, .55);
@@ -10,6 +12,7 @@
     padding: 16px;
     backdrop-filter: blur(2px);
 }
+.ab-overlay.open { display: flex; }
 .ab-modal {
     background: #fff;
     border-radius: 12px;
@@ -107,27 +110,29 @@
 .tox-tinymce-aux,
 .tox-dialog-wrap { z-index: 2300 !important; }
 </style>
+@endpush
+@endonce
 
 <div class="ab-overlay" onclick="if(event.target===this)closeAboutModal()">
 <div class="ab-modal">
 
     <div class="ab-header">
-        <h3>About &mdash; {{ $stock->UL_STOCKS_COMPNAME }}</h3>
+        <h3 id="abCompanyName">About</h3>
         <button class="ab-close" onclick="closeAboutModal()" type="button">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
     <div class="ab-body">
-        <textarea id="UL_ABOUT_CONTENT1">{{ $about?->UL_ABOUT_CONTENT ?? '' }}</textarea>
+        <textarea id="UL_ABOUT_CONTENT1"></textarea>
     </div>
 
     <div class="ab-footer">
         <div class="ab-active-row">
             <span>Active:</span>
             <select id="aboutActive">
-                <option value="1" @selected(($about?->UL_ABOUT_ACTIVE ?? '1') == '1')>Active</option>
-                <option value="0" @selected(($about?->UL_ABOUT_ACTIVE ?? '1') == '0')>Inactive</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
             </select>
         </div>
         <div class="ab-footer-right">
@@ -139,22 +144,22 @@
 </div>
 </div>
 
+@push('scripts')
 <script>
 (function () {
-    var STOCKS_BASE = window.STOCKS_BASE;
-    var CSRF        = $('meta[name="csrf-token"]').attr('content');
-    var fincode     = '{{ $stock->UL_STOCKS_FINCODE }}';
+    var fincode = null;
 
     var isSmallScreen = window.matchMedia('(max-width: 1023.5px)').matches;
 
     function about_image_upload_handler(blobInfo) {
         return new Promise(function (resolve, reject) {
+            var CSRF     = $('meta[name="csrf-token"]').attr('content');
             var formData = new FormData();
             formData.append('file', blobInfo.blob(), blobInfo.filename());
             formData.append('_token', CSRF);
 
             $.ajax({
-                url:         STOCKS_BASE + '/' + fincode + '/about/upload-image',
+                url:         window.STOCKS_BASE + '/' + fincode + '/about/upload-image',
                 method:      'POST',
                 data:        formData,
                 processData: false,
@@ -195,13 +200,34 @@
         promotion: false,
     });
 
+    window.openAboutModal = function (fc, companyName) {
+        fincode = fc;
+        $('#abCompanyName').text('About — ' + companyName);
+        $('#abSaveMsg').text('');
+
+        $.get(window.STOCKS_BASE + '/' + fincode + '/about')
+            .done(function (data) {
+                var editor = tinymce.get('UL_ABOUT_CONTENT1');
+                if (editor) editor.setContent(data.UL_ABOUT_CONTENT || '');
+                $('#aboutActive').val(data.UL_ABOUT_ACTIVE || '1');
+                $('.ab-overlay').addClass('open');
+            })
+            .fail(function () {
+                alert('Failed to load about content.');
+            });
+    };
+
+    function closeAboutModal() { $('.ab-overlay').removeClass('open'); }
+    window.closeAboutModal = closeAboutModal;
+
     $('#aboutSubmitBtn').on('click', function () {
+        var CSRF    = $('meta[name="csrf-token"]').attr('content');
         var content = tinymce.get('UL_ABOUT_CONTENT1').getContent();
         var active  = $('#aboutActive').val();
         var $btn    = $(this).prop('disabled', true).text('Saving…');
 
         $.ajax({
-            url:         STOCKS_BASE + '/' + fincode + '/about',
+            url:         window.STOCKS_BASE + '/' + fincode + '/about',
             method:      'POST',
             contentType: 'application/json',
             headers:     { 'X-CSRF-TOKEN': CSRF },
@@ -221,3 +247,4 @@
     });
 }());
 </script>
+@endpush

@@ -404,8 +404,8 @@
 }
 .priv-modal-close:hover { background: rgba(255,255,255,.25); color: #fff; }
 
-.priv-modal form { display: flex; flex-direction: column; overflow-y: auto; flex: 1; }
-.priv-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; }
+.priv-modal form { display: flex; flex-direction: column; overflow-y: auto; flex: 1; min-height: 0; }
+.priv-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; overflow-y: auto; }
 
 .priv-section { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
 .priv-section-label {

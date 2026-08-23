@@ -1,7 +1,4 @@
 @php
-    $isEdit  = isset($faq);
-    $editUrl = $isEdit ? url('/admin/unlisted/stocks/' . $stock->UL_STOCKS_FINCODE . '/faqs/' . $faq->UL_FAQ_ID) : '';
-
     $targets = [
         'overview' => 'Overview',
         'about'    => 'About',
@@ -9,9 +6,11 @@
     ];
 @endphp
 
+@once
+@push('styles')
 <style>
 .fq-overlay {
-    display: flex;
+    display: none;
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, .55);
@@ -21,6 +20,7 @@
     padding: 16px;
     backdrop-filter: blur(2px);
 }
+.fq-overlay.open { display: flex; }
 .fq-modal {
     background: #fff;
     border-radius: 12px;
@@ -56,6 +56,7 @@
     transition: background .15s;
 }
 .fq-close:hover { background: #e2e8f0; color: #1a1a1a; }
+#faqForm { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
 .fq-body { flex: 1; min-height: 0; padding: 20px 22px; overflow-y: auto; }
 .fq-field { margin-bottom: 16px; }
 .fq-field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
@@ -97,22 +98,20 @@
 .fq-save-btn:hover { background: #054d3c; }
 .fq-save-btn:disabled { opacity: .6; cursor: not-allowed; }
 </style>
+@endpush
+@endonce
 
 <div class="fq-overlay" onclick="if(event.target===this)closeFaqEditModal()">
 <div class="fq-modal">
 
     <div class="fq-header">
-        <h3>{{ $isEdit ? 'Edit' : 'Add' }} FAQ &mdash; {{ $stock->UL_STOCKS_COMPNAME }}</h3>
+        <h3 id="fqTitle">Add FAQ</h3>
         <button class="fq-close" onclick="closeFaqEditModal()" type="button">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
-    @if($isEdit)
-    <form id="faqForm" data-fincode="{{ $stock->UL_STOCKS_FINCODE }}" data-mode="edit" data-edit-url="{{ $editUrl }}">
-    @else
-    <form id="faqForm" data-fincode="{{ $stock->UL_STOCKS_FINCODE }}" data-mode="add">
-    @endif
+    <form id="faqForm">
         @csrf
         <div class="fq-body">
 
@@ -121,32 +120,36 @@
                 <select name="UL_FAQ_TARGET" required>
                     <option value="">— Select —</option>
                     @foreach($targets as $val => $label)
-                        <option value="{{ $val }}" @selected($isEdit && $faq->UL_FAQ_TARGET === $val)>{{ $label }} Page</option>
+                        <option value="{{ $val }}">{{ $label }} Page</option>
                     @endforeach
                 </select>
             </div>
 
             <div class="fq-field">
+                <label>Tab (optional — groups FAQs within the page, e.g. "Basics", "Business")</label>
+                <input type="text" name="UL_FAQ_TAB" maxlength="60" placeholder="Leave blank for no tab">
+            </div>
+
+            <div class="fq-field">
                 <label>Question <span class="fq-req">*</span></label>
-                <input type="text" name="UL_FAQ_QUESTION" maxlength="500" required
-                       value="{{ $isEdit ? $faq->UL_FAQ_QUESTION : '' }}">
+                <input type="text" name="UL_FAQ_QUESTION" maxlength="500" required>
             </div>
 
             <div class="fq-field">
                 <label>Answer</label>
-                <textarea name="UL_FAQ_ANSWER">{{ $isEdit ? $faq->UL_FAQ_ANSWER : '' }}</textarea>
+                <textarea name="UL_FAQ_ANSWER"></textarea>
             </div>
 
             <div class="fq-row">
                 <div class="fq-field">
                     <label>Sort Order</label>
-                    <input type="number" name="UL_FAQ_SORT_ORDER" value="{{ $isEdit ? $faq->UL_FAQ_SORT_ORDER : 0 }}">
+                    <input type="number" name="UL_FAQ_SORT_ORDER" value="0">
                 </div>
                 <div class="fq-field">
                     <label>Active</label>
                     <select name="UL_FAQ_ACTIVE">
-                        <option value="1" @selected(($isEdit ? $faq->UL_FAQ_ACTIVE : '1') == '1')>Active</option>
-                        <option value="0" @selected($isEdit && $faq->UL_FAQ_ACTIVE == '0')>Inactive</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
                     </select>
                 </div>
             </div>
@@ -155,8 +158,8 @@
 
         <div class="fq-footer">
             <span id="faqSaveMsg" class="fq-save-msg"></span>
-            <button type="submit" class="fq-save-btn">
-                <i class="fa-solid fa-floppy-disk"></i> {{ $isEdit ? 'Update' : 'Save' }}
+            <button type="submit" class="fq-save-btn" id="faqSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> Save
             </button>
         </div>
     </form>
@@ -164,16 +167,57 @@
 </div>
 </div>
 
+@push('scripts')
 <script>
 (function () {
-    var STOCKS_BASE = window.STOCKS_BASE;
-    var CSRF        = $('meta[name="csrf-token"]').attr('content');
-    var isEdit      = $('#faqForm').data('mode') === 'edit';
-    var url         = isEdit ? $('#faqForm').data('edit-url') : STOCKS_BASE + '/' + $('#faqForm').data('fincode') + '/faqs';
-    var method      = isEdit ? 'PUT' : 'POST';
+    var fincode = null;
+    var faqId   = null;
+    var isEdit  = false;
+
+    window.openFaqAddModal = function (fc) {
+        fincode = fc;
+        faqId   = null;
+        isEdit  = false;
+        $('#fqTitle').text('Add FAQ');
+        $('#faqForm')[0].reset();
+        $('#faqSaveMsg').text('');
+        $('#faqSaveBtn').html('<i class="fa-solid fa-floppy-disk"></i> Save');
+        $('.fq-overlay').addClass('open');
+    };
+
+    window.openFaqEditModal = function (fc, id) {
+        fincode = fc;
+        faqId   = id;
+        isEdit  = true;
+        $('#fqTitle').text('Edit FAQ');
+        $('#faqForm')[0].reset();
+        $('#faqSaveMsg').text('');
+        $('#faqSaveBtn').html('<i class="fa-solid fa-floppy-disk"></i> Update');
+
+        $.get(window.STOCKS_BASE + '/' + fincode + '/faqs/' + id + '/edit')
+            .done(function (data) {
+                $('#faqForm select, #faqForm input, #faqForm textarea').each(function () {
+                    var name = $(this).attr('name');
+                    if (name && data[name] !== undefined && data[name] !== null) $(this).val(data[name]);
+                });
+                $('.fq-overlay').addClass('open');
+            })
+            .fail(function () {
+                alert('Failed to load FAQ.');
+            });
+    };
+
+    function closeFaqEditModal() {
+        $('.fq-overlay').removeClass('open');
+        if (typeof window.loadFaqList === 'function') window.loadFaqList();
+    }
+    window.closeFaqEditModal = closeFaqEditModal;
 
     $('#faqForm').on('submit', function (e) {
         e.preventDefault();
+        var CSRF   = $('meta[name="csrf-token"]').attr('content');
+        var url    = isEdit ? window.STOCKS_BASE + '/' + fincode + '/faqs/' + faqId : window.STOCKS_BASE + '/' + fincode + '/faqs';
+        var method = isEdit ? 'PUT' : 'POST';
 
         var $btn = $(this).find('.fq-save-btn').prop('disabled', true)
                           .html('<i class="fa-solid fa-spinner fa-spin"></i> Saving…');
@@ -195,6 +239,7 @@
                     setTimeout(function () { closeFaqEditModal(); }, 800);
                 } else {
                     $('#faqForm')[0].reset();
+                    if (typeof window.loadFaqList === 'function') window.loadFaqList();
                 }
             }
         })
@@ -212,3 +257,4 @@
     });
 }());
 </script>
+@endpush

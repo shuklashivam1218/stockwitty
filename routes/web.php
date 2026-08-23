@@ -12,6 +12,7 @@ use App\Http\Controllers\UnlistedReportController;
 use App\Http\Controllers\CmsPagesController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\StocksController;
+use App\Http\Controllers\Sw\CompanyController;
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 Route::get('/login', function () {
@@ -32,11 +33,13 @@ Route::get('/unlisted', function () {
 });
 
 Route::view('/unlisted-shares/', 'sw.unlisted-shares.index')->name('sw.unlisted-shares');
-Route::view('/unlisted-shares/nse-india/', 'sw.unlisted-shares.nse-india.index')->name('sw.unlisted-shares.nse-india');
-Route::view('/unlisted-shares/nse-india/about/', 'sw.unlisted-shares.nse-india.about')->name('sw.unlisted-shares.nse-india.about');
-Route::view('/unlisted-shares/nse-india/thesis/', 'sw.unlisted-shares.nse-india.thesis')->name('sw.unlisted-shares.nse-india.thesis');
 
-Route::get('/unlisted-shares/{slug}', [StocksController::class, 'company'])->name('stocks.company');
+Route::get('/unlisted-shares/{slug}/', [CompanyController::class, 'index'])->name('sw.unlisted-shares.company');
+Route::get('/unlisted-shares/{slug}/about/', [CompanyController::class, 'about'])->name('sw.unlisted-shares.company.about');
+Route::get('/unlisted-shares/{slug}/thesis/', [CompanyController::class, 'thesis'])->name('sw.unlisted-shares.company.thesis');
+
+// v1 — old Bootstrap company page, real DB data, kept for rollback/reference.
+Route::get('/unlisted-shares-v1/{slug}', [StocksController::class, 'company'])->name('stocks.company');
 
 Route::view('/listed/', 'sw.listed.index')->name('sw.listed');
 Route::view('/listed/reliance/', 'sw.listed.reliance')->name('sw.listed.reliance');
@@ -152,10 +155,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.toggle');
 
-    Route::get('/unlisted/stocks/{fincode}/price', [UnlistedStocksController::class, 'getPriceModal'])
-        ->middleware('privilege:unlisted')
-        ->name('unlisted.stocks.price');
-
     Route::post('/unlisted/stocks/{fincode}/price', [UnlistedStocksController::class, 'storePriceData'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.price.store');
@@ -171,10 +170,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/unlisted/stocks/{fincode}/price/{date}', [UnlistedStocksController::class, 'deletePriceEntry'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.price.delete');
-
-    Route::get('/unlisted/stocks/{fincode}/financials', [UnlistedStocksController::class, 'getFinancialsModal'])
-        ->middleware('privilege:unlisted')
-        ->name('unlisted.stocks.financials');
 
     Route::post('/unlisted/stocks/{fincode}/financials', [UnlistedStocksController::class, 'storeFinancialsData'])
         ->middleware('privilege:unlisted')
@@ -232,10 +227,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.faqs.list');
 
-    Route::get('/unlisted/stocks/{fincode}/faqs', [UnlistedStocksController::class, 'getFaqModal'])
-        ->middleware('privilege:unlisted')
-        ->name('unlisted.stocks.faqs');
-
     Route::post('/unlisted/stocks/{fincode}/faqs', [UnlistedStocksController::class, 'storeFaq'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.faqs.store');
@@ -251,6 +242,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/unlisted/stocks/{fincode}/faqs/{faqId}', [UnlistedStocksController::class, 'deleteFaq'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.faqs.delete');
+
+    Route::get('/unlisted/stocks/{fincode}/witty-score', [UnlistedStocksController::class, 'getWittyScoreModal'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.witty-score');
+
+    Route::post('/unlisted/stocks/{fincode}/witty-score', [UnlistedStocksController::class, 'saveWittyScore'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.witty-score.save');
+
+    Route::get('/unlisted/stocks/{fincode}/about-extra', [UnlistedStocksController::class, 'getAboutExtraModal'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.about-extra');
+
+    Route::post('/unlisted/stocks/{fincode}/about-extra', [UnlistedStocksController::class, 'saveAboutExtra'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.about-extra.save');
+
+    Route::get('/unlisted/stocks/{fincode}/insights', [UnlistedStocksController::class, 'getCompanyInsightsModal'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.insights');
+
+    Route::post('/unlisted/stocks/{fincode}/insights', [UnlistedStocksController::class, 'saveCompanyInsights'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.insights.save');
 
     // ── Unlisted Leads ────────────────────────────────────────────────────────
     Route::get('/unlisted/leads', [UnlistedLeadsController::class, 'leads'])

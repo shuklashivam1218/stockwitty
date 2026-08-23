@@ -198,15 +198,7 @@
             var periodEnd = $(this).data('period-end');
             var type = $(this).data('type');
             var noMonths = $(this).data('no-months');
-            $('#finEditModalWrap').html(loadingSpinner());
-            $.get(STOCKS_BASE + '/' + window.flFincode + '/financials/' + periodEnd + '/' + type + '/' + noMonths + '/edit')
-                .done(function(html) {
-                    $('#finEditModalWrap').html(html);
-                })
-                .fail(function() {
-                    $('#finEditModalWrap').empty();
-                    alert('Failed to load.');
-                });
+            window.openFinancialsEditModal(window.flFincode, @json($stock->UL_STOCKS_COMPNAME), periodEnd, type, noMonths);
         });
 
         $tbody.on('click', '.fl-delete-btn', function() {
