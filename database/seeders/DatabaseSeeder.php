@@ -21,6 +21,5 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(IndustryMasterSeeder::class);
-        $this->call(UnlistedDemoStocksSeeder::class);
     }
 }
