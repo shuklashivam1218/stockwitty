@@ -17,3 +17,7 @@ yarn-error.log
 /.idea
 /.vscode
 /.claude
+
+# Demo/dummy data seeders — local dev & testing only, never run on production
+/database/seeders/UnlistedDemoStocksSeeder.php
+/database/seeders/UnlistedDemoExtrasSeeder.php
