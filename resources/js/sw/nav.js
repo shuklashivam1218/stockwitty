@@ -4,6 +4,7 @@ export function navBar() {
         open: false,
         mega: false,
         mobileProducts: false,
+        userMenu: false,
 
         init() {
             const onScroll = () => {
@@ -17,6 +18,7 @@ export function navBar() {
             this.open = false;
             this.mega = false;
             this.mobileProducts = false;
+            this.userMenu = false;
         },
     };
 }

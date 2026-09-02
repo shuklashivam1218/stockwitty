@@ -17,6 +17,10 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login')->middleware('guest.only');
 
+Route::get('/signup', function () {
+    return view('auth.signup');
+})->name('signup')->middleware('guest.only');
+
 Route::post('/login',    [AuthController::class, 'login'])->name('login.submit')->middleware('throttle:5,1');
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit')->middleware('throttle:5,1');
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
@@ -74,8 +78,6 @@ Route::view('/case-studies/first-time-unlisted-kyc/', 'sw.case-studies.first-tim
 Route::view('/case-studies/research-over-hype/', 'sw.case-studies.research-over-hype')->name('sw.case-studies.research-over-hype');
 
 Route::view('/why-witty/', 'sw.why-witty.index')->name('sw.why-witty');
-Route::view('/login-new/', 'sw.login.index')->name('sw.login');
-Route::view('/signup-new/', 'sw.signup.index')->name('sw.signup');
 
 Route::get('/disclaimer', [CmsPagesController::class, 'showDisclaimer'])->name('disclaimer');
 

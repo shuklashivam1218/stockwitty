@@ -15,6 +15,7 @@ import { fixedDeposits } from './sw/fixed-deposits';
 import { screener } from './sw/screener';
 import { sipCalculator } from './sw/sip-calculator';
 import { downloadGate } from './sw/download-gate';
+import { authPage } from './sw/auth-page';
 
 Alpine.plugin(intersect);
 Alpine.data('navBar', navBar);
@@ -30,6 +31,7 @@ Alpine.data('fixedDeposits', fixedDeposits);
 Alpine.data('screener', screener);
 Alpine.data('sipCalculator', sipCalculator);
 Alpine.data('downloadGate', downloadGate);
+Alpine.data('authPage', authPage);
 registerCountupDirective(Alpine);
 
 window.Alpine = Alpine;

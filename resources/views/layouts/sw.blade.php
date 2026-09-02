@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'StockWitty — Invest Smart, Stay Witty')</title>
   <meta name="description" content="@yield('description', 'Research and buy unlisted & pre-IPO shares in India — live prices, DRHP tracking, honest research and same-day demat delivery. Invest Smart, Stay Witty.')" />
   <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
