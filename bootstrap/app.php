@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -27,6 +28,26 @@ return Application::configure(basePath: dirname(__DIR__))
                 'success' => false,
                 'message' => "Too many attempts. Please try again in {$retryAfter} seconds.",
             ], 429);
+        });
+
+        // A stale tab's CSRF token (session expired, or invalidated by a deploy) should
+        // send the user back to sign in — not Laravel's raw "419 Page Expired" screen.
+        // Laravel's Handler::prepareException() converts TokenMismatchException into a
+        // plain HttpException(419, ...) before any render() callback sees it, so that's
+        // the type we actually have to catch here.
+        $exceptions->render(function (HttpException $e, Request $request) {
+            if ($e->getStatusCode() !== 419) {
+                return null;
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your session expired. Please refresh the page and try again.',
+                ], 419);
+            }
+
+            return redirect()->route('login');
         });
 
         // Catch DB connection failures — show a clean 503 instead of raw SQL errors
