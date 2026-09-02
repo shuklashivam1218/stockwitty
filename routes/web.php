@@ -10,8 +10,6 @@ use App\Http\Controllers\UnlistedOrdersController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\UnlistedReportController;
 use App\Http\Controllers\CmsPagesController;
-use App\Http\Controllers\PublicController;
-use App\Http\Controllers\StocksController;
 use App\Http\Controllers\Sw\CompanyController;
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -26,20 +24,11 @@ Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
 // ── Public pages ─────────────────────────────────────────────────────────────
 Route::view('/', 'sw.home')->name('home');
 
-Route::get('/v1', [PublicController::class, 'welcome'])->name('home.v1');
-
-Route::get('/unlisted', function () {
-    return view('public.unlisted');
-});
-
 Route::get('/unlisted-shares/', [CompanyController::class, 'directory'])->name('sw.unlisted-shares');
 
 Route::get('/unlisted-shares/{slug}/', [CompanyController::class, 'index'])->name('sw.unlisted-shares.company');
 Route::get('/unlisted-shares/{slug}/about/', [CompanyController::class, 'about'])->name('sw.unlisted-shares.company.about');
 Route::get('/unlisted-shares/{slug}/thesis/', [CompanyController::class, 'thesis'])->name('sw.unlisted-shares.company.thesis');
-
-// v1 — old Bootstrap company page, real DB data, kept for rollback/reference.
-Route::get('/unlisted-shares-v1/{slug}', [StocksController::class, 'company'])->name('stocks.company');
 
 Route::view('/listed/', 'sw.listed.index')->name('sw.listed');
 Route::view('/listed/reliance/', 'sw.listed.reliance')->name('sw.listed.reliance');
@@ -87,10 +76,6 @@ Route::view('/case-studies/research-over-hype/', 'sw.case-studies.research-over-
 Route::view('/why-witty/', 'sw.why-witty.index')->name('sw.why-witty');
 Route::view('/login-new/', 'sw.login.index')->name('sw.login');
 Route::view('/signup-new/', 'sw.signup.index')->name('sw.signup');
-
-Route::get('/blog-v1', function () {
-    return view('public.blog');
-})->name('blog.v1');
 
 Route::get('/disclaimer', [CmsPagesController::class, 'showDisclaimer'])->name('disclaimer');
 

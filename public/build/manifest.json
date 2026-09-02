@@ -34,21 +34,9 @@
     "src": "node_modules/html2canvas/dist/html2canvas.esm.js",
     "isDynamicEntry": true
   },
-  "resources/css/app.css": {
-    "file": "assets/app-l0sNRNKZ.js",
-    "name": "app",
-    "src": "resources/css/app.css",
-    "isEntry": true
-  },
   "resources/css/sw.css": {
     "file": "assets/sw-CeiZ6Mqy.css",
     "src": "resources/css/sw.css",
-    "isEntry": true
-  },
-  "resources/js/app.js": {
-    "file": "assets/app-DUr89oQr.js",
-    "name": "app",
-    "src": "resources/js/app.js",
     "isEntry": true
   },
   "resources/js/sw.js": {

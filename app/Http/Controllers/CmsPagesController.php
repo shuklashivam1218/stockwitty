@@ -62,6 +62,6 @@ class CmsPagesController extends Controller
             ->where('CMS_PAGE_ACTIVE', '1')
             ->firstOrFail();
 
-        return view('public.disclaimer', compact('page'));
+        return view('sw.disclaimer.index', compact('page'));
     }
 }
