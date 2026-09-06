@@ -21,5 +21,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(IndustryMasterSeeder::class);
+        $this->call(UnlistedStocksSeeder::class);
+        $this->call(UnlistedPriceDataSeeder::class);
+        $this->call(UnlistedFinancialsSeeder::class);
     }
 }
