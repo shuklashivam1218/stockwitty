@@ -13,7 +13,9 @@
         <x-sw.categories />
         <x-sw.products />
         <x-sw.sectors :sectors="$sectors" />
-        <x-sw.witty-score :company="$wittyScoreCompany" :score="$wittyScoreValue" :pillars="$wittyScorePillars" />
+        @if (!empty($wittyScorePillars))
+            <x-sw.witty-score :company="$wittyScoreCompany" :score="$wittyScoreValue" :pillars="$wittyScorePillars" />
+        @endif
         <x-sw.how-to-buy />
         <x-sw.about />
         <x-sw.features />

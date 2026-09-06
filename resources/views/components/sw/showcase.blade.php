@@ -5,6 +5,8 @@
         <x-sw.section-heading eyebrow="Live showcase" title="Pick any company. The whole showcase follows."
                                subtitle="Tap a card in the slider to swap the price card, calculator and chart instantly." />
 
+        <template x-if="companies.length > 0">
+        <div>
         <x-sw.reveal :delay="0.06">
             <div class="mt-8 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_4%,#000_96%,transparent)]">
                 <div class="marquee-track flex w-max gap-4">
@@ -162,6 +164,12 @@
                     </div>
                 </div>
             </x-sw.reveal>
+        </div>
+        </div>
+        </template>
+
+        <div x-show="companies.length === 0" x-cloak class="mt-10 rounded-2xl border border-border bg-green-50 p-8 text-center text-sm text-muted-foreground">
+            Live company data is being added — check back soon.
         </div>
     </div>
 </section>

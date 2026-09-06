@@ -113,7 +113,7 @@ class HomeController extends Controller
         });
 
         $showcaseCompanies = $companies
-            ->filter(fn ($c) => $c['wittyScore'] > 0 && $c['price'] > 0)
+            ->filter(fn ($c) => $c['price'] > 0)
             ->sortByDesc('wittyScore')
             ->take(10)
             ->map(fn ($c) => [...$c, 'series' => $this->weeklySeries($c['fincode'])])
@@ -121,7 +121,7 @@ class HomeController extends Controller
             ->all();
 
         $newArrivals = $companies
-            ->filter(fn ($c) => $c['tag'] && $c['price'] > 0)
+            ->filter(fn ($c) => $c['price'] > 0)
             ->sortByDesc('insertTime')
             ->take(9)
             ->map(fn ($c) => [
