@@ -8,6 +8,9 @@ export function unlistedShares() {
 
         init() {
             this.companies = JSON.parse(this.$el.dataset.companies || '[]');
+
+            const sector = new URLSearchParams(window.location.search).get('sector');
+            if (sector) this.sector = sector;
         },
 
         get list() {

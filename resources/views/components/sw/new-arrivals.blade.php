@@ -1,3 +1,5 @@
+@props(['companies' => []])
+
 @php $chips = ['All', 'Pre-IPO', 'DRHP', 'Unicorn', 'Trending']; @endphp
 
 <section id="new-arrivals" class="py-20 sm:py-28" x-data="{ filter: 'All' }">
@@ -18,7 +20,7 @@
         </x-sw.reveal>
 
         <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach (config('sw.new_arrival_companies') as $c)
+            @foreach ($companies as $c)
                 <article x-show="filter === 'All' || {!! \Illuminate\Support\Js::from($c['tags']) !!}.includes(filter)"
                          x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                          x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0 scale-95"

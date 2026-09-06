@@ -11,6 +11,7 @@ use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\UnlistedReportController;
 use App\Http\Controllers\CmsPagesController;
 use App\Http\Controllers\Sw\CompanyController;
+use App\Http\Controllers\Sw\HomeController;
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 Route::get('/login', function () {
@@ -26,7 +27,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
 
 // ── Public pages ─────────────────────────────────────────────────────────────
-Route::view('/', 'sw.home')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/unlisted-shares/', [CompanyController::class, 'directory'])->name('sw.unlisted-shares');
 

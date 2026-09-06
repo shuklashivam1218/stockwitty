@@ -8,17 +8,17 @@
     <main>
         <x-sw.hero />
         <x-sw.trusted-strip />
-        <x-sw.showcase />
-        <x-sw.stats-bar />
+        <x-sw.showcase :companies="$showcaseCompanies" />
+        <x-sw.stats-bar :companies-tracked="$companiesTracked" />
         <x-sw.categories />
         <x-sw.products />
-        <x-sw.sectors />
-        <x-sw.witty-score />
+        <x-sw.sectors :sectors="$sectors" />
+        <x-sw.witty-score :company="$wittyScoreCompany" :score="$wittyScoreValue" :pillars="$wittyScorePillars" />
         <x-sw.how-to-buy />
         <x-sw.about />
         <x-sw.features />
         <x-sw.split-banner />
-        <x-sw.new-arrivals />
+        <x-sw.new-arrivals :companies="$newArrivals" />
         <x-sw.compare-teaser />
         <x-sw.research-tools />
         <x-sw.blog-teaser />

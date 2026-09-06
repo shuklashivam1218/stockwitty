@@ -1,6 +1,8 @@
+@props(['companiesTracked' => 0])
+
 @php
 $stats = [
-    ['value' => '250+', 'count' => 250, 'suffix' => '+', 'label' => 'Unlisted companies tracked'],
+    ['value' => $companiesTracked . '+', 'count' => $companiesTracked, 'suffix' => '+', 'label' => 'Unlisted companies tracked'],
     ['value' => '10,000+', 'count' => 10000, 'suffix' => '+', 'label' => 'Investors served'],
     ['value' => 'Same-day', 'label' => 'Demat credit (CDSL / NSDL)'],
     ['value' => '0–10', 'label' => 'Honest WittyScore on every share'],

@@ -1,12 +1,6 @@
+@props(['company' => 'StockWitty pick', 'score' => 0, 'pillars' => []])
+
 @php
-$pillars = [
-    ['label' => 'Financial Health', 'value' => 8.8, 'weight' => 30],
-    ['label' => 'Valuation', 'value' => 7.6, 'weight' => 20],
-    ['label' => 'Growth Potential', 'value' => 9.1, 'weight' => 20],
-    ['label' => 'IPO Probability', 'value' => 8.9, 'weight' => 15],
-    ['label' => 'Liquidity & Safety', 'value' => 8.1, 'weight' => 15],
-];
-$score = 8.5;
 $r = 70;
 $circumference = 2 * M_PI * $r;
 $filled = ($score / 10) * $circumference;
@@ -58,7 +52,7 @@ $targetOffset = $circumference - $filled;
                                 <p class="text-xs font-bold text-muted-foreground">out of 10</p>
                             </div>
                         </div>
-                        <p class="mt-3 text-sm font-bold text-foreground">NSE India Limited</p>
+                        <p class="mt-3 text-sm font-bold text-foreground">{{ $company }}</p>
                     </div>
 
                     <div class="mt-7 space-y-4">

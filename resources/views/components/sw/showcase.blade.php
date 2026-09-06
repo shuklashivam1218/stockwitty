@@ -1,6 +1,8 @@
-<section id="live-price" class="py-20 sm:py-28" x-data="showcase()" data-companies="{{ json_encode(config('sw.showcase_companies')) }}">
+@props(['companies' => []])
+
+<section id="live-price" class="py-20 sm:py-28" x-data="showcase()" data-companies="{{ json_encode($companies) }}">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <x-sw.section-heading eyebrow="Live showcase — 250+ companies" title="Pick any company. The whole showcase follows."
+        <x-sw.section-heading eyebrow="Live showcase" title="Pick any company. The whole showcase follows."
                                subtitle="Tap a card in the slider to swap the price card, calculator and chart instantly." />
 
         <x-sw.reveal :delay="0.06">
