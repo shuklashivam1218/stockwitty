@@ -247,6 +247,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.about-extra.save');
 
+    Route::get('/unlisted/stocks/{fincode}/seo', [UnlistedStocksController::class, 'getSeoModal'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.seo');
+
+    Route::post('/unlisted/stocks/{fincode}/seo', [UnlistedStocksController::class, 'saveSeo'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.seo.save');
+
     Route::get('/unlisted/stocks/{fincode}/insights', [UnlistedStocksController::class, 'getCompanyInsightsModal'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.insights');

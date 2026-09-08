@@ -1,8 +1,8 @@
 @extends('layouts.sw')
 
-@section('title', $stock->UL_STOCKS_COMPNAME . ' Unlisted Share Price ₹' . number_format($company['price']) . ' | StockWitty')
-@section('description', $stock->UL_STOCKS_COMPNAME . ' unlisted share price, fundamentals, financials and how to buy. WittyScore ' . number_format($company['wittyScore'], 1) . '/10. Distributor, not investment advice.')
-@section('keywords', collect([
+@section('title', $seo?->UL_SEO_COMPANY_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ' Unlisted Share Price ₹' . number_format($company['price']) . ' | StockWitty'))
+@section('description', $seo?->UL_SEO_COMPANY_DESCRIPTION ?: ($stock->UL_STOCKS_COMPNAME . ' unlisted share price, fundamentals, financials and how to buy. WittyScore ' . number_format($company['wittyScore'], 1) . '/10. Distributor, not investment advice.'))
+@section('keywords', $seo?->UL_SEO_COMPANY_KEYWORDS ?: collect([
     $stock->UL_STOCKS_COMPNAME . ' unlisted shares',
     $stock->UL_STOCKS_COMPNAME . ' share price',
     'buy ' . $stock->UL_STOCKS_COMPNAME . ' shares',

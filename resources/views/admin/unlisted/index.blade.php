@@ -181,6 +181,12 @@
                             <i class="fa-regular fa-eye ptf-icon-view faq-view-btn"
                                data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
                                style="cursor:pointer" title="Manage FAQs"></i>
+                            <span class="ptf-sep">|</span>
+                            <span class="ptf-label">SEO</span>
+                            <i class="fa-solid fa-pen ptf-icon-edit seo-btn"
+                               data-fincode="{{ $stock->UL_STOCKS_FINCODE }}"
+                               data-name="{{ $stock->UL_STOCKS_COMPNAME }}"
+                               style="cursor:pointer" title="Edit meta title / description / keywords"></i>
                         </td>
                         <td>
                             <span class="admin-badge {{ $stock->UL_STOCKS_STATUS === '1' ? 'badge-admin' : 'badge-locked' }}">
@@ -232,6 +238,7 @@
 @include('admin.unlisted.about-extra-modal')
 @include('admin.unlisted.insights-modal')
 @include('admin.unlisted.faq-modal')
+@include('admin.unlisted.seo-modal')
 
 {{-- Price list modal container — still server-rendered on demand (paginated table) --}}
 <div id="priceListModalWrap"></div>
@@ -383,6 +390,11 @@
         $('#faqListModalWrap').empty();
         window.fqFincode = null;
     }
+
+    // ── SEO modal ───────────────────────────────────────────
+    $(document).on('click', '.seo-btn', function () {
+        window.openSeoModal($(this).data('fincode'), $(this).data('name'));
+    });
 
     // ── Shared loading spinner ─────────────────────────────
     function loadingSpinner() {

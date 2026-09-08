@@ -1,8 +1,8 @@
 @extends('layouts.sw')
 
-@section('title', $stock->UL_STOCKS_COMPNAME . ': Company Profile | StockWitty')
-@section('description', 'A company profile of ' . $stock->UL_STOCKS_COMPNAME . ' — business, verticals, revenue, history and FAQs.')
-@section('keywords', collect([
+@section('title', $seo?->UL_SEO_ABOUT_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ': Company Profile | StockWitty'))
+@section('description', $seo?->UL_SEO_ABOUT_DESCRIPTION ?: ('A company profile of ' . $stock->UL_STOCKS_COMPNAME . ' — business, verticals, revenue, history and FAQs.'))
+@section('keywords', $seo?->UL_SEO_ABOUT_KEYWORDS ?: collect([
     $stock->UL_STOCKS_COMPNAME . ' company profile',
     $stock->UL_STOCKS_COMPNAME . ' business model',
     'about ' . $stock->UL_STOCKS_COMPNAME,

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\UnlistedAboutExtra;
 use App\Models\UnlistedCompanyInsight;
 use App\Models\UnlistedFaq;
+use App\Models\UnlistedSeoMeta;
 use App\Models\UnlistedStock;
 use App\Models\UnlistedThesis;
 use App\Models\UnlistedWittyScore;
@@ -26,6 +27,14 @@ class CompanyController extends Controller
             ->where('UL_STOCKS_SLUG', $slug)
             ->where('UL_STOCKS_STATUS', '1')
             ->firstOrFail();
+    }
+
+    private function seoMeta(int $fincode): ?UnlistedSeoMeta
+    {
+        return UnlistedSeoMeta::where('UL_SEO_FINCODE', $fincode)
+            ->where('UL_SEO_ACTIVE', '1')
+            ->orderByDesc('UL_SEO_ID')
+            ->first();
     }
 
     public function directory()
@@ -244,7 +253,7 @@ class CompanyController extends Controller
         $financialTables = $this->buildFinancialTables($financials, $quarterlyFin);
 
         return view('sw.unlisted-shares.company.index', [
-            'stock' => $stock, 'company' => $company, 'series' => $series,
+            'stock' => $stock, 'company' => $company, 'series' => $series, 'seo' => $this->seoMeta($fincode),
             'currentPrice' => $currentPrice, 'marketCap' => $marketCap, 'peRatio' => $peRatio,
             'eps' => $eps, 'bookValue' => $bookValue, 'pbRatio' => $pbRatio, 'roe' => $roe,
             'debtToEquity' => $debtToEquity, 'high52w' => $high52w, 'low52w' => $low52w,
@@ -274,7 +283,7 @@ class CompanyController extends Controller
             ->groupBy(fn ($f) => $f->UL_FAQ_TAB ?: 'General');
 
         return view('sw.unlisted-shares.company.about', [
-            'stock' => $stock,
+            'stock' => $stock, 'seo' => $this->seoMeta($fincode),
             'verticals'    => UnlistedAboutExtra::parsePairs($extra?->UL_ABX_VERTICALS),
             'revenue'      => UnlistedAboutExtra::parsePairs($extra?->UL_ABX_REVENUE_SEGMENTS),
             'products'     => UnlistedAboutExtra::parsePairs($extra?->UL_ABX_PRODUCTS_SERVICES),
@@ -327,7 +336,7 @@ class CompanyController extends Controller
             : null;
 
         return view('sw.unlisted-shares.company.thesis', [
-            'stock' => $stock,
+            'stock' => $stock, 'seo' => $this->seoMeta($fincode),
             'thesisHtml'  => $fixImageSrc($thesis?->UL_THESIS_CONTENT),
             'wittyScore'  => $wittyScore,
             'tldr'        => $insight?->UL_CI_TLDR,

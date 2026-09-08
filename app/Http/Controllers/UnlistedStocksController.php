@@ -13,6 +13,7 @@ use App\Models\UnlistedFaq;
 use App\Models\UnlistedWittyScore;
 use App\Models\UnlistedAboutExtra;
 use App\Models\UnlistedCompanyInsight;
+use App\Models\UnlistedSeoMeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -802,6 +803,74 @@ class UnlistedStocksController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'About page sections saved successfully.']);
+    }
+
+    public function getSeoModal(string $fincode)
+    {
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $seo = UnlistedSeoMeta::where('UL_SEO_FINCODE', $fincode)
+                    ->orderByDesc('UL_SEO_ID')
+                    ->first();
+
+        $fields = [
+            'UL_SEO_COMPANY_TITLE', 'UL_SEO_COMPANY_DESCRIPTION', 'UL_SEO_COMPANY_KEYWORDS',
+            'UL_SEO_ABOUT_TITLE', 'UL_SEO_ABOUT_DESCRIPTION', 'UL_SEO_ABOUT_KEYWORDS',
+            'UL_SEO_THESIS_TITLE', 'UL_SEO_THESIS_DESCRIPTION', 'UL_SEO_THESIS_KEYWORDS',
+        ];
+
+        $data = [];
+        foreach ($fields as $field) {
+            $data[$field] = $seo?->{$field};
+        }
+        $data['UL_SEO_ACTIVE'] = $seo?->UL_SEO_ACTIVE ?? '1';
+
+        return response()->json($data);
+    }
+
+    public function saveSeo(Request $request, string $fincode)
+    {
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $fields = [
+            'UL_SEO_COMPANY_TITLE', 'UL_SEO_COMPANY_DESCRIPTION', 'UL_SEO_COMPANY_KEYWORDS',
+            'UL_SEO_ABOUT_TITLE', 'UL_SEO_ABOUT_DESCRIPTION', 'UL_SEO_ABOUT_KEYWORDS',
+            'UL_SEO_THESIS_TITLE', 'UL_SEO_THESIS_DESCRIPTION', 'UL_SEO_THESIS_KEYWORDS',
+        ];
+
+        $request->validate([
+            'UL_SEO_COMPANY_TITLE'       => 'nullable|string|max:255',
+            'UL_SEO_COMPANY_DESCRIPTION' => 'nullable|string|max:500',
+            'UL_SEO_COMPANY_KEYWORDS'    => 'nullable|string|max:500',
+            'UL_SEO_ABOUT_TITLE'         => 'nullable|string|max:255',
+            'UL_SEO_ABOUT_DESCRIPTION'   => 'nullable|string|max:500',
+            'UL_SEO_ABOUT_KEYWORDS'      => 'nullable|string|max:500',
+            'UL_SEO_THESIS_TITLE'        => 'nullable|string|max:255',
+            'UL_SEO_THESIS_DESCRIPTION'  => 'nullable|string|max:500',
+            'UL_SEO_THESIS_KEYWORDS'     => 'nullable|string|max:500',
+        ]);
+
+        $seo = UnlistedSeoMeta::where('UL_SEO_FINCODE', $fincode)
+                    ->orderByDesc('UL_SEO_ID')
+                    ->first();
+
+        $data = [];
+        foreach ($fields as $field) {
+            $data[$field] = $request->input($field);
+        }
+        $data['UL_SEO_ACTIVE']      = $request->input('UL_SEO_ACTIVE', '1');
+        $data['UL_SEO_UPDATE_TIME'] = now();
+
+        if ($seo) {
+            UnlistedSeoMeta::where('UL_SEO_ID', $seo->UL_SEO_ID)->update($data);
+        } else {
+            UnlistedSeoMeta::insert(array_merge($data, [
+                'UL_SEO_FINCODE'     => $fincode,
+                'UL_SEO_INSERT_TIME' => now(),
+            ]));
+        }
+
+        return response()->json(['success' => true, 'message' => 'SEO meta saved successfully.']);
     }
 
     public function getCompanyInsightsModal(string $fincode)

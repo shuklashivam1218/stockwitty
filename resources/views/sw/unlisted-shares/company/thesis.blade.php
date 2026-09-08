@@ -1,8 +1,8 @@
 @extends('layouts.sw')
 
-@section('title', $stock->UL_STOCKS_COMPNAME . ' Unlisted Shares: Should You Buy? | StockWitty')
-@section('description', 'Our take on ' . $stock->UL_STOCKS_COMPNAME . ' unlisted shares — WittyScore, bull/bear case, key risks and a clear verdict. Not investment advice.')
-@section('keywords', collect([
+@section('title', $seo?->UL_SEO_THESIS_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ' Unlisted Shares: Should You Buy? | StockWitty'))
+@section('description', $seo?->UL_SEO_THESIS_DESCRIPTION ?: ('Our take on ' . $stock->UL_STOCKS_COMPNAME . ' unlisted shares — WittyScore, bull/bear case, key risks and a clear verdict. Not investment advice.'))
+@section('keywords', $seo?->UL_SEO_THESIS_KEYWORDS ?: collect([
     'should I buy ' . $stock->UL_STOCKS_COMPNAME . ' shares',
     $stock->UL_STOCKS_COMPNAME . ' investment thesis',
     $stock->UL_STOCKS_COMPNAME . ' WittyScore',
