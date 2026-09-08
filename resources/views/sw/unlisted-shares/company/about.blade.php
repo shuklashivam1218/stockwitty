@@ -2,6 +2,14 @@
 
 @section('title', $stock->UL_STOCKS_COMPNAME . ': Company Profile | StockWitty')
 @section('description', 'A company profile of ' . $stock->UL_STOCKS_COMPNAME . ' — business, verticals, revenue, history and FAQs.')
+@section('keywords', collect([
+    $stock->UL_STOCKS_COMPNAME . ' company profile',
+    $stock->UL_STOCKS_COMPNAME . ' business model',
+    'about ' . $stock->UL_STOCKS_COMPNAME,
+    $stock->UL_STOCKS_COMPNAME . ' revenue segments',
+    filled($stock->UL_STOCKS_INDUSTRY) ? $stock->UL_STOCKS_INDUSTRY . ' companies' : null,
+    'unlisted shares India',
+])->filter()->implode(', '))
 
 @php
 $toc = array_values(array_filter([

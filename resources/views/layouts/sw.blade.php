@@ -6,6 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'StockWitty — Invest Smart, Stay Witty')</title>
   <meta name="description" content="@yield('description', 'Research and buy unlisted & pre-IPO shares in India — live prices, DRHP tracking, honest research and same-day demat delivery. Invest Smart, Stay Witty.')" />
+  <meta name="keywords" content="@yield('keywords', 'unlisted shares, pre-IPO shares, buy unlisted shares in India, unlisted stock price, StockWitty')" />
   {{-- url()->current() rtrims the trailing slash, which fights the site's
        own /-terminated URL convention — build from the raw path instead so
        /wittyscore/ stays /wittyscore/ and the homepage stays "/". --}}

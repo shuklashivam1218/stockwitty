@@ -2,6 +2,14 @@
 
 @section('title', $stock->UL_STOCKS_COMPNAME . ' Unlisted Shares: Should You Buy? | StockWitty')
 @section('description', 'Our take on ' . $stock->UL_STOCKS_COMPNAME . ' unlisted shares — WittyScore, bull/bear case, key risks and a clear verdict. Not investment advice.')
+@section('keywords', collect([
+    'should I buy ' . $stock->UL_STOCKS_COMPNAME . ' shares',
+    $stock->UL_STOCKS_COMPNAME . ' investment thesis',
+    $stock->UL_STOCKS_COMPNAME . ' WittyScore',
+    $stock->UL_STOCKS_COMPNAME . ' bull case bear case',
+    $stock->UL_STOCKS_COMPNAME . ' risks',
+    'unlisted shares India',
+])->filter()->implode(', '))
 
 @php
 $overall = $wittyScore?->overall();
