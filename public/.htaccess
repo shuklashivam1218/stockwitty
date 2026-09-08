@@ -14,10 +14,16 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # Add trailing slash if missing (every app route below is defined
+    # with one, e.g. /unlisted-shares/ — this makes that URL canonical).
+    # GET/HEAD only: redirecting a POST/PATCH/DELETE here would risk the
+    # browser resubmitting it as GET, silently dropping form/AJAX data —
+    # and login, admin panel and every admin AJAX call use no-slash routes.
+    RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+    RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
+    RewriteCond %{REQUEST_URI} !/$
+    RewriteRule ^(.*)$ /$1/ [L,R=301]
 
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
