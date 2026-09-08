@@ -97,6 +97,17 @@
             'titleHint' => 'Leave blank to auto-generate from company name',
         ],
     ];
+
+    // Computed here rather than inline in @json() below — a multi-line
+    // closure with an array literal inside a Blade directive's own
+    // parentheses can trip up the directive-argument parser (it compiles
+    // without error but the generated PHP comes out malformed).
+    $seoFieldNames = [];
+    foreach ($seoPages as $p) {
+        $seoFieldNames[] = 'UL_SEO_' . $p['key'] . '_TITLE';
+        $seoFieldNames[] = 'UL_SEO_' . $p['key'] . '_DESCRIPTION';
+        $seoFieldNames[] = 'UL_SEO_' . $p['key'] . '_KEYWORDS';
+    }
 @endphp
 
 <div id="seoOverlay" class="seo-overlay" onclick="if(event.target===this)closeSeoModal()">
@@ -158,13 +169,7 @@
 <script>
 (function () {
     var fincode = null;
-    var fields  = @json(collect($seoPages)->flatMap(function ($p) {
-        return [
-            'UL_SEO_' . $p['key'] . '_TITLE',
-            'UL_SEO_' . $p['key'] . '_DESCRIPTION',
-            'UL_SEO_' . $p['key'] . '_KEYWORDS',
-        ];
-    })->values());
+    var fields  = @json($seoFieldNames);
 
     window.openSeoModal = function (fc, companyName) {
         fincode = fc;
