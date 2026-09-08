@@ -86,7 +86,10 @@ echo "============================================"
 echo ""
 
 # ── Patch .env for production ────────────────────────────────
-APP_DOMAIN="stockswitty.com"
+# www is the canonical host — public/.htaccess 301-redirects the
+# bare domain and http here, so APP_URL must match or url()/route()
+# would generate links to the non-canonical host.
+APP_DOMAIN="www.stockswitty.com"
 
 info "Patching .env for production ..."
 ENV_FILE="$APP_DIR/.env"

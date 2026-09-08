@@ -6,6 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'StockWitty — Invest Smart, Stay Witty')</title>
   <meta name="description" content="@yield('description', 'Research and buy unlisted & pre-IPO shares in India — live prices, DRHP tracking, honest research and same-day demat delivery. Invest Smart, Stay Witty.')" />
+  <link rel="canonical" href="{{ url()->current() }}" />
   <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
   <link rel="alternate icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
