@@ -1,2 +1,69 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /login
+Disallow: /login/
+Disallow: /signup
+Disallow: /signup/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /profile
+Disallow: /*?*utm_
+Disallow: /*?*ref=
+Disallow: /*?*fbclid=
+Disallow: /*?*gclid=
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# AI / LLM crawlers - allowed so StockWitty can surface in ChatGPT, Claude,
+# Perplexity etc. answers (see /llms.txt for a crawler-friendly site map).
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+# Aggressive scrapers with no SEO upside for us
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+Sitemap: https://www.stockswitty.com/sitemap.xml

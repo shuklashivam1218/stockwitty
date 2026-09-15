@@ -12,6 +12,7 @@ use App\Http\Controllers\UnlistedReportController;
 use App\Http\Controllers\CmsPagesController;
 use App\Http\Controllers\Sw\CompanyController;
 use App\Http\Controllers\Sw\HomeController;
+use App\Http\Controllers\Sw\SeoController;
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 Route::get('/login', function () {
@@ -28,6 +29,9 @@ Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
 
 // ── Public pages ─────────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
+Route::get('/llms.txt', [SeoController::class, 'llms'])->name('llms');
 
 Route::get('/unlisted-shares/', [CompanyController::class, 'directory'])->name('sw.unlisted-shares');
 
