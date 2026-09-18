@@ -33,6 +33,8 @@
     transition: box-shadow .15s, border-color .15s;
 }
 .dash-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.09); border-color: #c8ddd8; }
+a.dash-card:not([href]) { cursor: default; }
+a.dash-card:not([href]):hover { box-shadow: 0 1px 4px rgba(0,0,0,.04); border-color: #e8edf2; }
 .dash-card-icon {
     width: 46px;
     height: 46px;
@@ -84,6 +86,14 @@
 @endpush
 
 @section('content')
+@php
+    $_p         = session('privilege', []);
+    $_ul        = $_p['unlisted'] ?? [];
+    $linkUsers  = !empty($_p['user_master']) ? url('/admin/users') : null;
+    $linkStocks = !empty($_ul['unlisted_stocks']) ? url('/admin/unlisted') : null;
+    $linkLeads  = (!empty($_ul['leads']) || !empty($_ul['leads_allocation'])) ? url('/admin/unlisted/leads') : null;
+    $linkOrders = !empty($_ul['orders']) ? url('/admin/unlisted/orders') : null;
+@endphp
 <div class="admin-main">
 
     <h1 class="admin-page-title">Dashboard</h1>
@@ -91,28 +101,28 @@
     {{-- ── Users ─────────────────────────────────────────── --}}
     <div class="dash-section-title">Users</div>
     <div class="dash-stats">
-        <a class="dash-card" href="{{ url('/admin/users') }}">
+        <a class="dash-card" @if($linkUsers) href="{{ $linkUsers }}" @endif>
             <div class="dash-card-icon green"><i class="fa-solid fa-users"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $totalUsers }}</div>
                 <div class="dash-card-lbl">Total Users</div>
             </div>
         </a>
-        <a class="dash-card" href="{{ url('/admin/users') }}">
+        <a class="dash-card" @if($linkUsers) href="{{ $linkUsers }}" @endif>
             <div class="dash-card-icon purple"><i class="fa-solid fa-user-shield"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $adminUsers }}</div>
                 <div class="dash-card-lbl">Admin Users</div>
             </div>
         </a>
-        <a class="dash-card" href="{{ url('/admin/users') }}">
+        <a class="dash-card" @if($linkUsers) href="{{ $linkUsers }}" @endif>
             <div class="dash-card-icon blue"><i class="fa-solid fa-user-check"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $memberUsers }}</div>
                 <div class="dash-card-lbl">Members</div>
             </div>
         </a>
-        <a class="dash-card" href="{{ url('/admin/users') }}">
+        <a class="dash-card" @if($linkUsers) href="{{ $linkUsers }}" @endif>
             <div class="dash-card-icon orange"><i class="fa-solid fa-clock"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $kycPending }}</div>
@@ -124,21 +134,21 @@
     {{-- ── Unlisted Stocks ───────────────────────────────── --}}
     <div class="dash-section-title">Unlisted Stocks</div>
     <div class="dash-stats">
-        <a class="dash-card" href="{{ url('/admin/unlisted') }}">
+        <a class="dash-card" @if($linkStocks) href="{{ $linkStocks }}" @endif>
             <div class="dash-card-icon green"><i class="fa-solid fa-chart-bar"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $totalStocks }}</div>
                 <div class="dash-card-lbl">Total Stocks</div>
             </div>
         </a>
-        <a class="dash-card" href="{{ url('/admin/unlisted') }}">
+        <a class="dash-card" @if($linkStocks) href="{{ $linkStocks }}" @endif>
             <div class="dash-card-icon teal"><i class="fa-solid fa-circle-check"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $activeStocks }}</div>
                 <div class="dash-card-lbl">Active Stocks</div>
             </div>
         </a>
-        <a class="dash-card" href="{{ url('/admin/unlisted') }}">
+        <a class="dash-card" @if($linkStocks) href="{{ $linkStocks }}" @endif>
             <div class="dash-card-icon red"><i class="fa-solid fa-circle-xmark"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $totalStocks - $activeStocks }}</div>
@@ -150,14 +160,14 @@
     {{-- ── Leads & Orders ────────────────────────────────── --}}
     <div class="dash-section-title">Business</div>
     <div class="dash-stats">
-        <a class="dash-card" href="{{ url('/admin/unlisted/leads') }}">
+        <a class="dash-card" @if($linkLeads) href="{{ $linkLeads }}" @endif>
             <div class="dash-card-icon blue"><i class="fa-solid fa-address-book"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $totalLeads }}</div>
                 <div class="dash-card-lbl">Total Leads</div>
             </div>
         </a>
-        <a class="dash-card" href="{{ url('/admin/unlisted/orders') }}">
+        <a class="dash-card" @if($linkOrders) href="{{ $linkOrders }}" @endif>
             <div class="dash-card-icon orange"><i class="fa-solid fa-file-invoice"></i></div>
             <div class="dash-card-body">
                 <div class="dash-card-num">{{ $totalOrders }}</div>
@@ -169,26 +179,34 @@
     {{-- ── Quick Links ───────────────────────────────────── --}}
     <div class="dash-section-title">Quick Access</div>
     <div class="dash-quicklinks">
-        <a class="dash-ql" href="{{ url('/admin/users') }}">
+        @if($linkUsers)
+        <a class="dash-ql" href="{{ $linkUsers }}">
             <i class="fa-solid fa-users"></i>
             <span>Manage Users</span>
             <small>View, KYC verify &amp; manage privileges</small>
         </a>
-        <a class="dash-ql" href="{{ url('/admin/unlisted') }}">
+        @endif
+        @if($linkStocks)
+        <a class="dash-ql" href="{{ $linkStocks }}">
             <i class="fa-solid fa-chart-bar"></i>
             <span>Stocks</span>
             <small>Add &amp; manage unlisted stocks</small>
         </a>
-        <a class="dash-ql" href="{{ url('/admin/unlisted/leads') }}">
+        @endif
+        @if($linkLeads)
+        <a class="dash-ql" href="{{ $linkLeads }}">
             <i class="fa-solid fa-address-book"></i>
             <span>Leads</span>
             <small>View &amp; allocate leads</small>
         </a>
-        <a class="dash-ql" href="{{ url('/admin/unlisted/orders') }}">
+        @endif
+        @if($linkOrders)
+        <a class="dash-ql" href="{{ $linkOrders }}">
             <i class="fa-solid fa-file-invoice"></i>
             <span>Orders</span>
             <small>Track &amp; update order status</small>
         </a>
+        @endif
         <a class="dash-ql" href="{{ url('/') }}" target="_blank">
             <i class="fa-solid fa-globe"></i>
             <span>Public Site</span>

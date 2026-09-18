@@ -293,7 +293,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->name('unlisted.leads.activity');
 
     // ── User Dashboard Modal ──────────────────────────────────────────────────
-    Route::prefix('/users/{uid}/dashboard')->middleware('privilege:admin,user_master,unlisted')->group(function () {
+    Route::prefix('/users/{uid}/dashboard')->middleware('privilege:user_master,unlisted')->group(function () {
         Route::get('/',                [UserDashboardController::class, 'profile']);
         Route::get('/orders',          [UserDashboardController::class, 'orders']);
         Route::get('/demat',           [UserDashboardController::class, 'demat']);
@@ -343,18 +343,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // ── CMS ───────────────────────────────────────────────────────────────────
     Route::get('/cms', [CmsPagesController::class, 'index'])
-        ->middleware('privilege:admin')
+        ->middleware('privilege:author,reviewer')
         ->name('cms');
 
     Route::get('/cms/{slug}/edit', [CmsPagesController::class, 'getEditModal'])
-        ->middleware('privilege:admin')
+        ->middleware('privilege:author,reviewer')
         ->name('cms.edit');
 
     Route::post('/cms/{slug}', [CmsPagesController::class, 'update'])
-        ->middleware('privilege:admin')
+        ->middleware('privilege:author,reviewer')
         ->name('cms.update');
 
     Route::post('/cms/{slug}/upload-image', [CmsPagesController::class, 'uploadImage'])
-        ->middleware('privilege:admin')
+        ->middleware('privilege:author,reviewer')
         ->name('cms.upload');
 });

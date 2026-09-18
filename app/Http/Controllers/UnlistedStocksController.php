@@ -22,8 +22,8 @@ class UnlistedStocksController extends Controller
 {
     public function index()
     {
-        $isAdmin = !empty(Privilege::get('admin')) || !empty(Privilege::get('user_master'));
-        if (!$isAdmin && empty(Privilege::get('unlisted.stockx'))) abort(403);
+        $isUserMaster = !empty(Privilege::get('user_master'));
+        if (!$isUserMaster && empty(Privilege::get('unlisted.unlisted_stocks'))) abort(403);
 
         $stocks   = UnlistedStock::orderByDesc('UL_STOCKS_FINCODE')->paginate(20);
         $fincodes = $stocks->pluck('UL_STOCKS_FINCODE');

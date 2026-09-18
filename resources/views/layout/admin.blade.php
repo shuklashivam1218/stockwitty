@@ -71,7 +71,7 @@
 
             @php
                 $_ul    = $priv['unlisted'] ?? [];
-                $_ulAny = !empty($priv['admin']) || !empty($priv['user_master']) || !empty(array_filter($_ul));
+                $_ulAny = !empty($priv['user_master']) || !empty(array_filter($_ul));
             @endphp
             @if($_ulAny)
             <li class="{{ request()->is('admin/unlisted*') ? 'mm-active' : '' }}">
@@ -80,7 +80,7 @@
                     <div class="menu-title">Unlisted Stocks</div>
                 </a>
                 <ul>
-                    @if(!empty($priv['admin']) || !empty($_ul['stockx']))
+                    @if(!empty($_ul['unlisted_stocks']))
                     <li><a href="{{ url('/admin/unlisted') }}"
                            class="{{ request()->is('admin/unlisted') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Stocks
@@ -96,19 +96,19 @@
                     </li>
                     @endif
                     @endif
-                    @if(!empty($priv['admin']) || !empty($_ul['leads']))
+                    @if(!empty($_ul['leads']))
                     <li><a href="{{ url('/admin/unlisted/leads') }}"
                            class="{{ request()->is('admin/unlisted/leads*') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Leads
                     </a></li>
                     @endif
-                    @if(!empty($priv['admin']) || !empty($_ul['orders']))
+                    @if(!empty($_ul['orders']))
                     <li><a href="{{ url('/admin/unlisted/orders') }}"
                            class="{{ request()->is('admin/unlisted/orders*') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Orders
                     </a></li>
                     @endif
-                    @if(!empty($priv['admin']) || !empty($_ul['unlisted_reports']))
+                    @if(!empty($_ul['unlisted_reports']))
                     <li><a href="{{ url('/admin/unlisted/reports') }}"
                            class="{{ request()->is('admin/unlisted/reports*') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Reports
@@ -118,7 +118,7 @@
             </li>
             @endif
 
-            @if(!empty($priv['admin']) || !empty($priv['user_master']))
+            @if(!empty($priv['user_master']))
             <li class="{{ request()->is('admin/users*') ? 'mm-active' : '' }}">
                 <a href="{{ url('/admin/users') }}">
                     <div class="parent-icon"><i class="fa-solid fa-users"></i></div>
@@ -127,7 +127,7 @@
             </li>
             @endif
 
-            @if(!empty($priv['admin']))
+            @if(!empty($priv['author']) || !empty($priv['reviewer']))
             <li class="{{ request()->is('admin/cms*') ? 'mm-active' : '' }}">
                 <a href="javascript:;" class="has-arrow">
                     <div class="parent-icon"><i class="fa-solid fa-file-lines"></i></div>

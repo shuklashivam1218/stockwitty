@@ -125,7 +125,7 @@
                 <div class="priv-pill-grid">
                     @php
                         $unlistedItems = [
-                            'unlisted_stockx'            => ['label' => 'Stocks',           'key' => 'stockx'],
+                            'unlisted_unlisted_stocks'   => ['label' => 'Stocks',           'key' => 'unlisted_stocks'],
                             'unlisted_leads'             => ['label' => 'Leads',            'key' => 'leads'],
                             'unlisted_leads_allocation'  => ['label' => 'Leads Allocation', 'key' => 'leads_allocation'],
                             'unlisted_orders'            => ['label' => 'Orders',           'key' => 'orders'],

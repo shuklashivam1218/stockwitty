@@ -18,11 +18,14 @@ class AdminController extends Controller
         if (!empty(Privilege::get('user_master'))) {
             return redirect()->route('admin.users');
         }
-        if (!empty(Privilege::get('unlisted.stockx'))) {
+        if (!empty(Privilege::get('unlisted.unlisted_stocks'))) {
             return redirect()->route('admin.unlisted');
         }
         if (!empty(Privilege::get('unlisted.leads')) || !empty(Privilege::get('unlisted.leads_allocation'))) {
             return redirect()->route('admin.unlisted.leads');
+        }
+        if (!empty(Privilege::get('author')) || !empty(Privilege::get('reviewer'))) {
+            return redirect()->route('admin.cms');
         }
         if (!empty(Privilege::get('pg.margin'))) {
             return redirect()->route('admin.pg.margin');

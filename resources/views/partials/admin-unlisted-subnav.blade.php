@@ -53,7 +53,7 @@
 @php
     $_ul      = session('privilege.unlisted', []);
     $_isAdmin = !empty(session('privilege.admin')) || !empty(session('privilege.user_master'));
-    $_stockx  = $_isAdmin || !empty($_ul['stockx']);
+    $_stocks  = $_isAdmin || !empty($_ul['unlisted_stocks']);
     $_leads   = $_isAdmin || !empty($_ul['leads']) || !empty($_ul['leads_allocation']);
     $_orders  = $_isAdmin || !empty($_ul['orders']);
     $_reports = !empty($_ul['unlisted_reports']);
@@ -61,7 +61,7 @@
 
 <div class="admin-sub-subnav">
     <div class="admin-sub-subnav-inner">
-        @if($_stockx)
+        @if($_stocks)
         <a href="{{ url('/admin/unlisted') }}"
             class="admin-sub-subnav-tab {{ request()->routeIs('admin.unlisted') ? 'active' : '' }}">
             Dashboard
@@ -89,7 +89,7 @@
         </a>
         @endif
 
-        @if($_stockx && request()->routeIs('admin.unlisted'))
+        @if($_stocks && request()->routeIs('admin.unlisted'))
         <button type="button" class="admin-sub-subnav-tab" id="stocksNavBtn">
             + Add Stocks
         </button>

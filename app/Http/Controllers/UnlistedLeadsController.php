@@ -14,9 +14,9 @@ class UnlistedLeadsController extends Controller
 {
     public function leads()
     {
-        $isAdmin     = !empty(Privilege::get('admin')) || !empty(Privilege::get('user_master'));
-        $canAllocate = $isAdmin || !empty(Privilege::get('unlisted.leads_allocation'));
-        $canSeeOwn   = !empty(Privilege::get('unlisted.leads'));
+        $isUserMaster = !empty(Privilege::get('user_master'));
+        $canAllocate  = $isUserMaster || !empty(Privilege::get('unlisted.leads_allocation'));
+        $canSeeOwn    = !empty(Privilege::get('unlisted.leads'));
 
         if (!$canAllocate && !$canSeeOwn) abort(403);
 
@@ -27,9 +27,9 @@ class UnlistedLeadsController extends Controller
 
     public function leadsData(Request $request)
     {
-        $isAdmin     = !empty(Privilege::get('admin')) || !empty(Privilege::get('user_master'));
-        $canAllocate = $isAdmin || !empty(Privilege::get('unlisted.leads_allocation'));
-        $canSeeOwn   = !empty(Privilege::get('unlisted.leads'));
+        $isUserMaster = !empty(Privilege::get('user_master'));
+        $canAllocate  = $isUserMaster || !empty(Privilege::get('unlisted.leads_allocation'));
+        $canSeeOwn    = !empty(Privilege::get('unlisted.leads'));
 
         if (!$canAllocate && !$canSeeOwn) abort(403);
 
@@ -110,8 +110,7 @@ class UnlistedLeadsController extends Controller
 
     public function allocateLead(Request $request, int $leadId)
     {
-        $canAllocate = !empty(Privilege::get('admin'))
-                    || !empty(Privilege::get('user_master'))
+        $canAllocate = !empty(Privilege::get('user_master'))
                     || !empty(Privilege::get('unlisted.leads_allocation'));
 
         if (!$canAllocate) return response()->json(['success' => false], 403);
@@ -311,8 +310,7 @@ class UnlistedLeadsController extends Controller
 
     private function canAccessLeads(): bool
     {
-        return !empty(Privilege::get('admin'))
-            || !empty(Privilege::get('user_master'))
+        return !empty(Privilege::get('user_master'))
             || !empty(Privilege::get('unlisted.leads_allocation'))
             || !empty(Privilege::get('unlisted.leads'));
     }

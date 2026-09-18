@@ -94,7 +94,7 @@ class UsersController extends Controller
             'author'      => $request->boolean('author'),
             'reviewer'    => $request->boolean('reviewer'),
             'unlisted'    => [
-                'stockx'           => $request->boolean('unlisted_stockx'),
+                'unlisted_stocks'  => $request->boolean('unlisted_unlisted_stocks'),
                 'leads'            => $request->boolean('unlisted_leads'),
                 'leads_allocation' => $request->boolean('unlisted_leads_allocation'),
                 'orders'           => $request->boolean('unlisted_orders'),
