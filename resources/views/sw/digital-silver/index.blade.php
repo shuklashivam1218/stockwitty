@@ -57,7 +57,19 @@ $faqs = [
                         </ul>
                     </x-sw.reveal>
 
-                    <x-sw.reveal :delay="0.08" class="h-full rounded-3xl border border-border bg-card p-7 shadow-soft"
+                    @php $example = \App\Support\AgentView\CalculatorFormulas::metalPurchase(1000, $RATE); @endphp
+                    <x-sw.agent-calculator
+                        title="Digital silver buy calculator — worked example"
+                        formula="Silver (grams) = amount ÷ rate per gram; GST = 3% of the purchase amount"
+                        :example="[
+                            'Amount' => '₹1,000',
+                            'Rate per gram (illustrative)' => '₹' . number_format($RATE, 2),
+                            'Silver you get' => number_format($example['grams'], 4) . ' g',
+                            'GST (3%, on purchase)' => '₹' . number_format($example['gst'], 2),
+                        ]"
+                        note="GST applies on purchase only, not on sale." />
+
+                    <x-sw.reveal data-agent-skip :delay="0.08" class="h-full rounded-3xl border border-border bg-card p-7 shadow-soft"
                                  x-data="{
                                      mode: 'Buy', amount: 1000, rate: {{ $RATE }},
                                      get grams() { return this.amount / this.rate; },

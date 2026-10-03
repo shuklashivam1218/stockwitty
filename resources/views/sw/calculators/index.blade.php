@@ -95,7 +95,21 @@ $calcCount = array_sum(array_map(fn($g) => count($g['items']), $calcGroups));
                             <span class="ml-auto rounded-full bg-primary px-3 py-1 text-[11px] font-bold tracking-wider text-primary-foreground uppercase">Live</span>
                         </div>
 
-                        <div class="grid gap-8 p-6 sm:p-7 lg:grid-cols-[minmax(0,1fr)_22rem]">
+                        @php $sip = \App\Support\AgentView\CalculatorFormulas::sip(10000, 12, 10); @endphp
+                        <x-sw.agent-calculator
+                            title="SIP calculator — worked example"
+                            formula="FV = P × [((1 + i)^n − 1) / i] × (1 + i), where P = monthly investment, i = annual rate / 12 / 100, n = months"
+                            :example="[
+                                'Monthly investment' => '₹10,000',
+                                'Expected return' => '12% p.a.',
+                                'Time period' => '10 years (120 months)',
+                                'Invested amount' => \App\Support\AgentView\AgentTables::inr($sip['invested']),
+                                'Estimated returns' => \App\Support\AgentView\AgentTables::inr($sip['returns']),
+                                'Total value' => \App\Support\AgentView\AgentTables::inr($sip['total']),
+                            ]"
+                            note="Estimates only. Returns are not guaranteed." />
+
+                        <div data-agent-skip class="grid gap-8 p-6 sm:p-7 lg:grid-cols-[minmax(0,1fr)_22rem]">
                             <div class="space-y-7">
                                 <div>
                                     <div class="flex flex-wrap items-center justify-between gap-2">

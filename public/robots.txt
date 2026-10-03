@@ -1,4 +1,9 @@
+# Content Signals (contentsignals.org): how our content may be used.
+# Keep in sync with config/agent_view.php -> content_signal.
+# Every public page also has a Markdown twin for AI agents at the same path
+# ending in .md (e.g. /blog/tax-on-unlisted-shares.md, /index.md).
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 Disallow: /login
 Disallow: /login/

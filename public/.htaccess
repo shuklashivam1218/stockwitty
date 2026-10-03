@@ -19,10 +19,13 @@
     # GET/HEAD only: redirecting a POST/PATCH/DELETE here would risk the
     # browser resubmitting it as GET, silently dropping form/AJAX data —
     # and login, admin panel and every admin AJAX call use no-slash routes.
+    # Generated files (/sitemap.xml, /llms.txt, the /page.md Markdown twins
+    # for AI agents) are not directories and must never get a slash.
     RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} !/$
+    RewriteCond %{REQUEST_URI} !\.(xml|txt|md)$ [NC]
     RewriteRule ^(.*)$ /$1/ [L,R=301]
 
     # Send Requests To Front Controller...

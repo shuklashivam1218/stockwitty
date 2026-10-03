@@ -5,6 +5,11 @@
         <x-sw.section-heading eyebrow="Live showcase" title="Pick any company. The whole showcase follows."
                                subtitle="Tap a card in the slider to swap the price card, calculator and chart instantly." />
 
+        <x-sw.agent-data-table caption="Top-rated unlisted companies right now (by WittyScore)"
+                               :head="\App\Support\AgentView\AgentTables::SNAPSHOT_HEAD"
+                               :rows="\App\Support\AgentView\AgentTables::snapshotRows($companies)"
+                               note="Prices are dealer-negotiated, not exchange quoted. 1-week change compares with the price 7 days ago." />
+
         <template x-if="companies.length > 0">
         <div>
         <x-sw.reveal :delay="0.06">

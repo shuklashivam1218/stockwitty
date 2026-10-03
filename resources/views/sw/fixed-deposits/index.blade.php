@@ -15,7 +15,7 @@
 
         <section class="py-14 sm:py-20" x-data="fixedDeposits()" data-fds="{{ json_encode(config('sw.fds')) }}">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-wrap items-center justify-between gap-4">
+                <div data-agent-skip class="flex flex-wrap items-center justify-between gap-4">
                     <x-sw.chips :options="['All', 'Bank', 'Corporate']" model="type" />
                     <select x-model="tenure" aria-label="Filter by tenure"
                             class="rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-semibold outline-none focus:border-primary">
@@ -25,7 +25,15 @@
                     </select>
                 </div>
 
-                <x-sw.reveal>
+                <x-sw.agent-data-table caption="Fixed deposit rate comparison"
+                                       :head="['Issuer', 'Type', 'General rate', 'Senior citizen rate', 'Best tenure', 'Insurance']"
+                                       :rows="array_map(fn ($f) => [
+                                           ['text' => $f['issuer'], 'href' => '/fixed-deposits/' . $f['slug'] . '/'],
+                                           $f['type'], $f['general'], $f['senior'], $f['tenure'],
+                                           $f['insured'] ? 'DICGC insured up to ₹5L' : 'Not DICGC insured',
+                                       ], config('sw.fds'))" />
+
+                <x-sw.reveal data-agent-skip>
                     <div class="mt-6 overflow-x-auto rounded-2xl border border-border bg-card shadow-soft">
                         <table class="w-full min-w-[44rem] text-sm">
                             <caption class="sr-only">Fixed deposit rate comparison</caption>

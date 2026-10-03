@@ -47,7 +47,7 @@ $tableRows = array_map(fn ($r) => [$r['row'], $r['before'], $r['after']], $study
     </section>
 
     <div class="mx-auto w-full max-w-[1160px] px-4 pt-8 sm:px-6">
-        <div class="flex flex-wrap items-center justify-between gap-4" x-data="{ copied: false }">
+        <div data-agent-skip class="flex flex-wrap items-center justify-between gap-4" x-data="{ copied: false }">
             <div class="flex flex-wrap items-center gap-2">
                 <span class="text-xs font-bold tracking-wide text-muted-foreground uppercase">Share</span>
                 <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}" target="_blank" rel="noopener noreferrer"
@@ -119,6 +119,8 @@ $tableRows = array_map(fn ($r) => [$r['row'], $r['before'], $r['after']], $study
                  x-data="caseStudyChart()" data-chart="{{ json_encode($study['chart']) }}">
                 <canvas x-ref="chart"></canvas>
             </div>
+            <x-sw.agent-data-table caption="Price index over the journey (entry = 100)" :head="['Point', 'Index']"
+                                   :rows="array_map(fn ($p) => [$p['label'], $p['value']], $study['chart'])" />
 
             <x-sw.article-h2 id="outcome">Outcome</x-sw.article-h2>
             <ul class="mt-4 space-y-3">
@@ -155,7 +157,7 @@ $tableRows = array_map(fn ($r) => [$r['row'], $r['before'], $r['after']], $study
                 @endforeach
             </div>
 
-            <div id="callback" class="scroll-mt-28">
+            <div id="callback" data-agent-skip class="scroll-mt-28">
                 <form class="mt-6 rounded-3xl border border-border bg-green-50 p-6 sm:p-8" x-data="{
                         done: false, errors: {},
                         submit(e) {

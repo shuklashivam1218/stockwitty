@@ -27,7 +27,16 @@
 
         <section class="py-14 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="grid gap-6 lg:grid-cols-[17rem_1fr]">
+                @agentOnly
+                    <p>
+                        The screener is an interactive tool: visitors filter unlisted companies by sector, maximum
+                        price, minimum WittyScore, tag (Pre-IPO, Unicorn, Trending) and IPO probability, or
+                        describe what they want in plain English. The sample rows it shows are illustrative.
+                        For every company StockWitty tracks, with current indicative prices, lot sizes and
+                        WittyScores, see <a href="/unlisted-shares/">the unlisted shares directory</a>.
+                    </p>
+                @endagentOnly
+                <div data-agent-skip class="grid gap-6 lg:grid-cols-[17rem_1fr]">
                     <aside class="h-fit rounded-2xl border border-border bg-card p-5 shadow-soft">
                         <h2 class="text-sm font-bold tracking-widest text-primary uppercase">Filters</h2>
 

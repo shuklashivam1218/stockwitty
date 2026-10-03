@@ -3,7 +3,7 @@
 
 <div class="mx-auto w-full max-w-[1160px] px-4 sm:px-6 lg:flex lg:justify-center lg:gap-12" x-data="tocSpy(@js($ids))">
     <div class="min-w-0 lg:max-w-[780px] lg:flex-1">
-        <div class="sticky top-16 z-30 -mx-4 border-b border-border bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+        <div data-agent-skip class="sticky top-16 z-30 -mx-4 border-b border-border bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
             <p class="text-[0.7rem] font-bold tracking-[0.14em] text-primary uppercase">On this page</p>
             <select @change="scrollToSection($event.target.value)" :value="active"
                     aria-label="Jump to section"
@@ -17,7 +17,7 @@
         {{ $slot }}
     </div>
 
-    <aside class="hidden shrink-0 lg:block lg:w-[248px]">
+    <aside data-agent-skip class="hidden shrink-0 lg:block lg:w-[248px]">
         <nav aria-label="Table of contents" class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
             <p class="text-[0.7rem] font-bold tracking-[0.14em] text-primary uppercase">On this page</p>
             <ol class="mt-4 border-l border-green-100">

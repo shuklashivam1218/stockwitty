@@ -15,7 +15,7 @@
 
         <section class="py-14 sm:py-20" x-data="unlistedShares()" data-companies="{{ json_encode($companies) }}">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div data-agent-skip class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <x-sw.chips :options="['All', 'Pre-IPO', 'Unicorn', 'DRHP-Filed', 'Trending']" model="filter" />
                     <div class="flex flex-wrap gap-3">
                         <label class="relative">
@@ -39,9 +39,14 @@
                     </div>
                 </div>
 
-                <p class="mt-6 text-sm text-muted-foreground">
+                <p data-agent-skip class="mt-6 text-sm text-muted-foreground">
                     Showing <span class="font-bold text-foreground" x-text="list.length"></span> of {{ count($companies) }} companies
                 </p>
+
+                <x-sw.agent-data-table caption="All {{ count($companies) }} unlisted companies tracked by StockWitty"
+                                       :head="\App\Support\AgentView\AgentTables::COMPANY_HEAD"
+                                       :rows="\App\Support\AgentView\AgentTables::companyRows($companies)"
+                                       note="Prices are indicative, dealer-negotiated levels (not exchange quotes). Min investment = price × lot size." />
 
                 <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <template x-for="c in list" :key="c.slug">

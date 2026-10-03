@@ -4,6 +4,11 @@
     'video', 'faqTabs', 'faqs', 'sources', 'related', 'leadForm',
 ])
 
+@push('jsonld')
+    {!! \App\Support\Seo\JsonLd::script(\App\Support\Seo\JsonLd::article($title, $description, \App\Support\Seo\JsonLd::currentUrl(), $hero['src'] ?? null)) !!}
+@endpush
+<x-sw.faq-schema :faqs="$faqs" />
+
 <div class="pt-16">
     <x-sw.breadcrumb :items="$crumbs" />
 </div>
@@ -20,7 +25,7 @@
                 <h1 class="mt-5 text-3xl font-bold leading-tight text-foreground sm:text-[2.75rem]">{{ $title }}</h1>
                 <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-muted-foreground">
                     <span class="inline-flex items-center gap-2">
-                        <span class="grid size-9 place-items-center rounded-full bg-primary text-[0.7rem] font-bold text-primary-foreground">SW</span>
+                        <span aria-hidden="true" class="grid size-9 place-items-center rounded-full bg-primary text-[0.7rem] font-bold text-primary-foreground">SW</span>
                         {{ $authorLine }}
                     </span>
                     <span>{{ $dateLabel }}</span>
@@ -43,7 +48,7 @@
                 <img src="{{ $hero['src'] }}" alt="{{ $hero['alt'] }}" width="{{ $hero['width'] ?? 1600 }}" height="{{ $hero['height'] ?? 900 }}"
                      class="w-full rounded-3xl border border-border object-cover shadow-soft" />
             @else
-            <div class="bg-price-card relative flex aspect-[16/7] w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-3xl px-6 text-center shadow-soft">
+            <div data-agent-skip class="bg-price-card relative flex aspect-[16/7] w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-3xl px-6 text-center shadow-soft">
                 <div class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-mint/20 blur-3xl"></div>
                 @if ($heroIcon)
                     <span class="relative grid size-16 place-items-center rounded-2xl bg-white/10 text-mint-bright ring-1 ring-white/20 backdrop-blur sm:size-20">
@@ -77,7 +82,7 @@
             </x-sw.reveal>
 
             <x-sw.reveal>
-                <figure class="mt-10" x-data="{ playing: false }">
+                <figure data-agent-skip class="mt-10" x-data="{ playing: false }">
                     <div class="bg-price-card relative grid aspect-video w-full place-items-center overflow-hidden rounded-3xl">
                         <button type="button" @click="playing = true"
                                 class="grid size-16 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/30 backdrop-blur transition-transform hover:scale-105"
@@ -132,7 +137,7 @@
                 </div>
             </div>
 
-            <div class="mt-12 flex flex-wrap items-center gap-3 border-y border-border py-5" x-data="{ copied: false }">
+            <div data-agent-skip class="mt-12 flex flex-wrap items-center gap-3 border-y border-border py-5" x-data="{ copied: false }">
                 <span class="inline-flex items-center gap-2 text-sm font-bold text-foreground">
                     <x-sw.icon name="share-2" class="size-4 text-primary" /> Share this guide
                 </span>
@@ -153,7 +158,7 @@
 
             <x-sw.reveal>
                 <div class="mt-10 flex flex-col gap-4 rounded-3xl border border-border bg-secondary p-6 sm:flex-row sm:items-start">
-                    <span class="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary text-base font-bold text-primary-foreground">SW</span>
+                    <span aria-hidden="true" class="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary text-base font-bold text-primary-foreground">SW</span>
                     <div>
                         <p class="text-base font-bold text-foreground">StockWitty Research</p>
                         <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">
@@ -187,7 +192,7 @@
         </article>
     </x-sw.toc-layout>
 
-    <section class="bg-price-card mt-16 py-14" x-data="{
+    <section data-agent-skip class="bg-price-card mt-16 py-14" x-data="{
         done: false, errors: {},
         submit(e) {
             const fd = new FormData(e.target);

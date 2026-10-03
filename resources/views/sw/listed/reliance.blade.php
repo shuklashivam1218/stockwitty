@@ -90,14 +90,19 @@ $tabs = ['Performance', 'Fundamentals', 'Quarterly results', 'Shareholding'];
                 </div>
 
                 <div class="mt-6 rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-7">
+                    {{-- Humans switch tabs; agents get every tab in order, each labelled. --}}
                     <div x-show="tab === 'Performance'" style="display: block;">
                         <div class="h-72 w-full">
                             <div x-ref="perfData" data-series="{{ json_encode($series) }}"></div>
                             <canvas x-ref="perfChart"></canvas>
                         </div>
+                        <x-sw.agent-data-table caption="Performance: monthly closing price"
+                                               :head="['Month', 'Price']"
+                                               :rows="array_map(fn ($p) => [$p['m'], '₹' . number_format($p['p'])], $series)" />
                     </div>
 
-                    <dl x-show="tab === 'Fundamentals'" style="display: none;" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    @agentOnly <h3>Fundamentals</h3> @endagentOnly
+                    <dl data-agent-keep x-show="tab === 'Fundamentals'" style="display: none;" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         @foreach ([['Market cap', '₹19.26 L Cr'], ['EPS (TTM)', '₹119.45'], ['ROE', '9.85%'], ['Book value', '₹1,323'], ['Dividend yield', '0.35%'], ['Face value', '₹10'], ['3Y CAGR', '+12.8%'], ['5Y CAGR', '+14.2%']] as [$k, $v])
                             <div class="rounded-2xl bg-green-50 p-4">
                                 <dt class="text-xs font-semibold text-muted-foreground">{{ $k }}</dt>
@@ -106,7 +111,8 @@ $tabs = ['Performance', 'Fundamentals', 'Quarterly results', 'Shareholding'];
                         @endforeach
                     </dl>
 
-                    <div x-show="tab === 'Quarterly results'" style="display: none;">
+                    @agentOnly <h3>Quarterly results</h3> @endagentOnly
+                    <div data-agent-keep x-show="tab === 'Quarterly results'" style="display: none;">
                         <div class="mb-5 grid gap-4 sm:grid-cols-3">
                             @foreach ([['Revenue (latest quarter)', '₹2,68,402 Cr', '+11.2% YoY'], ['Net profit', '₹19,407 Cr', '+8.5% YoY'], ['Operating margin', '17.8%', 'Latest quarter']] as [$k, $v, $n])
                                 <div class="rounded-2xl bg-green-50 p-4">
@@ -143,7 +149,8 @@ $tabs = ['Performance', 'Fundamentals', 'Quarterly results', 'Shareholding'];
                         </div>
                     </div>
 
-                    <div x-show="tab === 'Shareholding'" style="display: none;" class="grid items-center gap-6 lg:grid-cols-2">
+                    @agentOnly <h3>Shareholding</h3> @endagentOnly
+                    <div data-agent-keep x-show="tab === 'Shareholding'" style="display: none;" class="grid items-center gap-6 lg:grid-cols-2">
                         <div class="h-64">
                             <div x-ref="pieData" data-holding="{{ json_encode($holding) }}"></div>
                             <canvas x-ref="pieChart"></canvas>

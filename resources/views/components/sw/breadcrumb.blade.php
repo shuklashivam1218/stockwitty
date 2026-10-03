@@ -1,5 +1,9 @@
 @props(['items'])
 
+@push('jsonld')
+    {!! \App\Support\Seo\JsonLd::script(\App\Support\Seo\JsonLd::breadcrumbs($items, \App\Support\Seo\JsonLd::currentUrl())) !!}
+@endpush
+
 <nav aria-label="Breadcrumb" class="border-b border-border bg-green-50">
     <ol class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 text-xs sm:px-6 lg:px-8 sm:text-sm">
         @foreach ($items as $i => $c)

@@ -19,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest.only' => \App\Http\Middleware\GuestOnly::class,
             'privilege'  => \App\Http\Middleware\RequirePrivilege::class,
         ]);
+
+        // Global, not per-route: /x.md has to be mapped to /x/ before routing.
+        $middleware->append(\App\Http\Middleware\ServeAgentMarkdown::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Return JSON for throttle errors so AJAX login/register forms handle them properly

@@ -123,7 +123,20 @@ $faqs = [
                         </p>
                     </x-sw.reveal>
 
-                    <x-sw.reveal :delay="0.08" class="rounded-3xl border border-border bg-card p-6 shadow-soft"
+                    @php
+                        $general = \App\Support\AgentView\CalculatorFormulas::fdQuarterly(100000, 9.1, 5);
+                        $senior  = \App\Support\AgentView\CalculatorFormulas::fdQuarterly(100000, 9.6, 5);
+                    @endphp
+                    <x-sw.agent-calculator
+                        title="FD calculator — worked example"
+                        formula="Maturity = P × (1 + r/4)^(4 × years), quarterly compounding, r = annual rate / 100"
+                        :example="[
+                            'Deposit' => '₹1,00,000 for 5 years',
+                            'Maturity at 9.10% (general)' => \App\Support\AgentView\AgentTables::inr($general['maturity']) . ' (interest ' . \App\Support\AgentView\AgentTables::inr($general['interest']) . ')',
+                            'Maturity at 9.60% (senior citizen)' => \App\Support\AgentView\AgentTables::inr($senior['maturity']) . ' (interest ' . \App\Support\AgentView\AgentTables::inr($senior['interest']) . ')',
+                        ]" />
+
+                    <x-sw.reveal data-agent-skip :delay="0.08" class="rounded-3xl border border-border bg-card p-6 shadow-soft"
                                  x-data="{
                                      amount: 100000, years: 5, senior: false,
                                      get rate() { return this.senior ? 9.6 : 9.1; },

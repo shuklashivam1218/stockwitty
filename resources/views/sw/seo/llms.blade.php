@@ -2,6 +2,9 @@
 
 > StockWitty is an investment platform for unlisted and pre-IPO shares in India — with honest research, transparent pricing and human support. Each company carries a WittyScore rating, a full profile and an investment thesis. StockWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.
 
+## Markdown for AI agents
+Every page listed below is also available as clean Markdown: request the same path ending in `.md` (for example https://www.stockswitty.com/blog/tax-on-unlisted-shares.md, or https://www.stockswitty.com/index.md for the homepage), or send `Accept: text/markdown` to the page URL. The Markdown is generated from the live page, including current indicative prices.
+
 ## Core pages
 - [Home](https://www.stockswitty.com/)
 - [Unlisted Shares](https://www.stockswitty.com/unlisted-shares/): directory of unlisted & pre-IPO companies

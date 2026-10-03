@@ -14,6 +14,7 @@ import { screener } from './sw/screener';
 import { sipCalculator } from './sw/sip-calculator';
 import { downloadGate } from './sw/download-gate';
 import { authPage } from './sw/auth-page';
+import { agentView } from './sw/agent-view';
 
 Alpine.plugin(intersect);
 Alpine.data('navBar', navBar);
@@ -28,6 +29,7 @@ Alpine.data('screener', screener);
 Alpine.data('sipCalculator', sipCalculator);
 Alpine.data('downloadGate', downloadGate);
 Alpine.data('authPage', authPage);
+Alpine.data('agentView', agentView);
 registerCountupDirective(Alpine);
 
 window.Alpine = Alpine;

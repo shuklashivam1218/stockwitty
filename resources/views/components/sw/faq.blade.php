@@ -1,3 +1,5 @@
+<x-sw.faq-schema :faqs="config('sw.faqs')" />
+
 <section id="faq" class="py-20 sm:py-28">
     <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:px-8">
         <x-sw.section-heading eyebrow="FAQ — Questions, answered" title="The things everyone asks us first"

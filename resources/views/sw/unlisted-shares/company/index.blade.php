@@ -80,7 +80,7 @@ $ipoFacts    = \App\Models\UnlistedCompanyInsight::parsePairs($insight?->UL_CI_I
                 <div>
                     <x-sw.reveal>
                         <div class="flex items-start gap-4">
-                            <span class="grid size-16 shrink-0 place-items-center rounded-2xl bg-primary text-xl font-bold text-primary-foreground shadow-soft">{{ $company['initials'] }}</span>
+                            <span aria-hidden="true" class="grid size-16 shrink-0 place-items-center rounded-2xl bg-primary text-xl font-bold text-primary-foreground shadow-soft">{{ $company['initials'] }}</span>
                             <div>
                                 <h1 class="text-2xl leading-tight font-bold text-foreground sm:text-4xl">{{ $stock->UL_STOCKS_COMPNAME }}</h1>
                                 <div class="mt-3 flex flex-wrap gap-2">
@@ -147,17 +147,17 @@ $ipoFacts    = \App\Models\UnlistedCompanyInsight::parsePairs($insight?->UL_CI_I
                             <p class="relative mt-4 text-xs font-semibold text-white/75">
                                 Min lot: {{ number_format($company['lot']) }} shares · Total: ₹{{ number_format($company['lot'] * $company['price']) }}
                             </p>
-                            <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer"
+                            <a data-agent-skip href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer"
                                class="relative mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-mint to-mint-bright px-4 py-3 text-sm font-bold text-[#052a14] transition-transform hover:-translate-y-0.5">
                                 <x-sw.icon name="message-circle" class="size-4" />
                                 Get Quote on WhatsApp
                             </a>
-                            <a href="#lead" class="relative mt-3 block text-center text-xs font-semibold text-mint-bright underline-offset-4 hover:underline">
+                            <a data-agent-skip href="#lead" class="relative mt-3 block text-center text-xs font-semibold text-mint-bright underline-offset-4 hover:underline">
                                 Fill inquiry form instead →
                             </a>
                         </div>
 
-                        <div x-data="{ side: 'Buy', qty: {{ $company['lot'] }}, price: {{ $company['price'] }}, submitted: false }" class="rounded-3xl border border-border bg-card p-6 shadow-soft">
+                        <div data-agent-skip x-data="{ side: 'Buy', qty: {{ $company['lot'] }}, price: {{ $company['price'] }}, submitted: false }" class="rounded-3xl border border-border bg-card p-6 shadow-soft">
                             <h2 class="text-lg font-bold text-foreground">Trade</h2>
                             <div role="group" aria-label="Order side" class="mt-4 grid grid-cols-2 gap-1 rounded-xl border border-border bg-green-50 p-1">
                                 <button type="button" @click="side = 'Buy'" :aria-pressed="side === 'Buy'"
@@ -255,6 +255,10 @@ $ipoFacts    = \App\Models\UnlistedCompanyInsight::parsePairs($insight?->UL_CI_I
                         Indicative dealer levels. Unlisted prices are negotiated, not exchange-quoted.
                     </p>
                 </div>
+                <x-sw.agent-data-table caption="{{ $stock->UL_STOCKS_COMPNAME }} indicative price by period"
+                                       :head="\App\Support\AgentView\AgentTables::PRICE_HISTORY_HEAD"
+                                       :rows="\App\Support\AgentView\AgentTables::priceHistoryRows($series)"
+                                       note="High and low are taken from up to 24 sampled price points per period." />
             </div>
         </section>
 
@@ -327,7 +331,11 @@ $ipoFacts    = \App\Models\UnlistedCompanyInsight::parsePairs($insight?->UL_CI_I
                         @foreach ($financialTables as $rangeKey => $tabs)
                             @foreach ($tabs as $tabKey => $table)
                                 @if (count($table['cols']))
-                                    <table x-show="range === '{{ $rangeKey }}' && tab === '{{ $tabKey }}'" style="display: none;"
+                                    {{-- Humans see one tab at a time; agents get every table, each labelled. --}}
+                                    @agentOnly
+                                        <h3>{{ $rangeKey }} {{ $tabKey }} (₹ Cr)</h3>
+                                    @endagentOnly
+                                    <table data-agent-keep x-show="range === '{{ $rangeKey }}' && tab === '{{ $tabKey }}'" style="display: none;"
                                            class="w-full min-w-[640px] border-collapse text-left text-sm">
                                         <thead>
                                             <tr class="bg-green-50">
@@ -409,6 +417,7 @@ $ipoFacts    = \App\Models\UnlistedCompanyInsight::parsePairs($insight?->UL_CI_I
         @endif
 
         @if ($overviewFaqs->isNotEmpty())
+            <x-sw.faq-schema :faqs="$overviewFaqs->map(fn ($f) => ['q' => $f->UL_FAQ_QUESTION, 'a' => $f->UL_FAQ_ANSWER])->all()" />
             <section id="faq" class="py-14 sm:py-20">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <x-sw.section-heading eyebrow="FAQ" title="Buying {{ $stock->UL_STOCKS_COMPNAME }} unlisted shares" align="center" />

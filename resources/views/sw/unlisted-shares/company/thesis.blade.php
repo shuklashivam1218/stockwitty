@@ -214,6 +214,7 @@ $toc = array_values(array_filter([
             @endif
 
             @if (count($thesisFaqs))
+                <x-sw.faq-schema :faqs="$thesisFaqs->map(fn ($f) => ['q' => $f->UL_FAQ_QUESTION, 'a' => $f->UL_FAQ_ANSWER])->all()" />
                 <section id="thesis-faq" class="scroll-mt-28 mt-16">
                     <x-sw.reveal><h2 class="text-2xl font-bold text-foreground sm:text-3xl">Frequently asked questions</h2></x-sw.reveal>
                     <div class="mt-7">
