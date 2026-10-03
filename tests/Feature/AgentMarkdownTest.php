@@ -16,6 +16,7 @@ class AgentMarkdownTest extends TestCase
         '/calculators/',
         '/fixed-deposits/suryoday/',
         '/case-studies/nse-pre-ipo-journey/',
+        '/contact/',
     ];
 
     public function test_every_static_page_has_a_markdown_twin(): void

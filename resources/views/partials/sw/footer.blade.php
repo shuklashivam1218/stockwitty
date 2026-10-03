@@ -7,7 +7,7 @@ $swAccount = [
 
 <footer id="footer" class="bg-price-card text-white">
     <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div class="grid gap-10 lg:grid-cols-5">
+        <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
             <div class="lg:col-span-2">
                 <p class="text-2xl text-white font-bold tracking-tight">
                     Stocks<span class="text-mint">Witty</span>
@@ -44,6 +44,15 @@ $swAccount = [
                 <ul class="mt-4 space-y-2.5">
                     @foreach (config('sw.tools') as $t)
                         <li><a href="{{ $t['href'] }}" class="text-sm text-white/70 transition-colors hover:text-mint-bright">{{ $t['title'] }}</a></li>
+                    @endforeach
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-bold tracking-widest text-mint-bright uppercase">Company</h3>
+                <ul class="mt-4 space-y-2.5">
+                    @foreach (config('sw.company_links') as $c)
+                        <li><a href="{{ $c['href'] }}" class="text-sm text-white/70 transition-colors hover:text-mint-bright">{{ $c['title'] }}</a></li>
                     @endforeach
                 </ul>
             </div>

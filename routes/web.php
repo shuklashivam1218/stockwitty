@@ -84,6 +84,8 @@ Route::view('/case-studies/research-over-hype/', 'sw.case-studies.research-over-
 
 Route::view('/why-witty/', 'sw.why-witty.index')->name('sw.why-witty');
 
+Route::view('/contact/', 'sw.contact.index')->name('sw.contact');
+
 Route::get('/disclaimer', [CmsPagesController::class, 'showDisclaimer'])->name('disclaimer');
 
 // Profile placeholder (admin dropdown link)

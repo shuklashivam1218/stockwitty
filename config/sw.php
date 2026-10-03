@@ -23,6 +23,41 @@ return [
         ['title' => 'WittyScore', 'desc' => 'How we grade unlisted companies out of 10.', 'href' => '/wittyscore/', 'icon' => 'gauge'],
     ],
 
+    // Footer "Company" column.
+    'company_links' => [
+        ['title' => 'Why StocksWitty', 'href' => '/why-witty/'],
+        ['title' => 'Contact', 'href' => '/contact/'],
+    ],
+
+    /*
+     | Contact details used by /contact/ (cards, map, JSON-LD). phone and
+     | whatsapp stay null until the real business numbers are confirmed;
+     | while null, their cards and buttons are not rendered at all.
+     | whatsapp is digits only with country code, e.g. '919876543210'.
+     */
+    'contact' => [
+        'email'     => 'hello@stockswitty.com',
+        'phone'     => null,
+        'whatsapp'  => null,
+        'address'   => [
+            'street'   => 'B-197, Jaitpur Extension Part 1, Near Gyan Mandir Road',
+            'locality' => 'Badarpur, New Delhi',
+            'region'   => 'Delhi',
+            'postcode' => '110044',
+            'country'  => 'IN',
+        ],
+        'maps_link' => 'https://maps.app.goo.gl/EN26HAywAWo4WPBA7',
+        'maps_embed' => 'https://maps.google.com/maps?q=B-197%20Jaitpur%20Extension%20Part%201%2C%20Near%20Gyan%20Mandir%20Road%2C%20Badarpur%2C%20New%20Delhi%20110044&z=16&output=embed',
+        'hours'     => [
+            'label'  => 'Mon–Sat 10:00 AM – 7:00 PM',
+            'closed' => 'Sunday closed',
+            'days'   => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            'opens'  => '10:00',
+            'closes' => '19:00',
+        ],
+        'topics'    => ['Unlisted shares', 'Pre-IPO', 'Calculators', 'Other'],
+    ],
+
     'showcase_companies' => [
         ['slug' => 'nse-india', 'name' => 'NSE India Limited', 'initials' => 'NSE', 'price' => 1960, 'changeAbs' => 40, 'changePct' => 2.08, 'high52' => 2470, 'low52' => 1705, 'lot' => 250, 'mktCap' => '₹4.85L Cr', 'pe' => '40.0x', 'wittyScore' => 8.4, 'tag' => 'Pre-IPO', 'series' => [2180, 2360, 2490, 2080, 1885, 1960]],
         ['slug' => 'tata-capital', 'name' => 'Tata Capital', 'initials' => 'TA', 'price' => 1075, 'changeAbs' => 12, 'changePct' => 1.13, 'high52' => 1150, 'low52' => 720, 'lot' => 100, 'mktCap' => '₹3.9L Cr', 'pe' => '32.0x', 'wittyScore' => 8.1, 'tag' => 'Pre-IPO', 'series' => [840, 910, 980, 1020, 1050, 1075]],

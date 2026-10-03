@@ -6,7 +6,7 @@ $swLinks = [
     ['label' => 'Screener', 'href' => '/screener/'],
     ['label' => 'Blog', 'href' => '/blog/'],
     ['label' => 'News', 'href' => '/news/'],
-    ['label' => 'Contact', 'href' => '/#footer'],
+    ['label' => 'Contact', 'href' => '/contact/'],
 ];
 $authUid = session('uid');
 $hasPrivilege = $authUid ? !empty(\App\Helpers\Privilege::get()) : false;

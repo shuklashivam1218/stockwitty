@@ -11,6 +11,7 @@ namespace App\Support\Seo;
  *   BreadcrumbList          <x-sw.breadcrumb>
  *   FAQPage                 <x-sw.faq-schema> (home FAQ, blog posts, company pages)
  *   Article                 <x-sw.blog-post-layout>
+ *   FinancialService office sw/contact/index.blade.php
  */
 final class JsonLd
 {
@@ -95,6 +96,40 @@ final class JsonLd
             'inLanguage'       => config('seo.website.in_language'),
             'author'           => $publisher,
             'publisher'        => $publisher,
+        ]);
+    }
+
+    /** The office as a local FinancialService, from config('sw.contact'). Used on /contact/. */
+    public static function office(): array
+    {
+        $contact = config('sw.contact');
+        $address = $contact['address'];
+        $hours   = $contact['hours'];
+
+        return array_filter([
+            '@type'     => 'FinancialService',
+            '@id'       => config('seo.organization.url') . '#office',
+            'name'      => config('seo.organization.name'),
+            'url'       => config('seo.organization.url'),
+            'email'     => $contact['email'],
+            'telephone' => $contact['phone'],
+            'hasMap'    => $contact['maps_link'],
+            'address'   => [
+                '@type'           => 'PostalAddress',
+                'streetAddress'   => $address['street'],
+                'addressLocality' => $address['locality'],
+                'addressRegion'   => $address['region'],
+                'postalCode'      => $address['postcode'],
+                'addressCountry'  => $address['country'],
+            ],
+            'openingHoursSpecification' => [
+                '@type'     => 'OpeningHoursSpecification',
+                'dayOfWeek' => $hours['days'],
+                'opens'     => $hours['opens'],
+                'closes'    => $hours['closes'],
+            ],
+            'areaServed'       => config('seo.organization.area_served'),
+            'parentOrganization' => ['@id' => config('seo.organization.url') . '#organization'],
         ]);
     }
 

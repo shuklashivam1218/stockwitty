@@ -30,6 +30,7 @@ class SeoController extends Controller
         ['path' => '/calculators/',                                'view' => 'sw.calculators.index',                           'changefreq' => 'weekly',  'priority' => '0.9'],
         ['path' => '/wittyscore/',                                 'view' => 'sw.wittyscore.index',                            'changefreq' => 'monthly', 'priority' => '0.7'],
         ['path' => '/why-witty/',                                  'view' => 'sw.why-witty.index',                             'changefreq' => 'monthly', 'priority' => '0.7'],
+        ['path' => '/contact/',                                    'view' => 'sw.contact.index',                               'changefreq' => 'monthly', 'priority' => '0.6'],
         ['path' => '/listed/',                                     'view' => 'sw.listed.index',                                'changefreq' => 'monthly', 'priority' => '0.7'],
         ['path' => '/listed/reliance/',                            'view' => 'sw.listed.reliance',                             'changefreq' => 'weekly',  'priority' => '0.6'],
         ['path' => '/mutual-funds/',                               'view' => 'sw.mutual-funds.index',                          'changefreq' => 'monthly', 'priority' => '0.7'],

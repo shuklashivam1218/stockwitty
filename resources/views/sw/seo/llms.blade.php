@@ -13,6 +13,7 @@ Every page listed below is also available as clean Markdown: request the same pa
 - [Compare](https://www.stockswitty.com/compare/): compare two unlisted shares
 - [Calculators](https://www.stockswitty.com/calculators/): investment calculators
 - [Why StocksWitty](https://www.stockswitty.com/why-witty/)
+- [Contact](https://www.stockswitty.com/contact/): email, New Delhi office address, map and business hours
 
 ## Unlisted company research ({{ $companies->count() }} companies, each with price, profile /about/ and thesis /thesis/)
 @foreach ($companies as $company)
