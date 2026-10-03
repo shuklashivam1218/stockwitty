@@ -18,7 +18,7 @@ $hasPrivilege = $authUid ? !empty(\App\Helpers\Privilege::get()) : false;
 
     <nav class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <a href="/" class="text-xl text-primary font-bold tracking-tight">
-            Stock<span class="text-mint">Witty</span>
+            Stocks<span class="text-mint">Witty</span>
         </a>
 
         <ul class="hidden items-center gap-1 lg:flex">

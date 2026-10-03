@@ -1,6 +1,6 @@
 ﻿@extends('layout.admin')
 
-@section('title', 'Leads | Admin | StockWitty')
+@section('title', 'Leads | Admin | StocksWitty')
 
 @push('styles')
 <style>

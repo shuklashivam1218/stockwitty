@@ -1,7 +1,7 @@
 @extends('layouts.sw')
 
-@section('title', 'Pre-IPO, IPO & Unlisted Market News | StockWitty')
-@section('description', "News that moves unlisted and pre-IPO prices in India — SEBI approvals, DRHP filings, startup funding rounds and mutual fund flows, with StockWitty's honest take.")
+@section('title', 'Pre-IPO, IPO & Unlisted Market News | StocksWitty')
+@section('description', "News that moves unlisted and pre-IPO prices in India — SEBI approvals, DRHP filings, startup funding rounds and mutual fund flows, with StocksWitty's honest take.")
 
 @php
 $cats = ['All', 'IPO', 'Unlisted', 'Startup Funding', 'Mutual Funds'];

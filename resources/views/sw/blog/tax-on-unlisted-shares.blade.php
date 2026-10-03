@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Tax on Unlisted Shares in India: Complete Guide (2026) | StockWitty')
+@section('title', 'Tax on Unlisted Shares in India: Complete Guide (2026) | StocksWitty')
 @section('description', 'How unlisted shares are taxed in India — the 24-month holding period, LTCG vs STCG treatment, what changes after the company lists, ITR reporting and the mistakes to avoid.')
 
 @php
@@ -31,7 +31,7 @@ $faqs = [
     heroIcon="receipt"
     title="Tax on Unlisted Shares in India: Complete Guide (2026)"
     description="How unlisted shares are taxed in India — the 24-month holding period, LTCG vs STCG treatment, what changes after the company lists, ITR reporting and the mistakes to avoid."
-    authorLine="StockWitty Research · CA-reviewed"
+    authorLine="StocksWitty Research · CA-reviewed"
     dateLabel="August 2026"
     readLabel="8 min read"
     :toc="$toc"
@@ -42,7 +42,7 @@ $faqs = [
         'Gains must be reported in the capital gains schedule of your ITR, and unlisted equity holdings disclosed separately.',
         'Rules change with every Finance Act — verify the current position with a CA before you file.',
     ]"
-    :video="['caption' => 'Watch: Tax on unlisted shares, explained simply — StockWitty', 'note' => 'Replace with your StockWitty YouTube video']"
+    :video="['caption' => 'Watch: Tax on unlisted shares, explained simply — StocksWitty', 'note' => 'Replace with your StocksWitty YouTube video']"
     :faqTabs="['Basics', 'Rates', 'Filing']"
     :faqs="$faqs"
     :sources="[
@@ -57,7 +57,7 @@ $faqs = [
         ['title' => 'How to Sell Unlisted Shares in India', 'href' => '/blog/how-to-sell-unlisted-shares/', 'category' => 'Selling Guide', 'read' => '8 min read'],
         ['title' => 'Unlisted vs Listed Shares', 'href' => '/blog/unlisted-shares-vs-listed-shares/', 'category' => 'Comparison', 'read' => '7 min read'],
     ]"
-    :leadForm="['heading' => 'Questions on unlisted-share tax? We\'ll connect you.', 'subtext' => 'Tell us what you\'re holding and what you\'re planning. A StockWitty specialist will call you back and, where it\'s a tax question rather than a transaction question, point you to a qualified CA.']"
+    :leadForm="['heading' => 'Questions on unlisted-share tax? We\'ll connect you.', 'subtext' => 'Tell us what you\'re holding and what you\'re planning. A StocksWitty specialist will call you back and, where it\'s a tax question rather than a transaction question, point you to a qualified CA.']"
 >
     <x-slot:intro>
         <p>

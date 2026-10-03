@@ -1,7 +1,7 @@
 @php
 $features = [
     ['icon' => 'gauge', 'title' => 'Honest WittyScore ratings', 'body' => 'Every company gets a 0–100 score built from growth, profitability, governance and IPO visibility — with the reasoning shown, including the parts that look weak.'],
-    ['icon' => 'badge-check', 'title' => 'Verified company-account payments', 'body' => "Funds move only to StockWitty's registered current account against a GST invoice. No personal UPI, no intermediary wallet, ever."],
+    ['icon' => 'badge-check', 'title' => 'Verified company-account payments', 'body' => "Funds move only to StocksWitty's registered current account against a GST invoice. No personal UPI, no intermediary wallet, ever."],
     ['icon' => 'zap', 'title' => 'Same-day demat credit', 'body' => 'Off-market transfers executed before the 2 PM cut-off usually land in your CDSL or NSDL demat the same working day, with the DIS reference shared to you.'],
     ['icon' => 'indian-rupee', 'title' => 'Transparent all-inclusive pricing', 'body' => 'The price you see already includes our margin. No brokerage surprise, no last-minute revision between quote and payment.'],
     ['icon' => 'book-open-check', 'title' => 'Deep research & DRHP tracking', 'body' => "We read the prospectus so you don't have to: revenue mix, promoter dilution, offer-for-sale size and realistic listing timelines for 38 filed companies."],
@@ -11,7 +11,7 @@ $features = [
 
 <section id="features" class="bg-green-50/60 py-20 sm:py-28">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <x-sw.section-heading eyebrow="Why StockWitty" title="Smart Investing, Simplified"
+        <x-sw.section-heading eyebrow="Why StocksWitty" title="Smart Investing, Simplified"
                                subtitle="Investing isn't easy. Researching it should be." align="center" />
 
         <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

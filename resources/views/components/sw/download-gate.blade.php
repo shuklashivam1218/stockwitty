@@ -44,7 +44,7 @@
                 </div>
                 <label class="flex items-start gap-3 rounded-xl border border-border bg-green-50 p-3.5 text-sm text-muted-foreground">
                     <input type="checkbox" x-model="form.consent" class="mt-0.5 size-4 shrink-0 accent-[#076550]" />
-                    <span>I agree to be contacted by StockWitty about my enquiry.</span>
+                    <span>I agree to be contacted by StocksWitty about my enquiry.</span>
                 </label>
 
                 <button type="submit" :disabled="!valid || busy"

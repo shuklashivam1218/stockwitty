@@ -1,6 +1,6 @@
 @extends('layout.admin')
 
-@section('title', 'CMS | Admin | StockWitty')
+@section('title', 'CMS | Admin | StocksWitty')
 
 @section('content')
 <div class="admin-main">

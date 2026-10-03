@@ -7,7 +7,7 @@ function mobileOk(v) {
 }
 
 function fileName(study) {
-    return `StockWitty-case-study-${study.slug}.pdf`;
+    return `StocksWitty-case-study-${study.slug}.pdf`;
 }
 
 function triggerBlob(blob, name) {
@@ -23,7 +23,7 @@ function triggerBlob(blob, name) {
 
 function textFallback(study) {
     const lines = [
-        'StockWitty — Invest Smart, Stay Witty.',
+        'StocksWitty — Invest Smart, Stay Witty.',
         'Case study: ' + study.title,
         '',
         `Investor type: ${study.meta.investor}`,
@@ -35,7 +35,7 @@ function textFallback(study) {
         ...study.table.map((r) => `- ${r.row}: ${r.before} -> ${r.after}`),
         '',
         study.disclaimer,
-        'StockWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.',
+        'StocksWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.',
     ];
     triggerBlob(new Blob([lines.join('\n')], { type: 'application/pdf' }), fileName(study));
 }
@@ -52,7 +52,7 @@ async function makePdf(study) {
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(20);
-        doc.text('StockWitty', M, 44);
+        doc.text('StocksWitty', M, 44);
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
         doc.setTextColor(17, 241, 196);
@@ -147,7 +147,7 @@ async function makePdf(study) {
         doc.setFontSize(8);
         doc.text(
             doc.splitTextToSize(
-                'StockWitty is a distributor of unlisted shares and not a SEBI-registered investment adviser. Figures shown are illustrative and for layout purposes only. Verify all prices, ISINs and documents before you invest. stockswitty.com',
+                'StocksWitty is a distributor of unlisted shares and not a SEBI-registered investment adviser. Figures shown are illustrative and for layout purposes only. Verify all prices, ISINs and documents before you invest. stockswitty.com',
                 W - M * 2
             ),
             M,

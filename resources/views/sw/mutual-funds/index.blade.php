@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'SBI Mutual Funds — AUM ₹12.55L Cr, Top Funds & 1 to Avoid | StockWitty')
+@section('title', 'SBI Mutual Funds — AUM ₹12.55L Cr, Top Funds & 1 to Avoid | StocksWitty')
 @section('description', 'SBI Mutual Fund explained honestly — ₹12.55 lakh crore AUM, 8.7 crore+ investors, 88 schemes. Four SBI funds worth your money, one we\'d avoid, plus tax and how to invest.')
 
 @php
@@ -234,7 +234,7 @@ $peers = [
                 <x-sw.illustrative-note>
                     NAVs, AUM figures, expense ratios and all returns on this page are illustrative. Past
                     performance is not indicative of future results. Mutual fund investments are subject to
-                    market risk — read all scheme documents carefully. StockWitty is a distributor, not a
+                    market risk — read all scheme documents carefully. StocksWitty is a distributor, not a
                     SEBI-registered investment adviser.
                 </x-sw.illustrative-note>
             </div>

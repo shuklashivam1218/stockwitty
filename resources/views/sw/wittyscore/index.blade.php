@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'WittyScore Methodology — How We Score Unlisted Shares | StockWitty')
+@section('title', 'WittyScore Methodology — How We Score Unlisted Shares | StocksWitty')
 @section('description', 'WittyScore is our 0–10 score for unlisted companies, built from five weighted pillars: Financial Health 30%, Valuation 20%, Growth Potential 20%, IPO Probability 15% and Liquidity & Safety 15%.')
 
 @php
@@ -30,7 +30,7 @@ $scaleBands = [
 $board = collect(config('sw.unlisted_companies'))->sortByDesc('wittyScore')->take(8)->values()->all();
 
 $faqs = [
-    ['q' => 'Is a high WittyScore a buy recommendation?', 'a' => 'No. StockWitty is a distributor, not a SEBI-registered investment adviser. WittyScore is a research summary of what the numbers and disclosures look like — it is not advice and does not predict returns.'],
+    ['q' => 'Is a high WittyScore a buy recommendation?', 'a' => 'No. StocksWitty is a distributor, not a SEBI-registered investment adviser. WittyScore is a research summary of what the numbers and disclosures look like — it is not advice and does not predict returns.'],
     ['q' => 'How often is the score refreshed?', 'a' => 'After every set of audited annual results, and sooner if there is a material event — a DRHP filing, an auditor change, or a large funding round.'],
     ['q' => 'Why does a well-known unicorn score below a boring finance company?', 'a' => 'Because profitability and governance carry half the weight between them. Brand recognition carries none.'],
 ];

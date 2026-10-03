@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Unlisted Shares vs Listed Shares: Key Differences Explained (2026) | StockWitty')
+@section('title', 'Unlisted Shares vs Listed Shares: Key Differences Explained (2026) | StocksWitty')
 @section('description', 'Unlisted vs listed shares compared — trading venue, liquidity, pricing, disclosure, minimum investment, risk and tax holding periods, plus which one suits which investor.')
 
 @php
@@ -31,7 +31,7 @@ $faqs = [
     heroIcon="scale"
     title="Unlisted Shares vs Listed Shares: Key Differences Explained (2026)"
     description="Unlisted vs listed shares compared — trading venue, liquidity, pricing, disclosure, minimum investment, risk and tax holding periods, plus which one suits which investor."
-    authorLine="StockWitty Research · CA-reviewed"
+    authorLine="StocksWitty Research · CA-reviewed"
     dateLabel="August 2026"
     readLabel="7 min read"
     :toc="$toc"
@@ -42,7 +42,7 @@ $faqs = [
         'Tax holding periods differ: 24 months for unlisted vs 12 months for listed equity.',
         'Unlisted shares can offer pre-IPO entry, but with materially higher risk and no guaranteed exit.',
     ]"
-    :video="['caption' => 'Watch: Unlisted vs listed shares — what actually changes', 'note' => 'Replace with your StockWitty YouTube video']"
+    :video="['caption' => 'Watch: Unlisted vs listed shares — what actually changes', 'note' => 'Replace with your StocksWitty YouTube video']"
     :faqTabs="['Basics', 'Differences', 'Tax']"
     :faqs="$faqs"
     :sources="[
@@ -58,7 +58,7 @@ $faqs = [
         ['title' => 'How to Buy Unlisted Shares in India', 'href' => '/blog/how-to-buy-unlisted-shares/', 'category' => 'Buying Guide', 'read' => '10 min read'],
         ['title' => 'Tax on Unlisted Shares in India', 'href' => '/blog/tax-on-unlisted-shares/', 'category' => 'Tax', 'read' => '8 min read'],
     ]"
-    :leadForm="['heading' => 'Deciding between listed and unlisted? Ask an expert.', 'subtext' => 'A StockWitty specialist can walk you through how an unlisted position would sit alongside your listed portfolio — including the parts we\'d talk you out of. No obligation to transact.']"
+    :leadForm="['heading' => 'Deciding between listed and unlisted? Ask an expert.', 'subtext' => 'A StocksWitty specialist can walk you through how an unlisted position would sit alongside your listed portfolio — including the parts we\'d talk you out of. No obligation to transact.']"
 >
     <x-slot:intro>
         <p>

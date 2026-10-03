@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Buy 24K Digital Gold Online from ₹10 | StockWitty')
+@section('title', 'Buy 24K Digital Gold Online from ₹10 | StocksWitty')
 @section('description', "Buy and sell 99.99% pure 24K digital gold from ₹10 — live-style per-gram price, insured vault storage and an instant amount-to-grams calculator.")
 
 @php

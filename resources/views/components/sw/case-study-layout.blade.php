@@ -174,7 +174,7 @@ $tableRows = array_map(fn ($r) => [$r['row'], $r['before'], $r['after']], $study
                     <h3 class="text-xl font-bold text-foreground">Request a callback</h3>
                     <p class="mt-2 max-w-lg text-sm text-muted-foreground">
                         Have a question about this journey or about unlisted shares in general? Leave your number and
-                        a StockWitty specialist will call you back.
+                        a StocksWitty specialist will call you back.
                     </p>
 
                     <p x-show="done" x-cloak class="mt-5 rounded-xl border border-primary/30 bg-card px-4 py-3 text-sm font-bold text-primary">
@@ -206,7 +206,7 @@ $tableRows = array_map(fn ($r) => [$r['row'], $r['before'], $r['after']], $study
                         </button>
                     </div>
                     <p class="mt-4 text-[0.7rem] text-muted-foreground">
-                        StockWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.
+                        StocksWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.
                     </p>
                 </form>
             </div>

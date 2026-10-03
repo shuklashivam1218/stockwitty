@@ -23,7 +23,7 @@
                                 @endforeach
                             </ul>
                             <p class="mt-8 border-t border-white/10 pt-5 text-xs text-white/55">
-                                StockWitty is a distributor of unlisted shares, not a SEBI-registered investment
+                                StocksWitty is a distributor of unlisted shares, not a SEBI-registered investment
                                 adviser. Unlisted shares are illiquid and high-risk.
                             </p>
                         </div>

@@ -53,6 +53,6 @@ return [
      | Appended to every twin so an agent quoting a single page still carries
      | the compliance position with it.
      */
-    'footer_note' => 'StockWitty is a distributor of unlisted shares and an information platform, not a SEBI-registered investment adviser. Unlisted shares are illiquid and high-risk, with no guarantee of any IPO, listing or exit. This is information, not investment advice.',
+    'footer_note' => 'StocksWitty is a distributor of unlisted shares and an information platform, not a SEBI-registered investment adviser. Unlisted shares are illiquid and high-risk, with no guarantee of any IPO, listing or exit. This is information, not investment advice.',
 
 ];

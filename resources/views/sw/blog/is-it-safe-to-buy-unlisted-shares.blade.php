@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Is It Safe to Buy Unlisted Shares? What Every Investor Should Know (2026) | StockWitty')
+@section('title', 'Is It Safe to Buy Unlisted Shares? What Every Investor Should Know (2026) | StocksWitty')
 @section('description', "Unlisted shares are legal in India — but 'risky' and 'unsafe' are different things. How to buy safely, the red flags and scams to avoid, and how genuine platforms protect you.")
 
 @php
@@ -29,7 +29,7 @@ $faqs = [
     heroIcon="shield-check"
     title="Is It Safe to Buy Unlisted Shares? What Every Investor Should Know (2026)"
     description="Unlisted shares are legal in India — but 'risky' and 'unsafe' are different things. How to buy safely, the red flags and scams to avoid, and how genuine platforms protect you."
-    authorLine="StockWitty Research · CA-reviewed"
+    authorLine="StocksWitty Research · CA-reviewed"
     dateLabel="August 2026"
     readLabel="8 min read"
     :toc="$toc"
@@ -40,7 +40,7 @@ $faqs = [
         'Verify the ISIN and quantity yourself in your own CDSL/NSDL statement after delivery.',
         'Any guaranteed return, assured IPO date or same-day pressure tactic is a reason to walk away.',
     ]"
-    :video="['caption' => 'Watch: Buying unlisted shares safely — the checks that matter', 'note' => 'Replace with your StockWitty YouTube video']"
+    :video="['caption' => 'Watch: Buying unlisted shares safely — the checks that matter', 'note' => 'Replace with your StocksWitty YouTube video']"
     :faqTabs="['Basics', 'Safety', 'Process']"
     :faqs="$faqs"
     :sources="[
@@ -55,7 +55,7 @@ $faqs = [
         ['title' => 'Risks of Investing in Unlisted Shares', 'href' => '/blog/risks-of-investing-in-unlisted-shares/', 'category' => 'Risk', 'read' => '8 min read'],
         ['title' => 'How to Sell Unlisted Shares in India', 'href' => '/blog/how-to-sell-unlisted-shares/', 'category' => 'Selling Guide', 'read' => '8 min read'],
     ]"
-    :leadForm="['heading' => 'Want to buy safely? Talk to us first.', 'subtext' => 'A StockWitty specialist will walk you through KYC, how settlement works and what to verify at each step — before you transfer a rupee. No obligation to transact.']"
+    :leadForm="['heading' => 'Want to buy safely? Talk to us first.', 'subtext' => 'A StocksWitty specialist will walk you through KYC, how settlement works and what to verify at each step — before you transfer a rupee. No obligation to transact.']"
 >
     <x-slot:intro>
         <p>
@@ -142,7 +142,7 @@ $faqs = [
             take on trust.
         </p>
         <p>
-            It also means honest framing. StockWitty is a distributor, not a SEBI-registered investment
+            It also means honest framing. StocksWitty is a distributor, not a SEBI-registered investment
             adviser: we can explain a company, a price and a risk, and we will tell you when we think a
             name looks expensive — but we cannot promise you an outcome, and any figure we publish is
             illustrative until you verify it against official filings.

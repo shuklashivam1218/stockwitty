@@ -1,6 +1,6 @@
 @extends('layout.admin')
 
-@section('title', 'Admin Dashboard | StockWitty')
+@section('title', 'Admin Dashboard | StocksWitty')
 
 @push('styles')
 <style>
@@ -210,7 +210,7 @@ a.dash-card:not([href]):hover { box-shadow: 0 1px 4px rgba(0,0,0,.04); border-co
         <a class="dash-ql" href="{{ url('/') }}" target="_blank">
             <i class="fa-solid fa-globe"></i>
             <span>Public Site</span>
-            <small>View the live StockWitty website</small>
+            <small>View the live StocksWitty website</small>
         </a>
     </div>
 

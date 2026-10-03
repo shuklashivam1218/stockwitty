@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', $seo?->UL_SEO_COMPANY_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ' Unlisted Share Price ₹' . number_format($company['price']) . ' | StockWitty'))
+@section('title', $seo?->UL_SEO_COMPANY_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ' Unlisted Share Price ₹' . number_format($company['price']) . ' | StocksWitty'))
 @section('description', $seo?->UL_SEO_COMPANY_DESCRIPTION ?: ($stock->UL_STOCKS_COMPNAME . ' unlisted share price, fundamentals, financials and how to buy. WittyScore ' . number_format($company['wittyScore'], 1) . '/10. Distributor, not investment advice.'))
 @section('keywords', $seo?->UL_SEO_COMPANY_KEYWORDS ?: collect([
     $stock->UL_STOCKS_COMPNAME . ' unlisted shares',
@@ -45,7 +45,7 @@ $fundamentalCells = array_values(array_filter([
 
 $steps = [
     ['n' => '01', 'icon' => 'file-check-2', 'title' => 'Submit KYC', 'body' => 'Share your CML copy + PAN + Cancelled Cheque + Aadhaar for verification. Takes ~30 minutes.'],
-    ['n' => '02', 'icon' => 'landmark', 'title' => 'Transfer Payment', 'body' => 'Transfer to the verified StockWitty company account (never personal). UPI, NEFT, RTGS accepted.'],
+    ['n' => '02', 'icon' => 'landmark', 'title' => 'Transfer Payment', 'body' => 'Transfer to the verified StocksWitty company account (never personal). UPI, NEFT, RTGS accepted.'],
     ['n' => '03', 'icon' => 'wallet', 'title' => 'Receive Shares', 'body' => 'Shares credited to your demat (CDSL or NSDL) the same day. Independent ISIN verification available.'],
 ];
 
@@ -196,13 +196,13 @@ $ipoFacts    = \App\Models\UnlistedCompanyInsight::parsePairs($insight?->UL_CI_I
                             </button>
                             <div x-show="submitted" style="display: none;" class="mt-4 space-y-3 rounded-xl border border-border bg-beige px-4 py-3">
                                 <p class="text-xs font-semibold text-foreground">We'll confirm live availability &amp; price and get back to you.</p>
-                                <a :href="'https://wa.me/919999999999?text=' + encodeURIComponent('Hi StockWitty, I would like to ' + side.toLowerCase() + ' ' + Math.max(qty,0) + ' shares of {{ $stock->UL_STOCKS_COMPNAME }}.')"
+                                <a :href="'https://wa.me/919999999999?text=' + encodeURIComponent('Hi StocksWitty, I would like to ' + side.toLowerCase() + ' ' + Math.max(qty,0) + ' shares of {{ $stock->UL_STOCKS_COMPNAME }}.')"
                                    target="_blank" rel="noopener noreferrer"
                                    class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-transform hover:-translate-y-0.5">
                                     <x-sw.icon name="message-circle" class="size-4" />
                                     Continue on WhatsApp
                                 </a>
-                                <p class="text-[11px] text-muted-foreground">StockWitty is a distributor — this is a quote/lead request, not instant execution.</p>
+                                <p class="text-[11px] text-muted-foreground">StocksWitty is a distributor — this is a quote/lead request, not instant execution.</p>
                             </div>
                         </div>
                     </div>
@@ -452,7 +452,7 @@ $ipoFacts    = \App\Models\UnlistedCompanyInsight::parsePairs($insight?->UL_CI_I
 
         <div id="lead" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
             <p class="rounded-2xl border border-border bg-green-50 px-5 py-4 text-xs leading-relaxed text-muted-foreground">
-                <strong class="text-foreground">Disclaimer:</strong> StockWitty is a distributor of
+                <strong class="text-foreground">Disclaimer:</strong> StocksWitty is a distributor of
                 unlisted and pre-IPO shares, not a SEBI-registered investment adviser. Unlisted shares are
                 illiquid and high-risk, prices are negotiated and an IPO may be delayed or never happen.
                 Nothing on this page is investment advice.

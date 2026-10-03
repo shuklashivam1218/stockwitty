@@ -89,7 +89,7 @@
                                 aria-label="Play video">
                             <x-sw.icon name="play" class="size-7 fill-white" />
                         </button>
-                        <span class="absolute bottom-4 left-5 text-xs font-semibold text-white/60">Replace with your StockWitty YouTube video</span>
+                        <span class="absolute bottom-4 left-5 text-xs font-semibold text-white/60">Replace with your StocksWitty YouTube video</span>
                     </div>
                     <figcaption class="mt-3 text-center text-xs font-semibold text-muted-foreground">{{ $video['caption'] }}</figcaption>
                 </figure>
@@ -160,7 +160,7 @@
                 <div class="mt-10 flex flex-col gap-4 rounded-3xl border border-border bg-secondary p-6 sm:flex-row sm:items-start">
                     <span aria-hidden="true" class="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary text-base font-bold text-primary-foreground">SW</span>
                     <div>
-                        <p class="text-base font-bold text-foreground">StockWitty Research</p>
+                        <p class="text-base font-bold text-foreground">StocksWitty Research</p>
                         <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                             We research unlisted shares the way we'd want them explained to us — the risks as clearly as the upside.
                         </p>
@@ -251,7 +251,7 @@
                     <label class="flex items-start gap-3 text-xs text-white/75 sm:col-span-2">
                         <input type="checkbox" name="consent" class="mt-0.5 size-4 shrink-0 rounded border-white/30 bg-white/10" />
                         <span>
-                            I agree to be contacted by StockWitty about unlisted shares. I understand StockWitty is a distributor, not a SEBI-registered investment adviser.
+                            I agree to be contacted by StocksWitty about unlisted shares. I understand StocksWitty is a distributor, not a SEBI-registered investment adviser.
                             <span x-show="errors.consent" x-text="errors.consent" class="block font-semibold text-mint-bright" style="display: none;"></span>
                         </span>
                     </label>
@@ -268,7 +268,7 @@
 
     <div class="mx-auto max-w-[780px] px-4 py-10 sm:px-6">
         <p class="text-xs leading-relaxed text-muted-foreground">
-            Disclaimer: StockWitty is an information portal and a distributor of unlisted shares. It is
+            Disclaimer: StocksWitty is an information portal and a distributor of unlisted shares. It is
             not a SEBI-registered investment adviser and nothing here is investment advice. Unlisted
             shares are illiquid and high-risk, prices are negotiated, and an IPO may be delayed or may
             never happen. Do your own due diligence and consult your own adviser.

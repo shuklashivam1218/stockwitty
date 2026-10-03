@@ -1,7 +1,7 @@
 @extends('layouts.sw')
 
-@section('title', 'Why Witty — Smart, Honest Investing in Unlisted Shares | StockWitty')
-@section('description', 'Why we\'re called StockWitty: Wise, Insightful, Transparent, Trusted and Yours. Research-backed unlisted share investing with risks shown as clearly as rewards.')
+@section('title', 'Why Witty — Smart, Honest Investing in Unlisted Shares | StocksWitty')
+@section('description', 'Why we\'re called StocksWitty: Wise, Insightful, Transparent, Trusted and Yours. Research-backed unlisted share investing with risks shown as clearly as rewards.')
 
 @php
 $acronym = [
@@ -36,7 +36,7 @@ $brandBullets = [
     <main>
         <x-sw.page-hero eyebrow="Our name, our promise"
                         title="Why &quot;Witty&quot;? Because investing should be smart AND honest."
-                        subtitle="Wit isn't a joke — it's judgement. The unlisted market has plenty of noise and very little candour. We built StockWitty for investors who want both the numbers and the caveats.">
+                        subtitle="Wit isn't a joke — it's judgement. The unlisted market has plenty of noise and very little candour. We built StocksWitty for investors who want both the numbers and the caveats.">
             <div class="mt-7 flex flex-wrap gap-3">
                 <a href="/unlisted-shares/" class="bg-cta inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white">
                     Explore unlisted shares <x-sw.icon name="arrow-right" class="size-4" />
@@ -71,7 +71,7 @@ $brandBullets = [
         <section class="bg-green-50 py-14 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <x-sw.section-heading eyebrow="What it means in practice" title="Smart. Honest. Clear. Quick."
-                                       subtitle="Four things you should feel within five minutes of using StockWitty." />
+                                       subtitle="Four things you should feel within five minutes of using StocksWitty." />
                 <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @foreach ($values as $i => $v)
                         <x-sw.reveal :delay="$i * 0.06" class="card-lift h-full rounded-2xl border border-border bg-card p-6 shadow-soft">
@@ -102,7 +102,7 @@ $brandBullets = [
                                     spread. Everything was either dry and corporate or breathless and unverifiable.
                                 </p>
                                 <p>
-                                    We started StockWitty because there was an obvious gap: research that reads like a
+                                    We started StocksWitty because there was an obvious gap: research that reads like a
                                     person wrote it, with the awkward parts left in. So every company page carries a
                                     WittyScore, a valuation view we're willing to defend, and a bear case sitting right
                                     next to the bull case.
@@ -151,7 +151,7 @@ $brandBullets = [
                 </div>
 
                 <x-sw.illustrative-note>
-                    StockWitty is an information portal and a distributor of unlisted shares — not a
+                    StocksWitty is an information portal and a distributor of unlisted shares — not a
                     SEBI-registered investment adviser. Nothing here is investment advice.
                 </x-sw.illustrative-note>
             </div>

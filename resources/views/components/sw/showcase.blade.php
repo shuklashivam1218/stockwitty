@@ -161,7 +161,7 @@
 
         <div id="chart" class="mt-14 scroll-mt-24">
             <x-sw.section-heading eyebrow="Screener — Price Movement" title="Unlisted price movement"
-                                   subtitle="Dealer-negotiated levels tracked by StockWitty. Illustrative, not an exchange feed." />
+                                   subtitle="Dealer-negotiated levels tracked by StocksWitty. Illustrative, not an exchange feed." />
             <x-sw.reveal :delay="0.1">
                 <div class="card-lift mt-8 rounded-3xl border border-border bg-card p-4 shadow-soft sm:p-6">
                     <div class="h-[300px] w-full sm:h-[400px]">

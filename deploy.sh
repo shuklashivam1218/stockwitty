@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================
-#  StockWitty — Hostinger Deploy Script
+#  StocksWitty — Hostinger Deploy Script
 #  Place this file inside the stockwitty/ folder on the server
 #  Run from inside stockwitty/:  bash deploy.sh
 #  Migrations always run automatically (safe — Laravel skips
@@ -81,7 +81,7 @@ fi
 
 echo ""
 echo "============================================"
-echo "   StockWitty Deployment"
+echo "   StocksWitty Deployment"
 echo "============================================"
 echo ""
 

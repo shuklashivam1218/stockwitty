@@ -67,8 +67,9 @@ final class MarkdownDocument
         $markdown = preg_replace('/\s+\]\(/u', '](', $markdown);
         $markdown = preg_replace('/(?<=\S)[ \t]{2,}(?=\S)/u', ' ', $markdown);
         $markdown = preg_replace('/^[ \t]+(?![-*+] |\d+\. )/mu', '', $markdown);
-        // An inline badge right before a heading ("01### Submit KYC") gets its own line.
-        $markdown = preg_replace('/^([^\n#]*[^\s#])(#{1,6} )/mu', "$1\n\n$2", $markdown);
+        // An inline badge right before a heading ("01### Submit KYC",
+        // "Investment Thesis # Title") gets its own line.
+        $markdown = preg_replace('/^([^\n#]*[^\s#])[ \t]*(#{1,6} )/mu', "$1\n\n$2", $markdown);
         $markdown = preg_replace('/[ \t]+$/mu', '', $markdown);
         $markdown = preg_replace("/\n{3,}/", "\n\n", $markdown);
 

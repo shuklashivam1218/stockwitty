@@ -1,11 +1,11 @@
 @php
 $videos = [
-    ['initials' => 'NSE', 'title' => 'NSE India Unlisted — Should You Buy? | StockWitty', 'len' => '11:24'],
-    ['initials' => 'TA', 'title' => 'Tata Capital Pre-IPO: The Honest Breakdown | StockWitty', 'len' => '9:02'],
-    ['initials' => 'SB', 'title' => 'SBI Mutual Fund Unlisted Shares Explained | StockWitty', 'len' => '8:15'],
-    ['initials' => 'OY', 'title' => 'OYO Unlisted: Risk, Lot Size & Reality Check | StockWitty', 'len' => '12:38'],
-    ['initials' => 'SW', 'title' => 'Swiggy Unlisted vs Listed Peers | StockWitty', 'len' => '7:46'],
-    ['initials' => 'PH', 'title' => 'PhonePe Pre-IPO — What Retail Should Know | StockWitty', 'len' => '10:31'],
+    ['initials' => 'NSE', 'title' => 'NSE India Unlisted — Should You Buy? | StocksWitty', 'len' => '11:24'],
+    ['initials' => 'TA', 'title' => 'Tata Capital Pre-IPO: The Honest Breakdown | StocksWitty', 'len' => '9:02'],
+    ['initials' => 'SB', 'title' => 'SBI Mutual Fund Unlisted Shares Explained | StocksWitty', 'len' => '8:15'],
+    ['initials' => 'OY', 'title' => 'OYO Unlisted: Risk, Lot Size & Reality Check | StocksWitty', 'len' => '12:38'],
+    ['initials' => 'SW', 'title' => 'Swiggy Unlisted vs Listed Peers | StocksWitty', 'len' => '7:46'],
+    ['initials' => 'PH', 'title' => 'PhonePe Pre-IPO — What Retail Should Know | StocksWitty', 'len' => '10:31'],
 ];
 $loop = array_merge($videos, $videos);
 @endphp

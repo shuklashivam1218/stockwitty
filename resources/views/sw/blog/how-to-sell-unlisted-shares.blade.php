@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'How to Sell Unlisted Shares in India: Step-by-Step Guide (2026) | StockWitty')
+@section('title', 'How to Sell Unlisted Shares in India: Step-by-Step Guide (2026) | StocksWitty')
 @section('description', 'A practical guide to selling unlisted shares in India — liquidity reality, getting a buy-side quote, the off-market transfer via DIS, lock-in and ROFR checks, documents and tax on sale.')
 
 @php
@@ -30,7 +30,7 @@ $faqs = [
     heroIcon="banknote"
     title="How to Sell Unlisted Shares in India: Step-by-Step Guide (2026)"
     description="A practical guide to selling unlisted shares in India — liquidity reality, getting a buy-side quote, the off-market transfer via DIS, lock-in and ROFR checks, documents and tax on sale."
-    authorLine="StockWitty Research · CA-reviewed"
+    authorLine="StocksWitty Research · CA-reviewed"
     dateLabel="August 2026"
     readLabel="8 min read"
     :toc="$toc"
@@ -41,7 +41,7 @@ $faqs = [
         'Check lock-in periods and any right of first refusal (ROFR) in shareholder agreements before agreeing a sale.',
         'Tax depends on your holding period — 24 months is the long-term threshold while a share is unlisted.',
     ]"
-    :video="['caption' => 'Watch: Selling unlisted shares — the off-market transfer explained', 'note' => 'Replace with your StockWitty YouTube video']"
+    :video="['caption' => 'Watch: Selling unlisted shares — the off-market transfer explained', 'note' => 'Replace with your StocksWitty YouTube video']"
     :faqTabs="['Basics', 'Process', 'Tax']"
     :faqs="$faqs"
     :sources="[
@@ -55,7 +55,7 @@ $faqs = [
         ['title' => 'Tax on Unlisted Shares in India', 'href' => '/blog/tax-on-unlisted-shares/', 'category' => 'Tax', 'read' => '8 min read'],
         ['title' => 'Is It Safe to Buy Unlisted Shares?', 'href' => '/blog/is-it-safe-to-buy-unlisted-shares/', 'category' => 'Safety', 'read' => '8 min read'],
     ]"
-    :leadForm="['heading' => 'Looking to sell your unlisted shares? Get a quote.', 'subtext' => 'Share the company, quantity and ISIN and a StockWitty specialist will call you back with an indicative buy-side level and the paperwork involved. No obligation to sell.']"
+    :leadForm="['heading' => 'Looking to sell your unlisted shares? Get a quote.', 'subtext' => 'Share the company, quantity and ISIN and a StocksWitty specialist will call you back with an indicative buy-side level and the paperwork involved. No obligation to sell.']"
 >
     <x-slot:intro>
         <p>

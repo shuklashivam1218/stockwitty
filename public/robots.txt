@@ -32,7 +32,7 @@ Allow: /
 User-agent: YandexBot
 Allow: /
 
-# AI / LLM crawlers - allowed so StockWitty can surface in ChatGPT, Claude,
+# AI / LLM crawlers - allowed so StocksWitty can surface in ChatGPT, Claude,
 # Perplexity etc. answers (see /llms.txt for a crawler-friendly site map).
 User-agent: GPTBot
 Allow: /

@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Reliance Industries Share Price, Fundamentals & Analysis | StockWitty')
+@section('title', 'Reliance Industries Share Price, Fundamentals & Analysis | StocksWitty')
 @section('description', 'Reliance Industries share analysis — price trend, fundamentals, quarterly results, shareholding pattern, peer comparison and upcoming events, explained honestly.')
 
 @php

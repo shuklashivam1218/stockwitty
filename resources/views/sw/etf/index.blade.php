@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'ETFs in India — Low-Cost Index & Thematic ETFs | StockWitty')
+@section('title', 'ETFs in India — Low-Cost Index & Thematic ETFs | StocksWitty')
 @section('description', 'Explore index, gold, sectoral, international and debt ETFs in India — expense ratios, 1-year returns and AUM, plus a plain-English explainer on how ETFs work.')
 
 @php

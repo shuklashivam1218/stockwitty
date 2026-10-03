@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Risks of Investing in Unlisted Shares (The Honest View, 2026) | StockWitty')
+@section('title', 'Risks of Investing in Unlisted Shares (The Honest View, 2026) | StocksWitty')
 @section('description', 'The real risks of unlisted shares in India — illiquidity, valuation risk, no guaranteed IPO, thin disclosure, wide spreads and lock-in — plus practical ways to reduce each one.')
 
 @php
@@ -28,7 +28,7 @@ $faqs = [
     heroIcon="alert-triangle"
     title="Risks of Investing in Unlisted Shares (The Honest View, 2026)"
     description="The real risks of unlisted shares in India — illiquidity, valuation risk, no guaranteed IPO, thin disclosure, wide spreads and lock-in — plus practical ways to reduce each one."
-    authorLine="StockWitty Research · CA-reviewed"
+    authorLine="StocksWitty Research · CA-reviewed"
     dateLabel="August 2026"
     readLabel="8 min read"
     :toc="$toc"
@@ -39,7 +39,7 @@ $faqs = [
         'Disclosures are thinner than for listed companies, so you are deciding with less information.',
         'Bid-ask spreads are wide, and regulatory or lock-in restrictions can delay an exit further.',
     ]"
-    :video="['caption' => 'Watch: The risks of unlisted shares, without the sales pitch', 'note' => 'Replace with your StockWitty YouTube video']"
+    :video="['caption' => 'Watch: The risks of unlisted shares, without the sales pitch', 'note' => 'Replace with your StocksWitty YouTube video']"
     :faqTabs="['Basics', 'Risk', 'Process']"
     :faqs="$faqs"
     :sources="[
@@ -54,7 +54,7 @@ $faqs = [
         ['title' => 'How to Buy Unlisted Shares in India', 'href' => '/blog/how-to-buy-unlisted-shares/', 'category' => 'Buying Guide', 'read' => '10 min read'],
         ['title' => 'What Are Unlisted Shares?', 'href' => '/blog/what-are-unlisted-shares/', 'category' => 'Basics', 'read' => '7 min read'],
     ]"
-    :leadForm="['heading' => 'Understand the risks before you invest — talk to us.', 'subtext' => 'A StockWitty specialist will go through the risks of a specific name with you before anything else — liquidity, disclosure and realistic timelines. No obligation to transact.']"
+    :leadForm="['heading' => 'Understand the risks before you invest — talk to us.', 'subtext' => 'A StocksWitty specialist will go through the risks of a specific name with you before anything else — liquidity, disclosure and realistic timelines. No obligation to transact.']"
 >
     <x-slot:intro>
         <p>

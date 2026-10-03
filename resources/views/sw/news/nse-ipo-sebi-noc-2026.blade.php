@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'NSE India Inches Closer to IPO as SEBI Grants No-Objection | StockWitty')
+@section('title', 'NSE India Inches Closer to IPO as SEBI Grants No-Objection | StocksWitty')
 @section('description', "SEBI's no-objection moves NSE India's long-delayed listing forward. What the NOC covers, what still has to happen, and what it means for unlisted NSE shareholders.")
 
 @section('content')
@@ -17,7 +17,7 @@
                     NSE India Inches Closer to IPO as SEBI Grants No-Objection
                 </h1>
                 <p class="mt-4 text-xs font-semibold text-muted-foreground">
-                    StockWitty Newsroom · 15 Aug 2026 · 4 min read
+                    StocksWitty Newsroom · 15 Aug 2026 · 4 min read
                 </p>
             </x-sw.reveal>
 
@@ -80,7 +80,7 @@
             </x-sw.reveal>
 
             <p class="mt-8 text-xs leading-relaxed text-muted-foreground">
-                Disclaimer: StockWitty is an information portal and a distributor of unlisted shares, not a
+                Disclaimer: StocksWitty is an information portal and a distributor of unlisted shares, not a
                 SEBI-registered investment adviser. This report is journalism, not investment advice. IPO
                 timelines can slip or be abandoned entirely.
             </p>

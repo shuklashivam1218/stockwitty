@@ -5,17 +5,18 @@
 | Site identity for structured data (JSON-LD)
 |--------------------------------------------------------------------------
 |
-| Read by App\Support\Seo\JsonLd. The visible brand is "StockWitty"; the
-| domain is stockswitty.com, so the domain spelling is declared as an
-| alternate name to tie both spellings to the same organisation.
+| Read by App\Support\Seo\JsonLd. The brand is "StocksWitty", matching the
+| stockswitty.com domain. The site used "StockWitty" until October 2026, so
+| that spelling is declared as an alternate name: search engines and AI
+| answers that learned the old name still tie it to the same organisation.
 |
 */
 
 return [
 
     'organization' => [
-        'name'           => 'StockWitty',
-        'alternate_name' => 'StocksWitty',
+        'name'           => 'StocksWitty',
+        'alternate_name' => 'StockWitty',
         'url'            => 'https://www.stockswitty.com/',
         'logo'           => 'https://www.stockswitty.com/favicon.svg',
         'email'          => 'hello@stockswitty.com',
@@ -24,7 +25,7 @@ return [
     ],
 
     'website' => [
-        'name'        => 'StockWitty',
+        'name'        => 'StocksWitty',
         'url'         => 'https://www.stockswitty.com/',
         'in_language' => 'en-IN',
     ],

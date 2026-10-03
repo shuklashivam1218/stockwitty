@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'How to Buy Unlisted Shares in India: Step-by-Step Guide (2026) | StockWitty')
+@section('title', 'How to Buy Unlisted Shares in India: Step-by-Step Guide (2026) | StocksWitty')
 @section('description', 'A step-by-step guide to buying unlisted and pre-IPO shares in India — KYC documents, price and lot confirmation, payment to a verified company account, demat delivery and ISIN verification.')
 
 @php
@@ -33,7 +33,7 @@ $faqs = [
     :chips="['Unlisted Shares', 'Buying Guide', '2026']"
     title="How to Buy Unlisted Shares in India: Step-by-Step Guide (2026)"
     description="A step-by-step guide to buying unlisted and pre-IPO shares in India — KYC documents, price and lot confirmation, payment to a verified company account, demat delivery and ISIN verification."
-    authorLine="StockWitty Research · CA-reviewed"
+    authorLine="StocksWitty Research · CA-reviewed"
     dateLabel="August 2026"
     readLabel="10 min read"
     :hero="['src' => asset('images/sw/blog-how-to-buy-unlisted-shares.jpg'), 'alt' => 'Illustration of a share certificate, a rising green market chart and a phone showing demat holdings, representing buying unlisted shares in India', 'width' => 1600, 'height' => 900]"
@@ -45,7 +45,7 @@ $faqs = [
         'Prices are negotiated, not exchange-quoted — compare quotes before you commit.',
         'Unlisted shares are illiquid and high-risk; there is no guaranteed IPO or exit.',
     ]"
-    :video="['caption' => 'Watch: How to buy unlisted shares safely — StockWitty', 'note' => 'Replace with your StockWitty YouTube video']"
+    :video="['caption' => 'Watch: How to buy unlisted shares safely — StocksWitty', 'note' => 'Replace with your StocksWitty YouTube video']"
     :faqTabs="['Basics', 'Process', 'Tax']"
     :faqs="$faqs"
     :sources="[
@@ -59,7 +59,7 @@ $faqs = [
         ['title' => 'Unlisted vs Listed Shares', 'href' => '/blog/unlisted-shares-vs-listed-shares/', 'category' => 'Basics', 'read' => '6 min read'],
         ['title' => 'Is It Safe to Buy Unlisted Shares?', 'href' => '/blog/is-it-safe-to-buy-unlisted-shares/', 'category' => 'Analysis', 'read' => '8 min read'],
     ]"
-    :leadForm="['heading' => 'Want help buying your first unlisted shares?', 'subtext' => 'Tell us what you\'re looking at and a StockWitty specialist will call you back — walk you through KYC, current quotes, lot sizes and the risks, with no obligation to transact.']"
+    :leadForm="['heading' => 'Want help buying your first unlisted shares?', 'subtext' => 'Tell us what you\'re looking at and a StocksWitty specialist will call you back — walk you through KYC, current quotes, lot sizes and the risks, with no obligation to transact.']"
 >
     <x-slot:intro>
         <p>

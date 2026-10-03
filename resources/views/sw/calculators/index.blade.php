@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', '41 Investment Calculators — SIP, FD, Tax & Unlisted | StockWitty')
+@section('title', '41 Investment Calculators — SIP, FD, Tax & Unlisted | StocksWitty')
 @section('description', 'Free, honest investment calculators for Indian investors — a fully working SIP calculator plus 40 more tools across unlisted shares, mutual funds, fixed income, retirement, gold and tax.')
 
 @php
@@ -218,7 +218,7 @@ $calcCount = array_sum(array_map(fn($g) => count($g['items']), $calcGroups));
 
                 <x-sw.illustrative-note>
                     Calculator outputs are estimates based on the assumptions you enter. They are not
-                    projections of actual returns, and StockWitty does not give investment advice.
+                    projections of actual returns, and StocksWitty does not give investment advice.
                 </x-sw.illustrative-note>
             </div>
         </section>

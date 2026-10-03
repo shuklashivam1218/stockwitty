@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Suryoday Small Finance Bank FD — 9.10% / 9.60% Rates | StockWitty')
+@section('title', 'Suryoday Small Finance Bank FD — 9.10% / 9.60% Rates | StocksWitty')
 @section('description', 'Suryoday Small Finance Bank fixed deposit rates — 9.10% general, 9.60% for senior citizens, ₹1,000 minimum, DICGC insured up to ₹5 lakh — with an FD maturity calculator.')
 
 @php

@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', $seo?->UL_SEO_THESIS_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ' Unlisted Shares: Should You Buy? | StockWitty'))
+@section('title', $seo?->UL_SEO_THESIS_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ' Unlisted Shares: Should You Buy? | StocksWitty'))
 @section('description', $seo?->UL_SEO_THESIS_DESCRIPTION ?: ('Our take on ' . $stock->UL_STOCKS_COMPNAME . ' unlisted shares — WittyScore, bull/bear case, key risks and a clear verdict. Not investment advice.'))
 @section('keywords', $seo?->UL_SEO_THESIS_KEYWORDS ?: collect([
     'should I buy ' . $stock->UL_STOCKS_COMPNAME . ' shares',
@@ -62,8 +62,8 @@ $toc = array_values(array_filter([
                         </p>
                         <div class="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3 border-y border-border py-4 text-xs font-semibold text-muted-foreground">
                             <span class="flex items-center gap-2">
-                                <span class="grid size-9 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">SW</span>
-                                By StockWitty Research
+                                <span aria-hidden="true" class="grid size-9 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">SW</span>
+                                By StocksWitty Research
                             </span>
                         </div>
                     </x-sw.reveal>
@@ -250,9 +250,9 @@ $toc = array_values(array_filter([
                 <x-sw.reveal>
                     <div class="rounded-2xl border border-border bg-green-50 p-6 shadow-soft">
                         <div class="flex items-center gap-3">
-                            <span class="grid size-11 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">SW</span>
+                            <span aria-hidden="true" class="grid size-11 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">SW</span>
                             <div>
-                                <p class="text-sm font-bold text-foreground">StockWitty Research</p>
+                                <p class="text-sm font-bold text-foreground">StocksWitty Research</p>
                             </div>
                         </div>
                         <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
@@ -266,7 +266,7 @@ $toc = array_values(array_filter([
                     <div class="rounded-2xl border border-border bg-beige p-6">
                         <h3 class="text-xs font-bold tracking-widest text-ink/70 uppercase">Disclaimer</h3>
                         <p class="mt-3 text-xs leading-relaxed text-ink/70">
-                            This page is for information only and is not investment advice. StockWitty is a
+                            This page is for information only and is not investment advice. StocksWitty is a
                             distributor of unlisted shares and is not a SEBI-registered investment adviser.
                             Unlisted shares are illiquid and high-risk; there is no guarantee of an IPO, a listing
                             date or an exit at any price. WittyScore is our proprietary, opinion-based score and

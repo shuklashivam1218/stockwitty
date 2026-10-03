@@ -17,7 +17,7 @@
                             <template x-if="mode !== 'signup'">
                                 <div>
                                     <p class="text-xs font-bold tracking-widest text-mint-bright uppercase">Welcome back</p>
-                                    <h1 class="mt-4 text-3xl font-bold sm:text-4xl">Sign in to StockWitty.</h1>
+                                    <h1 class="mt-4 text-3xl font-bold sm:text-4xl">Sign in to StocksWitty.</h1>
                                     <p class="mt-3 text-sm text-white/75">Your watchlist, price alerts and order history — in one place.</p>
                                     <ul class="mt-8 space-y-3 text-sm text-white/85">
                                         <li class="flex items-start gap-3"><x-sw.icon name="check" class="mt-0.5 size-4 shrink-0 text-mint-bright" /> Watchlist across 250+ unlisted companies</li>
@@ -39,7 +39,7 @@
                                 </div>
                             </template>
                             <p class="mt-8 border-t border-white/10 pt-5 text-xs text-white/55">
-                                StockWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser. Unlisted shares are illiquid and high-risk.
+                                StocksWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser. Unlisted shares are illiquid and high-risk.
                             </p>
                         </div>
                     </x-sw.reveal>
@@ -89,7 +89,7 @@
                                 </p>
 
                                 <p class="border-t border-border pt-4 text-sm text-muted-foreground">
-                                    New to StockWitty?
+                                    New to StocksWitty?
                                     <a href="{{ route('signup') }}" class="font-bold text-primary hover:underline">Create an account</a>
                                 </p>
                             </form>
@@ -148,7 +148,7 @@
                                     <input type="checkbox" required class="mt-0.5 size-4 accent-[var(--brand)]" x-model="signupConsent" />
                                     <span>
                                         I understand unlisted shares are illiquid, dealer-priced and high-risk, and that
-                                        StockWitty is a distributor — not an investment adviser.
+                                        StocksWitty is a distributor — not an investment adviser.
                                     </span>
                                 </label>
 

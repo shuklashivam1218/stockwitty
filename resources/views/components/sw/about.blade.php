@@ -15,7 +15,7 @@ $aboutStats = [
     <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         <div>
             <x-sw.reveal>
-                <p class="eyebrow">About — About StockWitty</p>
+                <p class="eyebrow">About — About StocksWitty</p>
                 <h2 class="mt-3 text-3xl font-bold sm:text-4xl">
                     Unlisted investing, minus the mystique
                 </h2>
@@ -23,7 +23,7 @@ $aboutStats = [
             <x-sw.reveal :delay="0.1">
                 <div class="mt-5 space-y-4 text-base text-muted-foreground">
                     <p>
-                        StockWitty is a distributor of unlisted and pre-IPO shares built for Indian retail
+                        StocksWitty is a distributor of unlisted and pre-IPO shares built for Indian retail
                         investors who are tired of bland financial chatter. Most of this market still runs on
                         WhatsApp forwards, vague quotes and screenshots. We publish an actual price, explain
                         where it came from, and let you decide.

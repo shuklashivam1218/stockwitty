@@ -1,4 +1,4 @@
-@props(['company' => 'StockWitty pick', 'score' => 0, 'pillars' => []])
+@props(['company' => 'StocksWitty pick', 'score' => 0, 'pillars' => []])
 
 @php
 $r = 70;

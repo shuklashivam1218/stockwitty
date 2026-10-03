@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Buy 999 Pure Digital Silver Online from ₹10 | StockWitty')
+@section('title', 'Buy 999 Pure Digital Silver Online from ₹10 | StocksWitty')
 @section('description', "Buy and sell 999 pure digital silver from ₹10 — live-style per-gram price, insured vault storage and an instant rupees-to-grams calculator.")
 
 @php

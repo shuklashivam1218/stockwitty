@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Listed Stocks — Live Prices & Honest Analysis | StockWitty')
+@section('title', 'Listed Stocks — Live Prices & Honest Analysis | StocksWitty')
 @section('description', 'Track listed Indian stocks with live-style prices, fundamentals and an honest WittyScore — Reliance, TCS, HDFC Bank, Infosys and more.')
 
 @section('content')

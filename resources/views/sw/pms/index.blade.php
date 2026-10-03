@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', "Aditya Birla Sun Life PMS — India's #3 PMS by AUM | StockWitty")
+@section('title', "Aditya Birla Sun Life PMS — India's #3 PMS by AUM | StocksWitty")
 @section('description', "Aditya Birla Sun Life PMS explained: ₹32,200+ Cr AUM, 29 strategies, ₹50 lakh SEBI minimum, fee structure and flagship Select Sector Portfolio with 27.27% 3Y return.")
 
 @php
@@ -228,7 +228,7 @@ $peers = [
                     <p class="text-sm text-muted-foreground">
                         PMS is a high-ticket, market-linked product. Past performance is not indicative of future
                         results, returns are not guaranteed, and all strategy returns and AUM figures shown here
-                        are illustrative. StockWitty is a distributor, not a SEBI-registered investment adviser.
+                        are illustrative. StocksWitty is a distributor, not a SEBI-registered investment adviser.
                     </p>
                 </div>
 

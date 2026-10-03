@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Compare Unlisted Shares Side by Side | StockWitty')
+@section('title', 'Compare Unlisted Shares Side by Side | StocksWitty')
 @section('description', 'Pick any two unlisted or pre-IPO companies and compare price, WittyScore, sector, business model, financial snapshot and IPO status side by side.')
 
 @php

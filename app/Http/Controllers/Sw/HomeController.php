@@ -171,7 +171,7 @@ class HomeController extends Controller
             'newArrivals'       => $newArrivals,
             'sectors'           => $sectors,
             'companiesTracked'  => $stocks->count(),
-            'wittyScoreCompany' => $wittyScoreCompany ?? 'StockWitty pick',
+            'wittyScoreCompany' => $wittyScoreCompany ?? 'StocksWitty pick',
             'wittyScoreValue'   => $wittyScoreValue,
             'wittyScorePillars' => $wittyScorePillars,
         ]);

@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', $seo?->UL_SEO_ABOUT_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ': Company Profile | StockWitty'))
+@section('title', $seo?->UL_SEO_ABOUT_TITLE ?: ($stock->UL_STOCKS_COMPNAME . ': Company Profile | StocksWitty'))
 @section('description', $seo?->UL_SEO_ABOUT_DESCRIPTION ?: ('A company profile of ' . $stock->UL_STOCKS_COMPNAME . ' — business, verticals, revenue, history and FAQs.'))
 @section('keywords', $seo?->UL_SEO_ABOUT_KEYWORDS ?: collect([
     $stock->UL_STOCKS_COMPNAME . ' company profile',
@@ -41,12 +41,12 @@ $faqs = $aboutFaqs->flatMap(fn ($group, $tab) => $group->map(fn ($f) => ['tab' =
     heroIcon="landmark"
     :title="$stock->UL_STOCKS_COMPNAME . ': Company Profile'"
     :description="'A profile of ' . $stock->UL_STOCKS_COMPNAME . ' — business, verticals, revenue and history.'"
-    authorLine="SW · StockWitty Research"
+    authorLine="SW · StocksWitty Research"
     dateLabel="Updated August 2026"
     readLabel="8 min read"
     :toc="$toc"
     :takeaways="array_values(array_filter(array_slice($strengths, 0, 5)))"
-    :video="['caption' => $stock->UL_STOCKS_COMPNAME . ' explained — StockWitty', 'note' => 'Replace with your StockWitty YouTube video']"
+    :video="['caption' => $stock->UL_STOCKS_COMPNAME . ' explained — StocksWitty', 'note' => 'Replace with your StocksWitty YouTube video']"
     :faqTabs="$faqTabs"
     :faqs="$faqs"
     :sources="count($sources) ? array_map(fn ($s) => ['label' => $s['label'], 'href' => $s['href']], $sources) : [['label' => $stock->UL_STOCKS_COMPNAME . ' — official website', 'href' => $stock->UL_STOCKS_WEBSITE ?: '#']]"
@@ -55,7 +55,7 @@ $faqs = $aboutFaqs->flatMap(fn ($group, $tab) => $group->map(fn ($f) => ['tab' =
         ['title' => $stock->UL_STOCKS_COMPNAME . ' — our thesis & WittyScore', 'href' => '/unlisted-shares/' . $stock->UL_STOCKS_SLUG . '/thesis/', 'category' => 'Analysis', 'read' => 'Read more'],
         ['title' => 'What Are Unlisted Shares?', 'href' => '/blog/what-are-unlisted-shares/', 'category' => 'Basics', 'read' => '7 min read'],
     ]"
-    :leadForm="['heading' => 'Interested in ' . $stock->UL_STOCKS_COMPNAME . ' unlisted shares?', 'subtext' => 'Leave your details and a StockWitty specialist will call you back to explain current availability, pricing and the end-to-end process — with no obligation to buy.']"
+    :leadForm="['heading' => 'Interested in ' . $stock->UL_STOCKS_COMPNAME . ' unlisted shares?', 'subtext' => 'Leave your details and a StocksWitty specialist will call you back to explain current availability, pricing and the end-to-end process — with no obligation to buy.']"
 >
     <x-slot:intro>
         @if ($overview)

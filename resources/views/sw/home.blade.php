@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'StockWitty — Invest Smart, Stay Witty')
+@section('title', 'StocksWitty — Invest Smart, Stay Witty')
 @section('description', 'Research and buy unlisted & pre-IPO shares in India — live prices, DRHP tracking, honest research and same-day demat delivery. Invest Smart, Stay Witty.')
 
 @section('content')

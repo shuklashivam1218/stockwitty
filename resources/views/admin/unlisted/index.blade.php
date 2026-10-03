@@ -1,6 +1,6 @@
 ﻿@extends('layout.admin')
 
-@section('title', 'Unlisted Stocks | Admin | StockWitty')
+@section('title', 'Unlisted Stocks | Admin | StocksWitty')
 
 @push('styles')
 <style>

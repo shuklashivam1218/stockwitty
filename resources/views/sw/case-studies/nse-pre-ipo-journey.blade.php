@@ -5,7 +5,7 @@ $study = collect(config('sw.case_studies'))->firstWhere('slug', 'nse-pre-ipo-jou
 $related = collect(config('sw.case_studies'))->reject(fn ($c) => $c['slug'] === 'nse-pre-ipo-journey')->values()->all();
 @endphp
 
-@section('title', $study['title'] . ' — Case Study | StockWitty')
+@section('title', $study['title'] . ' — Case Study | StocksWitty')
 @section('description', $study['summary'] . ' Illustrative investor journey — not investment advice.')
 
 @section('content')

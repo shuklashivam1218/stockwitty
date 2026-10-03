@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'What Are Unlisted Shares? A Simple Guide for Indian Investors (2026) | StockWitty')
+@section('title', 'What Are Unlisted Shares? A Simple Guide for Indian Investors (2026) | StocksWitty')
 @section('description', 'Unlisted shares explained in plain English — what they are, how they trade in India, the types (pre-IPO, ESOP, delisted), why investors buy them, and who should stay away.')
 
 @php
@@ -30,7 +30,7 @@ $faqs = [
     heroIcon="help-circle"
     title="What Are Unlisted Shares? A Simple Guide for Indian Investors (2026)"
     description="Unlisted shares explained in plain English — what they are, how they trade in India, the types (pre-IPO, ESOP, delisted), why investors buy them, and who should stay away."
-    authorLine="StockWitty Research · CA-reviewed"
+    authorLine="StocksWitty Research · CA-reviewed"
     dateLabel="August 2026"
     readLabel="7 min read"
     :toc="$toc"
@@ -41,7 +41,7 @@ $faqs = [
         'Common types include pre-IPO shares, ESOP shares sold by employees, and delisted company shares.',
         'They offer early access, but they are illiquid and higher-risk, with no guaranteed IPO or exit.',
     ]"
-    :video="['caption' => 'Watch: Unlisted shares explained in 5 minutes — StockWitty', 'note' => 'Replace with your StockWitty YouTube video']"
+    :video="['caption' => 'Watch: Unlisted shares explained in 5 minutes — StocksWitty', 'note' => 'Replace with your StocksWitty YouTube video']"
     :faqTabs="['Basics', 'Process', 'Risk']"
     :faqs="$faqs"
     :sources="[
@@ -56,7 +56,7 @@ $faqs = [
         ['title' => 'Unlisted vs Listed Shares', 'href' => '/blog/unlisted-shares-vs-listed-shares/', 'category' => 'Comparison', 'read' => '7 min read'],
         ['title' => 'Is It Safe to Buy Unlisted Shares?', 'href' => '/blog/is-it-safe-to-buy-unlisted-shares/', 'category' => 'Safety', 'read' => '8 min read'],
     ]"
-    :leadForm="['heading' => 'New to unlisted shares? Talk to a specialist.', 'subtext' => 'Tell us what you\'re curious about and a StockWitty specialist will call you back to explain the process, the current quotes and the risks — with no obligation to transact.']"
+    :leadForm="['heading' => 'New to unlisted shares? Talk to a specialist.', 'subtext' => 'Tell us what you\'re curious about and a StocksWitty specialist will call you back to explain the process, the current quotes and the risks — with no obligation to transact.']"
 >
     <x-slot:intro>
         <p>

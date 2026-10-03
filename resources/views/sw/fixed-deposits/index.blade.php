@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Compare High-Interest Fixed Deposits — Up to 9.40% p.a. | StockWitty')
+@section('title', 'Compare High-Interest Fixed Deposits — Up to 9.40% p.a. | StocksWitty')
 @section('description', 'Compare bank and corporate fixed deposit rates in India — general and senior-citizen rates, tenures and DICGC insurance status, side by side.')
 
 @section('content')

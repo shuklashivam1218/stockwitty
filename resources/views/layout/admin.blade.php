@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin | StockWitty')</title>
+    <title>@yield('title', 'Admin | StocksWitty')</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="alternate icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
@@ -51,7 +51,7 @@
 
         <div class="sidebar-header">
             <a href="{{ url('/admin/dashboard') }}" class="sw-logo-link">
-                <span class="sw-logo-text">Stock<span>Witty</span></span>
+                <span class="sw-logo-text">Stocks<span>Witty</span></span>
             </a>
             <div class="toggle-icon ms-auto" title="Toggle Sidebar">
                 <i class="fa-solid fa-angles-left"></i>

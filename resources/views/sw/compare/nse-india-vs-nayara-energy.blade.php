@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'NSE India vs Nayara Energy — Unlisted Share Comparison | StockWitty')
+@section('title', 'NSE India vs Nayara Energy — Unlisted Share Comparison | StocksWitty')
 @section('description', 'NSE India vs Nayara Energy unlisted shares compared: price, WittyScore, sector, business model, financial snapshot, IPO status, SWOT and our verdict.')
 
 @php

@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Unlisted Shares Blog — Honest Guides & Tax Explainers | StockWitty')
+@section('title', 'Unlisted Shares Blog — Honest Guides & Tax Explainers | StocksWitty')
 @section('description', 'Plain-English guides on unlisted and pre-IPO shares in India: how to buy, tax treatment, DRHP, ISIN and CML basics, and what the risks really are.')
 
 @php
@@ -29,7 +29,7 @@ $rest = array_slice($blogPosts, 1);
     </div>
 
     <main>
-        <x-sw.page-hero eyebrow="StockWitty research" title="Unlisted shares, explained — honestly."
+        <x-sw.page-hero eyebrow="StocksWitty research" title="Unlisted shares, explained — honestly."
                         subtitle="No jargon walls, no sales pitch dressed up as research. Just what we'd tell a friend before they wired money for pre-IPO shares." />
 
         <section class="py-14 sm:py-20">

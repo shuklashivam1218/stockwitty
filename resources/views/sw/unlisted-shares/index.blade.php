@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Unlisted & Pre-IPO Shares in India — Live Prices | StockWitty')
+@section('title', 'Unlisted & Pre-IPO Shares in India — Live Prices | StocksWitty')
 @section('description', 'Browse unlisted and pre-IPO shares in India — NSE India, Tata Capital, Reliance Retail and more. Prices, WittyScore and lot sizes in one honest directory.')
 
 @section('content')
@@ -43,7 +43,7 @@
                     Showing <span class="font-bold text-foreground" x-text="list.length"></span> of {{ count($companies) }} companies
                 </p>
 
-                <x-sw.agent-data-table caption="All {{ count($companies) }} unlisted companies tracked by StockWitty"
+                <x-sw.agent-data-table caption="All {{ count($companies) }} unlisted companies tracked by StocksWitty"
                                        :head="\App\Support\AgentView\AgentTables::COMPANY_HEAD"
                                        :rows="\App\Support\AgentView\AgentTables::companyRows($companies)"
                                        note="Prices are indicative, dealer-negotiated levels (not exchange quotes). Min investment = price × lot size." />

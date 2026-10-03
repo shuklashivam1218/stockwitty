@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockWitty – Temporarily Unavailable</title>
+    <title>StocksWitty – Temporarily Unavailable</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -67,7 +67,7 @@
 <body>
     <div class="card">
         <div class="brand">
-            <img src="/assets/img/unlisted-head.jpeg" alt="StockWitty" onerror="this.style.display='none'">
+            <img src="/assets/img/unlisted-head.jpeg" alt="StocksWitty" onerror="this.style.display='none'">
         </div>
         <div class="icon"><span>🔧</span></div>
         <h1>We'll Be Right Back</h1>

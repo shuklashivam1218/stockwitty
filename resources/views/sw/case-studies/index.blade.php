@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'Case Studies — Real Unlisted Investor Journeys | StockWitty')
+@section('title', 'Case Studies — Real Unlisted Investor Journeys | StocksWitty')
 @section('description', 'Honest case studies from unlisted share investors — the wins, the waits and the passes. Illustrative journeys, not investment advice.')
 
 @php
@@ -54,7 +54,7 @@ $disclaimer = config('sw.case_studies_disclaimer');
 
                 <p class="mt-4 text-xs text-muted-foreground">
                     Case studies describe individual experiences, are framed around process rather than
-                    returns, and are not indicative of future outcomes. StockWitty is a distributor of unlisted
+                    returns, and are not indicative of future outcomes. StocksWitty is a distributor of unlisted
                     shares, not a SEBI-registered investment adviser.
                 </p>
             </div>

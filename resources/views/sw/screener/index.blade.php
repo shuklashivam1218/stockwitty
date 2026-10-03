@@ -1,6 +1,6 @@
 @extends('layouts.sw')
 
-@section('title', 'AI-Powered Unlisted Share Screener — Filter 245+ Stocks | StockWitty')
+@section('title', 'AI-Powered Unlisted Share Screener — Filter 245+ Stocks | StocksWitty')
 @section('description', 'Screen unlisted and pre-IPO shares in plain English — filter by sector, price, WittyScore, tag and IPO probability across 245+ companies.')
 
 @section('content')
@@ -32,7 +32,7 @@
                         The screener is an interactive tool: visitors filter unlisted companies by sector, maximum
                         price, minimum WittyScore, tag (Pre-IPO, Unicorn, Trending) and IPO probability, or
                         describe what they want in plain English. The sample rows it shows are illustrative.
-                        For every company StockWitty tracks, with current indicative prices, lot sizes and
+                        For every company StocksWitty tracks, with current indicative prices, lot sizes and
                         WittyScores, see <a href="/unlisted-shares/">the unlisted shares directory</a>.
                     </p>
                 @endagentOnly

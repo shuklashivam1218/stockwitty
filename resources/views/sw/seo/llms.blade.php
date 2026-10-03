@@ -1,6 +1,6 @@
-# StockWitty
+# StocksWitty
 
-> StockWitty is an investment platform for unlisted and pre-IPO shares in India — with honest research, transparent pricing and human support. Each company carries a WittyScore rating, a full profile and an investment thesis. StockWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.
+> StocksWitty is an investment platform for unlisted and pre-IPO shares in India — with honest research, transparent pricing and human support. Each company carries a WittyScore rating, a full profile and an investment thesis. StocksWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.
 
 ## Markdown for AI agents
 Every page listed below is also available as clean Markdown: request the same path ending in `.md` (for example https://www.stockswitty.com/blog/tax-on-unlisted-shares.md, or https://www.stockswitty.com/index.md for the homepage), or send `Accept: text/markdown` to the page URL. The Markdown is generated from the live page, including current indicative prices.
@@ -12,7 +12,7 @@ Every page listed below is also available as clean Markdown: request the same pa
 - [Screener](https://www.stockswitty.com/screener/): filter unlisted companies
 - [Compare](https://www.stockswitty.com/compare/): compare two unlisted shares
 - [Calculators](https://www.stockswitty.com/calculators/): investment calculators
-- [Why StockWitty](https://www.stockswitty.com/why-witty/)
+- [Why StocksWitty](https://www.stockswitty.com/why-witty/)
 
 ## Unlisted company research ({{ $companies->count() }} companies, each with price, profile /about/ and thesis /thesis/)
 @foreach ($companies as $company)
@@ -43,4 +43,4 @@ Every page listed below is also available as clean Markdown: request the same pa
 Complete KYC (PAN, CML copy, cancelled cheque, Aadhaar), pay only into a verified company account (never a personal one), and receive shares in your own CDSL/NSDL demat — usually the same day, with independent ISIN verification.
 
 ## Important
-Unlisted shares are illiquid and high-risk, with no guarantee of any IPO, listing or exit. All content is information only, not investment advice. StockWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.
+Unlisted shares are illiquid and high-risk, with no guarantee of any IPO, listing or exit. All content is information only, not investment advice. StocksWitty is a distributor of unlisted shares, not a SEBI-registered investment adviser.

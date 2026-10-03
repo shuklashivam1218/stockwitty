@@ -1,7 +1,7 @@
 @extends('layouts.sw')
 
-@section('title', ($page->CMS_PAGE_TITLE ?? 'Disclaimer') . ' | StockWitty')
-@section('description', $page->CMS_PAGE_DESCRIPTION ?? 'StockWitty disclaimer — read this before you invest.')
+@section('title', ($page->CMS_PAGE_TITLE ?? 'Disclaimer') . ' | StocksWitty')
+@section('description', $page->CMS_PAGE_DESCRIPTION ?? 'StocksWitty disclaimer — read this before you invest.')
 
 @section('content')
 <div class="min-h-screen bg-background">
@@ -18,7 +18,7 @@
                     <x-sw.callout title="Read this before you invest">
                         Investments in securities markets are subject to market risks. Read all the related
                         documents carefully before investing. The value of investments can go down as well as
-                        up, and you may get back less than you invested. StockWitty does not guarantee any
+                        up, and you may get back less than you invested. StocksWitty does not guarantee any
                         returns.
                     </x-sw.callout>
 
@@ -29,7 +29,7 @@
                     <x-sw.callout title="Read this before you invest">
                         Investments in securities markets are subject to market risks. Read all the related
                         documents carefully before investing. The value of investments can go down as well as
-                        up, and you may get back less than you invested. StockWitty does not guarantee any
+                        up, and you may get back less than you invested. StocksWitty does not guarantee any
                         returns.
                     </x-sw.callout>
 
