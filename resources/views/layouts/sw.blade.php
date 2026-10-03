@@ -59,11 +59,8 @@
 @yield('content')
 
 @humanView
-@include('partials.sw.footer')
-
-@if ($markdownTwin)
-    <x-sw.agent-view :markdown-url="$markdownTwin" />
-@endif
+{{-- The footer also carries the "Human view / AI agent" toggle when $markdownTwin is set. --}}
+@include('partials.sw.footer', ['markdownTwin' => $markdownTwin])
 
 @stack('scripts')
 @endhumanView

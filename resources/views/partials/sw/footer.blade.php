@@ -28,6 +28,12 @@ $swAccount = [
                         hello@stockswitty.com
                     </a>
                 </div>
+
+                @if (! empty($markdownTwin))
+                    <div class="mt-5">
+                        <x-sw.agent-view :markdown-url="$markdownTwin" />
+                    </div>
+                @endif
             </div>
 
             <div>

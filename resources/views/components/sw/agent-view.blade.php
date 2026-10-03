@@ -1,6 +1,8 @@
-{{-- "Human view / AI agent" toggle, rendered once by layouts/sw.blade.php on
+{{-- "Human view / AI agent" toggle plus the full-screen agent panel.
+     Rendered once, inside the site footer (partials/sw/footer.blade.php), on
      every page that has a Markdown twin. "AI agent" fetches the live twin
-     (the exact Markdown crawlers get) and shows it with its metadata.
+     (the exact Markdown crawlers get) and shows it with its metadata; the
+     panel repeats the toggle in its header so visitors can switch back.
      Behaviour lives in resources/js/sw/agent-view.js; #agent in the URL
      opens the agent view directly, so it can be shared. --}}
 @props(['markdownUrl'])
@@ -14,29 +16,21 @@
 @endphp
 
 <div x-data="agentView(@js($options))" @keydown.escape.window="agent && setAgent(false)">
-    <div role="group" aria-label="Page view"
-         class="fixed bottom-4 left-4 z-[60] inline-flex items-center gap-0.5 rounded-full border border-border/70 bg-background/85 p-0.5 shadow-soft backdrop-blur-xl sm:bottom-6 sm:left-6">
-        <button type="button" @click="setAgent(false)" :aria-pressed="!agent"
-                :class="!agent ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
-                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors">
-            <x-sw.icon name="user" class="size-3.5" />
-            Human view
-        </button>
-        <button type="button" @click="setAgent(true)" :aria-pressed="agent"
-                :class="agent ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
-                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors">
-            <x-sw.icon name="bot" class="size-3.5" />
-            AI agent
-        </button>
+    <div class="flex flex-wrap items-center gap-3">
+        <x-sw.agent-view-toggle variant="dark" />
+        <span class="text-xs text-white/60">See this page the way AI agents read it</span>
     </div>
 
     <div x-show="agent" x-cloak role="dialog" aria-modal="true" aria-label="AI agent view of this page"
-         class="fixed inset-0 z-[55] overflow-y-auto bg-background">
-        <div class="mx-auto max-w-7xl px-4 pt-8 pb-24 sm:px-6 lg:px-8">
-            <div class="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                <x-sw.icon name="bot" class="size-4 text-mint" />
-                <span class="font-semibold text-foreground">AI agent view</span>
-                <span class="min-w-0">— exactly what crawlers and AI agents receive from this page</span>
+         class="fixed inset-0 z-[60] overflow-y-auto bg-background text-foreground">
+        <div class="mx-auto max-w-7xl px-4 pt-8 pb-16 sm:px-6 lg:px-8">
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    <x-sw.icon name="bot" class="size-4 text-mint" />
+                    <span class="font-semibold text-foreground">AI agent view</span>
+                    <span class="min-w-0">— exactly what crawlers and AI agents receive from this page</span>
+                </div>
+                <x-sw.agent-view-toggle variant="light" />
             </div>
 
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
