@@ -135,7 +135,12 @@ ok "public_html cleaned"
 
 # ── Sync public/ → public_html/ ───────────────────────────────
 info "Syncing public assets to public_html ..."
+# Admin uploads (logos, thesis/about/CMS/blog images) are written straight
+# into public_html/images/ by App\Helpers\ImageUpload and exist nowhere
+# else, so --delete must never touch images/ — protect (P) still copies
+# the repo's own images across, it only stops deletions on this side.
 rsync -a --delete --force \
+    --filter="P /images/***" \
     --exclude="index.php" \
     --exclude="index.production.php" \
     "$APP_DIR/public/" "$PUBLIC_HTML/"

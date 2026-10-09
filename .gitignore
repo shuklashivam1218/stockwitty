@@ -2,6 +2,12 @@
 /node_modules
 /public/hot
 /public/storage
+# Admin uploads live only in the server's public_html (App\Helpers\ImageUpload) — never commit local test uploads
+/public/images/company-logo/
+/public/images/cms-pages-images/
+/public/images/unlisted-about-images/
+/public/images/unlisted-thesis-images/
+/public/images/blog/
 /storage/*.key
 /vendor
 .env

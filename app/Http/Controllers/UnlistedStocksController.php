@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Privilege;
-use App\Helpers\SafeUpload;
+use App\Helpers\ImageUpload;
 use App\Models\UnlistedStock;
 use App\Models\UnlistedPriceData;
 use App\Models\UnlistedFinancials;
@@ -457,34 +457,8 @@ class UnlistedStocksController extends Controller
             'UL_STOCKS_ABOUT'             => $request->input('UL_STOCKS_ABOUT'),
         ];
 
-        if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
-            $ext = SafeUpload::imageExtension($request->file('logo'));
-            if ($ext === null) {
-                return response()->json(['success' => false, 'message' => 'Uploaded file is not a recognised image type.']);
-            }
-
-            $slug     = $stock->UL_STOCKS_SLUG;
-            $filename = $slug . '.' . $ext;
-            $destDir  = SafeUpload::webRoot() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'company-logo';
-
-            if (!is_dir($destDir)) {
-                mkdir($destDir, 0755, true);
-            }
-
-            foreach (['png','jpg','jpeg','svg','webp'] as $oldExt) {
-                $old = $destDir . DIRECTORY_SEPARATOR . $slug . '.' . $oldExt;
-                if (file_exists($old)) @unlink($old);
-            }
-
-            try {
-                $request->file('logo')->move($destDir, $filename);
-            } catch (\Exception $e) {
-                return response()->json(['success' => false, 'message' => 'Upload failed: ' . $e->getMessage()]);
-            }
-
-            $data['UL_STOCKS_LOGO_LINK'] = 'images/company-logo/' . $filename;
-        } elseif ($request->hasFile('logo')) {
-            return response()->json(['success' => false, 'message' => 'Uploaded file is invalid.']);
+        if ($request->hasFile('logo')) {
+            $data['UL_STOCKS_LOGO_LINK'] = ImageUpload::replace($request->file('logo'), 'company-logo', $stock->UL_STOCKS_SLUG, allowSvg: true);
         }
 
         $stock->update($data);
@@ -534,21 +508,11 @@ class UnlistedStocksController extends Controller
 
     public function uploadThesisImage(Request $request, string $fincode)
     {
-        $request->validate(['file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:5120']);
+        $request->validate(['file' => 'required|' . ImageUpload::RULES]);
 
-        $file = $request->file('file');
-        $ext  = SafeUpload::imageExtension($file);
-        if ($ext === null) {
-            return response()->json(['message' => 'Uploaded file is not a recognised image type.'], 422);
-        }
+        $path = ImageUpload::store($request->file('file'), 'unlisted-thesis-images', 'thesis_' . $fincode);
 
-        $folder = SafeUpload::webRoot() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'unlisted-thesis-images';
-        if (!is_dir($folder)) mkdir($folder, 0755, true);
-
-        $filename = 'thesis_' . $fincode . '_' . time() . '_' . uniqid() . '.' . $ext;
-        $file->move($folder, $filename);
-
-        return response()->json(['location' => asset('images/unlisted-thesis-images/' . $filename)]);
+        return response()->json(['location' => ImageUpload::url($path)]);
     }
 
     public function getAboutModal(string $fincode)
@@ -593,21 +557,11 @@ class UnlistedStocksController extends Controller
 
     public function uploadAboutImage(Request $request, string $fincode)
     {
-        $request->validate(['file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:5120']);
+        $request->validate(['file' => 'required|' . ImageUpload::RULES]);
 
-        $file = $request->file('file');
-        $ext  = SafeUpload::imageExtension($file);
-        if ($ext === null) {
-            return response()->json(['message' => 'Uploaded file is not a recognised image type.'], 422);
-        }
+        $path = ImageUpload::store($request->file('file'), 'unlisted-about-images', 'about_' . $fincode);
 
-        $folder = SafeUpload::webRoot() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'unlisted-about-images';
-        if (!is_dir($folder)) mkdir($folder, 0755, true);
-
-        $filename = 'about_' . $fincode . '_' . time() . '_' . uniqid() . '.' . $ext;
-        $file->move($folder, $filename);
-
-        return response()->json(['location' => asset('images/unlisted-about-images/' . $filename)]);
+        return response()->json(['location' => ImageUpload::url($path)]);
     }
 
     public function getFaqListModal(string $fincode)
