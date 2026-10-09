@@ -10,10 +10,9 @@ class BlogPost extends Model
     use SoftDeletes;
 
     public const STATUS_DRAFT     = 'draft';
-    public const STATUS_IN_REVIEW = 'in_review';
     public const STATUS_PUBLISHED = 'published';
 
-    public const STATUSES = [self::STATUS_DRAFT, self::STATUS_IN_REVIEW, self::STATUS_PUBLISHED];
+    public const STATUSES = [self::STATUS_DRAFT, self::STATUS_PUBLISHED];
 
     private const WORDS_PER_MINUTE = 200;
 
@@ -39,11 +38,10 @@ class BlogPost extends Model
         'meta_description',
         'meta_keywords',
         'status',
-        'review_note',
         'is_featured',
         'published_at',
         'created_by',
-        'reviewed_by',
+        'published_by',
     ];
 
     protected function casts(): array
@@ -87,9 +85,9 @@ class BlogPost extends Model
         return $this->belongsTo(User::class, 'created_by', 'uid');
     }
 
-    public function reviewer()
+    public function publisher()
     {
-        return $this->belongsTo(User::class, 'reviewed_by', 'uid');
+        return $this->belongsTo(User::class, 'published_by', 'uid');
     }
 
     public function lockedByUser()

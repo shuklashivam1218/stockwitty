@@ -37,9 +37,8 @@ return new class extends Migration
             $table->string('meta_description', 500)->nullable();
             $table->string('meta_keywords', 500)->nullable();
 
-            // draft -> in_review -> published (a reviewer can send it back to draft with a note)
+            // draft | published — any author or reviewer can publish
             $table->string('status', 20)->default('draft');
-            $table->text('review_note')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->unsignedSmallInteger('reading_minutes')->default(1);
             $table->timestamp('published_at')->nullable();
@@ -47,7 +46,7 @@ return new class extends Migration
             // nullOnDelete: removing an admin user must not be blocked by, or
             // delete, the posts they wrote — the byline falls back instead.
             $table->foreignId('created_by')->nullable()->constrained('users', 'uid')->nullOnDelete();
-            $table->foreignId('reviewed_by')->nullable()->constrained('users', 'uid')->nullOnDelete();
+            $table->foreignId('published_by')->nullable()->constrained('users', 'uid')->nullOnDelete();
             $table->foreignId('locked_by')->nullable()->constrained('users', 'uid')->nullOnDelete();
             $table->timestamp('locked_at')->nullable();
 

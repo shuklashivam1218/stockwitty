@@ -78,7 +78,7 @@ class BlogModelsTest extends TestCase
     public function test_published_scope_needs_status_and_date(): void
     {
         $live    = $this->makePost(['status' => BlogPost::STATUS_PUBLISHED, 'published_at' => now()]);
-        $review  = $this->makePost(['status' => BlogPost::STATUS_IN_REVIEW]);
+        $review  = $this->makePost(['status' => BlogPost::STATUS_DRAFT]);
         $noDate  = $this->makePost(['status' => BlogPost::STATUS_PUBLISHED]);
 
         $ids = BlogPost::published()->pluck('id');
