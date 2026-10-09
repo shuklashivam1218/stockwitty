@@ -7,7 +7,7 @@
 @endif
 @section('description', $active
     ? 'StocksWitty guides on ' . $active->name . ' for unlisted and pre-IPO shares in India — plain English, no sales pitch.'
-    : 'Plain-English guides on unlisted and pre-IPO shares in India: how to buy, tax treatment, DRHP, ISIN and CML basics, and what the risks really are.')
+    : 'Plain-English guides on unlisted and pre-IPO shares in India: what they are, how to buy and sell them, how they are taxed, and what the risks really are.')
 @section('canonical', $canonical)
 
 @section('content')
