@@ -140,9 +140,11 @@ class ImageUpload
         return preg_replace('/[^A-Za-z0-9_-]/', '', $name);
     }
 
+    /** Uploads live under images/<folder>/; images/sw/ holds the site's own committed artwork and is never touched. */
     private static function isManagedPath(?string $path): bool
     {
         return is_string($path)
+            && !str_starts_with($path, 'images/sw/')
             && preg_match('#^images/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*/[A-Za-z0-9_-]+\.[A-Za-z0-9]+$#', $path) === 1;
     }
 }

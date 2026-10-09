@@ -103,6 +103,10 @@ class ImageUploadTest extends TestCase
         ImageUpload::delete('.env');
         ImageUpload::delete(null);
         $this->assertFileExists(public_path('index.php'));
+
+        // The site's own committed artwork (e.g. a migrated post's hero) is off-limits.
+        ImageUpload::delete('images/sw/blog-how-to-buy-unlisted-shares.jpg');
+        $this->assertFileExists(public_path('images/sw/blog-how-to-buy-unlisted-shares.jpg'));
     }
 
     public function test_exception_renders_json_for_ajax_callers(): void
