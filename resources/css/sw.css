@@ -331,3 +331,74 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/*
+ * Blog post bodies (x-sw.blog-post). The HTML comes from the admin editor
+ * through the `blog` purifier profile, so it is plain tags plus the sw-*
+ * classes in config/blog.php content_classes. These rules give that HTML
+ * the look the old hand-built components (callout, checklist-card,
+ * pullquote, numbered-steps, comparison-table) had. h2s get their classes
+ * from App\Support\HtmlToc.
+ */
+.sw-article {
+  @apply mt-4 text-base leading-relaxed text-muted-foreground;
+}
+.sw-article > * + * { @apply mt-4; }
+.sw-article h3 { @apply mt-10 text-xl font-bold text-foreground; }
+.sw-article h4 { @apply mt-8 text-lg font-bold text-foreground; }
+.sw-article a { @apply font-semibold text-primary underline underline-offset-4; }
+.sw-article strong, .sw-article b { @apply font-semibold text-foreground; }
+.sw-article ul:not([class]) { @apply list-disc space-y-2 pl-6; }
+.sw-article ol:not([class]) { @apply list-decimal space-y-2 pl-6; }
+.sw-article blockquote:not([class]) { @apply border-l-4 border-border pl-5 italic; }
+.sw-article img { @apply h-auto max-w-full rounded-2xl border border-border; }
+.sw-article figure { @apply my-8; }
+.sw-article figcaption { @apply mt-3 text-center text-xs font-semibold text-muted-foreground; }
+.sw-article hr { @apply my-10 border-border; }
+.sw-article table:not([class]) { @apply block w-full overflow-x-auto text-sm; }
+.sw-article table:not([class]) td, .sw-article table:not([class]) th { @apply border border-border px-3 py-2 text-left align-top; }
+
+/* Callout: first line (usually bold) is the title. */
+.sw-callout {
+  @apply relative mt-6 rounded-2xl border border-mint/50 bg-green-50 p-5 pl-14 text-sm leading-relaxed;
+}
+.sw-callout::before {
+  content: "";
+  @apply absolute top-5 left-5 size-5 bg-primary;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4'/%3E%3Cpath d='M12 8h.01'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.sw-callout > * + * { @apply mt-1.5; }
+.sw-callout > p:first-child { @apply font-bold text-foreground; }
+
+.sw-pullquote {
+  @apply my-8 border-l-4 border-mint pl-5 text-lg font-semibold italic leading-relaxed text-foreground;
+}
+
+.sw-checklist { @apply mt-5 grid gap-3; }
+.sw-checklist > li {
+  @apply relative rounded-xl border border-border bg-card py-3 pr-4 pl-11 text-sm text-muted-foreground;
+}
+.sw-checklist > li::before {
+  content: "";
+  @apply absolute top-3.5 left-4 size-4 bg-primary;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.sw-steps { counter-reset: sw-step; @apply mt-6 space-y-4; }
+.sw-steps > li {
+  counter-increment: sw-step;
+  @apply relative rounded-2xl border border-border bg-card p-5 pl-20 shadow-soft;
+}
+.sw-steps > li::before {
+  content: counter(sw-step);
+  @apply absolute top-5 left-5 text-4xl font-bold leading-none text-mint/70 sm:text-5xl;
+}
+.sw-steps > li > * + * { @apply mt-1 text-sm; }
+.sw-steps > li > p:first-child { @apply font-bold text-foreground; }
+
+.sw-table {
+  @apply mt-6 block w-full overflow-x-auto rounded-2xl border border-border text-left text-sm shadow-soft;
+}
+.sw-table th { @apply bg-green-50 px-4 py-3 text-xs font-bold tracking-wide whitespace-nowrap text-primary uppercase; }
+.sw-table td { @apply border-t border-border bg-card px-4 py-3 align-top; }
+.sw-table td:first-child { @apply font-semibold text-foreground; }

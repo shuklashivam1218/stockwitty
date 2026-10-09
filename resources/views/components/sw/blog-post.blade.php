@@ -1,13 +1,53 @@
+{{-- One blog post, rendered from a BlogPost (see Sw\BlogController::page()).
+     Everything here is escaped plain text except $body, which is stored
+     purified (clean($html, 'blog')) and only gains TOC ids/classes since. --}}
 @props([
-    'crumbs', 'chips', 'title', 'description', 'authorLine', 'dateLabel', 'readLabel',
-    'heroIcon' => null, 'hero' => null, 'toc', 'takeaways', 'takeawaysTitle' => 'Key takeaways',
-    'video', 'faqTabs', 'faqs', 'sources', 'related', 'leadForm',
+    'post', 'crumbs', 'chips', 'authorLine', 'author' => null, 'dateLabel', 'hero' => null,
+    'introParas' => [], 'toc', 'body', 'related' => [], 'leadForm', 'preview' => false,
+    'takeawaysTitle' => 'Key takeaways',
 ])
 
-@push('jsonld')
-    {!! \App\Support\Seo\JsonLd::script(\App\Support\Seo\JsonLd::article($title, $description, \App\Support\Seo\JsonLd::currentUrl(), $hero['src'] ?? null)) !!}
-@endpush
-<x-sw.faq-schema :faqs="$faqs" />
+@php
+    $title     = $post->title;
+    $takeaways = $post->takeaways ?? [];
+    $faqs      = $post->faqs ?? [];
+    $faqTabs   = $post->faqTabs();
+    $sources   = $post->sources ?? [];
+    $youtubeId = $post->video['youtube_id'] ?? null;
+    $socials   = $author ? array_filter([
+        'LinkedIn'  => $author->author_linkedin,
+        'X'         => $author->author_twitter,
+        'Facebook'  => $author->author_facebook,
+        'Instagram' => $author->author_instagram,
+        'Website'   => $author->author_website,
+    ]) : [];
+    $authorSchema = $author ? array_filter([
+        '@type'    => 'Person',
+        'name'     => $author->name,
+        'jobTitle' => $author->author_designation,
+        'sameAs'   => array_values($socials) ?: null,
+    ]) : null;
+@endphp
+
+@unless ($preview)
+    @push('jsonld')
+        {!! \App\Support\Seo\JsonLd::script(\App\Support\Seo\JsonLd::article(
+            $title, (string) $post->summary, \App\Support\Seo\JsonLd::currentUrl(), $hero['src'] ?? null,
+            array_filter([
+                'datePublished' => $post->published_at?->toIso8601String(),
+                'dateModified'  => $post->updated_at?->toIso8601String(),
+                'author'        => $authorSchema,
+            ])
+        )) !!}
+    @endpush
+    <x-sw.faq-schema :faqs="$faqs" />
+@endunless
+
+@if ($preview)
+    <div class="fixed inset-x-0 top-16 z-40 bg-amber-100 px-4 py-2 text-center text-sm font-bold text-amber-900">
+        Preview · {{ $post->trashed() ? 'in trash' : ($post->isPublished() ? 'published' : 'draft — not visible to the public') }}
+    </div>
+@endif
 
 <div class="pt-16">
     <x-sw.breadcrumb :items="$crumbs" />
@@ -25,13 +65,13 @@
                 <h1 class="mt-5 text-3xl font-bold leading-tight text-foreground sm:text-[2.75rem]">{{ $title }}</h1>
                 <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-muted-foreground">
                     <span class="inline-flex items-center gap-2">
-                        <span aria-hidden="true" class="grid size-9 place-items-center rounded-full bg-primary text-[0.7rem] font-bold text-primary-foreground">SW</span>
+                        <span aria-hidden="true" class="grid size-9 place-items-center rounded-full bg-primary text-[0.7rem] font-bold text-primary-foreground">{{ $author ? strtoupper(mb_substr($author->name, 0, 1)) : 'SW' }}</span>
                         {{ $authorLine }}
                     </span>
                     <span>{{ $dateLabel }}</span>
                     <span class="inline-flex items-center gap-1.5">
                         <x-sw.icon name="clock" class="size-3.5" />
-                        {{ $readLabel }}
+                        {{ $post->readLabel() }}
                     </span>
                 </div>
             </x-sw.reveal>
@@ -50,9 +90,9 @@
             @else
             <div data-agent-skip class="bg-price-card relative flex aspect-[16/7] w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-3xl px-6 text-center shadow-soft">
                 <div class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-mint/20 blur-3xl"></div>
-                @if ($heroIcon)
+                @if ($post->hero_icon)
                     <span class="relative grid size-16 place-items-center rounded-2xl bg-white/10 text-mint-bright ring-1 ring-white/20 backdrop-blur sm:size-20">
-                        <x-sw.icon :name="$heroIcon" class="size-8 sm:size-10" />
+                        <x-sw.icon :name="$post->hero_icon" class="size-8 sm:size-10" />
                     </span>
                 @endif
                 <p class="relative max-w-2xl text-lg font-bold leading-snug text-white sm:text-2xl">{{ $title }}</p>
@@ -63,10 +103,15 @@
 
     <x-sw.toc-layout :items="$toc">
         <article class="pb-4">
-            <div class="mt-8 space-y-4 text-base leading-relaxed text-muted-foreground">
-                {{ $intro }}
-            </div>
+            @if ($introParas)
+                <div class="mt-8 space-y-4 text-base leading-relaxed text-muted-foreground">
+                    @foreach ($introParas as $para)
+                        <p>{{ $para }}</p>
+                    @endforeach
+                </div>
+            @endif
 
+            @if ($takeaways)
             <x-sw.reveal>
                 <aside class="mt-10 rounded-3xl border border-mint/40 bg-green-50 p-6 sm:p-7">
                     <h2 class="text-lg font-bold text-foreground">{{ $takeawaysTitle }}</h2>
@@ -80,29 +125,43 @@
                     </ul>
                 </aside>
             </x-sw.reveal>
+            @endif
 
+            @if ($youtubeId)
+            {{-- Click-to-load: no YouTube request (or cookie) until the reader asks for it. --}}
             <x-sw.reveal>
                 <figure data-agent-skip class="mt-10" x-data="{ playing: false }">
                     <div class="bg-price-card relative grid aspect-video w-full place-items-center overflow-hidden rounded-3xl">
-                        <button type="button" @click="playing = true"
-                                class="grid size-16 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/30 backdrop-blur transition-transform hover:scale-105"
-                                aria-label="Play video">
-                            <x-sw.icon name="play" class="size-7 fill-white" />
-                        </button>
-                        <span class="absolute bottom-4 left-5 text-xs font-semibold text-white/60">Replace with your StocksWitty YouTube video</span>
+                        <template x-if="!playing">
+                            <button type="button" @click="playing = true" class="group absolute inset-0 grid place-items-center" aria-label="Play video: {{ $post->video['caption'] ?? $title }}">
+                                <img src="https://i.ytimg.com/vi/{{ $youtubeId }}/hqdefault.jpg" alt="" loading="lazy" class="absolute inset-0 size-full object-cover opacity-70" />
+                                <span class="relative grid size-16 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/30 backdrop-blur transition-transform group-hover:scale-105">
+                                    <x-sw.icon name="play" class="size-7 fill-white" />
+                                </span>
+                            </button>
+                        </template>
+                        <template x-if="playing">
+                            <iframe class="absolute inset-0 size-full" src="https://www.youtube-nocookie.com/embed/{{ $youtubeId }}?autoplay=1&rel=0"
+                                    title="{{ $post->video['caption'] ?? $title }}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen
+                                    referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                        </template>
                     </div>
-                    <figcaption class="mt-3 text-center text-xs font-semibold text-muted-foreground">{{ $video['caption'] }}</figcaption>
+                    @if (!empty($post->video['caption']))
+                        <figcaption class="mt-3 text-center text-xs font-semibold text-muted-foreground">{{ $post->video['caption'] }}</figcaption>
+                    @endif
                 </figure>
             </x-sw.reveal>
+            @endif
 
-            {{ $slot }}
+            <div class="sw-article">{!! $body !!}</div>
 
+            @if ($sources)
             <h2 id="sources" class="mt-14 scroll-mt-28 text-2xl font-bold text-foreground sm:text-3xl">Sources &amp; references</h2>
             <p class="mt-3 text-sm text-muted-foreground">Verify every figure against official filings.</p>
             <ul class="mt-4 grid gap-2 sm:grid-cols-2">
                 @foreach ($sources as $s)
                     <li>
-                        <a href="{{ $s['href'] }}" target="_blank" rel="noopener noreferrer"
+                        <a href="{{ $s['href'] }}" target="_blank" rel="noopener noreferrer nofollow"
                            class="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary">
                             {{ $s['label'] }}
                             <x-sw.icon name="external-link" class="size-4 shrink-0" />
@@ -110,19 +169,21 @@
                     </li>
                 @endforeach
             </ul>
+            @endif
 
+            @if ($faqs)
             <h2 id="faq" class="mt-14 scroll-mt-28 text-2xl font-bold text-foreground sm:text-3xl">Frequently asked questions</h2>
+            {{-- Tab names are admin text inside Alpine expressions: always @js(), never quoted {{ }}. --}}
             <div x-data="{ active: 'All' }">
+                @if (count($faqTabs) > 1)
                 <div class="mt-5 flex flex-wrap gap-2">
-                    <button type="button" @click="active = 'All'" :aria-pressed="active === 'All'"
-                            :class="active === 'All' ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-primary'"
-                            class="rounded-full border px-4 py-1.5 text-sm font-semibold transition-all">All</button>
-                    @foreach ($faqTabs as $t)
+                    @foreach (array_merge(['All'], $faqTabs) as $t)
                         <button type="button" @click="active = @js($t)" :aria-pressed="active === @js($t)"
                                 :class="active === @js($t) ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-primary'"
                                 class="rounded-full border px-4 py-1.5 text-sm font-semibold transition-all">{{ $t }}</button>
                     @endforeach
                 </div>
+                @endif
                 <div class="mt-5">
                     @foreach ($faqs as $f)
                         <details x-show="active === 'All' || active === @js($f['tab'])"
@@ -136,6 +197,7 @@
                     @endforeach
                 </div>
             </div>
+            @endif
 
             <div data-agent-skip class="mt-12 flex flex-wrap items-center gap-3 border-y border-border py-5" x-data="{ copied: false }">
                 <span class="inline-flex items-center gap-2 text-sm font-bold text-foreground">
@@ -158,21 +220,42 @@
 
             <x-sw.reveal>
                 <div class="mt-10 flex flex-col gap-4 rounded-3xl border border-border bg-secondary p-6 sm:flex-row sm:items-start">
-                    <span aria-hidden="true" class="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary text-base font-bold text-primary-foreground">SW</span>
+                    <span aria-hidden="true" class="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary text-base font-bold text-primary-foreground">
+                        {{ $author ? strtoupper(mb_substr($author->name, 0, 1)) : 'SW' }}
+                    </span>
                     <div>
-                        <p class="text-base font-bold text-foreground">StocksWitty Research</p>
-                        <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                            We research unlisted shares the way we'd want them explained to us — the risks as clearly as the upside.
-                        </p>
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            @foreach (['CA-reviewed', 'Unlisted-shares specialists', 'Distributor · not a SEBI adviser'] as $c)
-                                <span class="rounded-full border border-border bg-card px-3 py-1 text-[0.7rem] font-bold text-muted-foreground">{{ $c }}</span>
-                            @endforeach
-                        </div>
+                        @if ($author)
+                            <p class="text-base font-bold text-foreground">{{ $author->name }}</p>
+                            @if ($author->author_designation)
+                                <p class="text-xs font-bold tracking-wide text-primary uppercase">{{ $author->author_designation }}</p>
+                            @endif
+                            <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                                {{ $author->author_bio ?: 'Writes for StocksWitty on unlisted shares, pre-IPO investing and the Indian markets.' }}
+                            </p>
+                            @if ($socials)
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    @foreach ($socials as $label => $href)
+                                        <a href="{{ $href }}" target="_blank" rel="noopener noreferrer nofollow me"
+                                           class="rounded-full border border-border bg-card px-3 py-1 text-[0.7rem] font-bold text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary">{{ $label }}</a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        @else
+                            <p class="text-base font-bold text-foreground">StocksWitty Research</p>
+                            <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                                We research unlisted shares the way we'd want them explained to us — the risks as clearly as the upside.
+                            </p>
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                @foreach (['CA-reviewed', 'Unlisted-shares specialists', 'Distributor · not a SEBI adviser'] as $c)
+                                    <span class="rounded-full border border-border bg-card px-3 py-1 text-[0.7rem] font-bold text-muted-foreground">{{ $c }}</span>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 </div>
             </x-sw.reveal>
 
+            @if ($related)
             <h2 id="related" class="mt-14 scroll-mt-28 text-2xl font-bold text-foreground sm:text-3xl">Related reading</h2>
             <div class="mt-5 grid gap-4 sm:grid-cols-3">
                 @foreach ($related as $i => $r)
@@ -185,6 +268,7 @@
                     </x-sw.reveal>
                 @endforeach
             </div>
+            @endif
 
             <x-sw.illustrative-note>
                 Any prices, lot sizes or return figures in this article are illustrative examples for explanation only. Confirm live quotes and charges before you transact.

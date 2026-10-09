@@ -13,6 +13,7 @@ use App\Http\Controllers\CmsPagesController;
 use App\Http\Controllers\BlogPostsController;
 use App\Http\Controllers\BlogCategoriesController;
 use App\Http\Controllers\BlogAuthorProfileController;
+use App\Http\Controllers\Sw\BlogController;
 use App\Http\Controllers\Sw\CompanyController;
 use App\Http\Controllers\Sw\HomeController;
 use App\Http\Controllers\Sw\SeoController;
@@ -67,15 +68,8 @@ Route::view('/calculators/', 'sw.calculators.index')->name('sw.calculators');
 
 Route::view('/wittyscore/', 'sw.wittyscore.index')->name('sw.wittyscore');
 
-Route::view('/blog/', 'sw.blog.index')->name('sw.blog.slash');
-Route::view('/blog', 'sw.blog.index')->name('sw.blog');
-Route::view('/blog/how-to-buy-unlisted-shares/', 'sw.blog.how-to-buy-unlisted-shares')->name('sw.blog.how-to-buy-unlisted-shares');
-Route::view('/blog/how-to-sell-unlisted-shares/', 'sw.blog.how-to-sell-unlisted-shares')->name('sw.blog.how-to-sell-unlisted-shares');
-Route::view('/blog/is-it-safe-to-buy-unlisted-shares/', 'sw.blog.is-it-safe-to-buy-unlisted-shares')->name('sw.blog.is-it-safe-to-buy-unlisted-shares');
-Route::view('/blog/risks-of-investing-in-unlisted-shares/', 'sw.blog.risks-of-investing-in-unlisted-shares')->name('sw.blog.risks-of-investing-in-unlisted-shares');
-Route::view('/blog/tax-on-unlisted-shares/', 'sw.blog.tax-on-unlisted-shares')->name('sw.blog.tax-on-unlisted-shares');
-Route::view('/blog/unlisted-shares-vs-listed-shares/', 'sw.blog.unlisted-shares-vs-listed-shares')->name('sw.blog.unlisted-shares-vs-listed-shares');
-Route::view('/blog/what-are-unlisted-shares/', 'sw.blog.what-are-unlisted-shares')->name('sw.blog.what-are-unlisted-shares');
+Route::get('/blog/', [BlogController::class, 'index'])->name('sw.blog');
+Route::get('/blog/{slug}/', [BlogController::class, 'show'])->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('sw.blog.show');
 
 Route::view('/news/', 'sw.news.index')->name('sw.news');
 Route::view('/news/nse-ipo-sebi-noc-2026/', 'sw.news.nse-ipo-sebi-noc-2026')->name('sw.news.nse-ipo-sebi-noc-2026');
@@ -380,6 +374,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/profile',               [BlogAuthorProfileController::class, 'update'])->name('profile.update');
 
         Route::get('/{id}/edit',              [BlogPostsController::class, 'edit'])->whereNumber('id')->name('posts.edit');
+        Route::get('/{id}/preview',           [BlogController::class, 'preview'])->whereNumber('id')->name('posts.preview');
         Route::put('/{id}',                   [BlogPostsController::class, 'update'])->whereNumber('id')->name('posts.update');
         Route::post('/{id}/heartbeat',        [BlogPostsController::class, 'heartbeat'])->whereNumber('id')->name('posts.heartbeat');
         Route::post('/{id}/release-lock',     [BlogPostsController::class, 'releaseLock'])->whereNumber('id')->name('posts.release-lock');

@@ -82,7 +82,11 @@ final class JsonLd
         return ['@type' => 'FAQPage', 'mainEntity' => $questions];
     }
 
-    public static function article(string $headline, string $description, string $url, ?string $image = null): array
+    /**
+     * $extra may carry datePublished / dateModified (ISO 8601) and an
+     * `author` Person; without one the organisation is the author.
+     */
+    public static function article(string $headline, string $description, string $url, ?string $image = null, array $extra = []): array
     {
         $publisher = ['@id' => config('seo.organization.url') . '#organization'];
 
@@ -94,7 +98,9 @@ final class JsonLd
             'mainEntityOfPage' => $url,
             'image'            => $image ? self::absolute($image) : null,
             'inLanguage'       => config('seo.website.in_language'),
-            'author'           => $publisher,
+            'datePublished'    => $extra['datePublished'] ?? null,
+            'dateModified'     => $extra['dateModified'] ?? null,
+            'author'           => $extra['author'] ?? $publisher,
             'publisher'        => $publisher,
         ]);
     }
