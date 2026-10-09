@@ -10,6 +10,9 @@ use App\Http\Controllers\UnlistedOrdersController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\UnlistedReportController;
 use App\Http\Controllers\CmsPagesController;
+use App\Http\Controllers\BlogPostsController;
+use App\Http\Controllers\BlogCategoriesController;
+use App\Http\Controllers\BlogAuthorProfileController;
 use App\Http\Controllers\Sw\CompanyController;
 use App\Http\Controllers\Sw\HomeController;
 use App\Http\Controllers\Sw\SeoController;
@@ -359,4 +362,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/cms/{slug}/upload-image', [CmsPagesController::class, 'uploadImage'])
         ->middleware('privilege:author,reviewer')
         ->name('cms.upload');
+
+    // ── Blog CMS ── authors and reviewers can both write and publish ───────────
+    Route::prefix('/blog')->name('blog.')->middleware('privilege:author,reviewer')->group(function () {
+        Route::get('/',                       [BlogPostsController::class, 'index'])->name('posts');
+        Route::get('/create',                 [BlogPostsController::class, 'create'])->name('posts.create');
+        Route::post('/',                      [BlogPostsController::class, 'store'])->name('posts.store');
+        Route::post('/upload-image',          [BlogPostsController::class, 'uploadContentImage'])->name('posts.upload-image');
+        Route::get('/stocks/search',          [BlogPostsController::class, 'searchStocks'])->name('posts.stocks.search');
+
+        Route::get('/categories',             [BlogCategoriesController::class, 'index'])->name('categories');
+        Route::post('/categories',            [BlogCategoriesController::class, 'store'])->name('categories.store');
+        Route::put('/categories/{id}',        [BlogCategoriesController::class, 'update'])->whereNumber('id')->name('categories.update');
+        Route::delete('/categories/{id}',     [BlogCategoriesController::class, 'destroy'])->whereNumber('id')->name('categories.destroy');
+
+        Route::get('/profile',                [BlogAuthorProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('/profile',               [BlogAuthorProfileController::class, 'update'])->name('profile.update');
+
+        Route::get('/{id}/edit',              [BlogPostsController::class, 'edit'])->whereNumber('id')->name('posts.edit');
+        Route::put('/{id}',                   [BlogPostsController::class, 'update'])->whereNumber('id')->name('posts.update');
+        Route::post('/{id}/heartbeat',        [BlogPostsController::class, 'heartbeat'])->whereNumber('id')->name('posts.heartbeat');
+        Route::post('/{id}/release-lock',     [BlogPostsController::class, 'releaseLock'])->whereNumber('id')->name('posts.release-lock');
+        Route::post('/{id}/publish-toggle',   [BlogPostsController::class, 'publishToggle'])->whereNumber('id')->name('posts.publish-toggle');
+        Route::delete('/{id}',                [BlogPostsController::class, 'trash'])->whereNumber('id')->name('posts.trash');
+        Route::post('/{id}/restore',          [BlogPostsController::class, 'restore'])->whereNumber('id')->name('posts.restore');
+        Route::delete('/{id}/force',          [BlogPostsController::class, 'forceDelete'])->whereNumber('id')->name('posts.force-delete');
+    });
 });

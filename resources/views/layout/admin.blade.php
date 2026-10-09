@@ -128,12 +128,24 @@
             @endif
 
             @if(!empty($priv['author']) || !empty($priv['reviewer']))
-            <li class="{{ request()->is('admin/cms*') ? 'mm-active' : '' }}">
+            <li class="{{ request()->is('admin/cms*', 'admin/blog*') ? 'mm-active' : '' }}">
                 <a href="javascript:;" class="has-arrow">
                     <div class="parent-icon"><i class="fa-solid fa-file-lines"></i></div>
                     <div class="menu-title">CMS</div>
                 </a>
                 <ul>
+                    <li><a href="{{ url('/admin/blog') }}"
+                           class="{{ request()->is('admin/blog', 'admin/blog/create', 'admin/blog/*/edit') ? 'active' : '' }}">
+                        <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Blog Posts
+                    </a></li>
+                    <li><a href="{{ url('/admin/blog/categories') }}"
+                           class="{{ request()->is('admin/blog/categories') ? 'active' : '' }}">
+                        <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Blog Categories
+                    </a></li>
+                    <li><a href="{{ url('/admin/blog/profile') }}"
+                           class="{{ request()->is('admin/blog/profile') ? 'active' : '' }}">
+                        <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>My Author Profile
+                    </a></li>
                     <li><a href="{{ url('/admin/cms') }}"
                            class="{{ request()->is('admin/cms') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Disclaimer Page
