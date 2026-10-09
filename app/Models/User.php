@@ -41,6 +41,14 @@ class User extends Authenticatable
         'user_pan_no',
         'user_pan_image',
         'user_pan_verified',
+        // Blog author profile
+        'author_designation',
+        'author_bio',
+        'author_linkedin',
+        'author_twitter',
+        'author_facebook',
+        'author_instagram',
+        'author_website',
     ];
 
     protected $hidden = [
@@ -55,5 +63,10 @@ class User extends Authenticatable
             'privilege'          => 'array',
             'login_locked_until' => 'datetime',
         ];
+    }
+
+    public function blogPosts()
+    {
+        return $this->hasMany(BlogPost::class, 'created_by', 'uid');
     }
 }
