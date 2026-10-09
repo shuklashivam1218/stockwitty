@@ -100,29 +100,30 @@
                 </div>
 
                 {{-- FAQs: repeater rows. Blank rows are dropped on save. --}}
-                <div class="cms-field">
+                <div class="cms-field blog-section">
                     <label>FAQs</label>
-                    <p class="cms-field-hint" style="margin:0 0 8px;">Shown under "Frequently asked questions" and as FAQ rich results in Google. The tab groups questions into filters.</p>
-                    <div id="faqRows" class="blog-repeater">
+                    <p class="cms-field-hint" style="margin:0 0 10px;">Shown under "Frequently asked questions" and as FAQ rich results in Google. The tab groups questions into filters.</p>
+                    <div id="faqRows" class="blog-repeater" data-empty="No FAQs yet — add the questions readers actually ask.">
                         @foreach(old('faqs', $post->faqs ?? []) as $i => $faq)
                             @include('admin.blog.partials.faq-row', ['i' => $i, 'faq' => $faq])
                         @endforeach
                     </div>
-                    <button type="button" class="cms-action-btn blog-add-row" data-target="#faqRows" data-template="#faqRowTemplate"><i class="fa-solid fa-plus"></i> Add FAQ</button>
+                    <button type="button" class="blog-add-row" data-target="#faqRows" data-template="#faqRowTemplate"><i class="fa-solid fa-plus"></i> Add FAQ</button>
                     @error('faqs') <div class="cms-error">{{ $message }}</div> @enderror
                     @foreach($errors->get('faqs.*') as $messages)
                         <div class="cms-error">{{ $messages[0] }}</div>
                     @endforeach
                 </div>
 
-                <div class="cms-field">
+                <div class="cms-field blog-section">
                     <label>Sources &amp; References</label>
-                    <div id="sourceRows" class="blog-repeater">
+                    <p class="cms-field-hint" style="margin:0 0 10px;">Official pages readers can check the facts against — SEBI, NSDL, CDSL, the Income Tax portal.</p>
+                    <div id="sourceRows" class="blog-repeater" data-empty="No sources yet.">
                         @foreach(old('sources', $post->sources ?? []) as $i => $source)
                             @include('admin.blog.partials.source-row', ['i' => $i, 'source' => $source])
                         @endforeach
                     </div>
-                    <button type="button" class="cms-action-btn blog-add-row" data-target="#sourceRows" data-template="#sourceRowTemplate"><i class="fa-solid fa-plus"></i> Add Source</button>
+                    <button type="button" class="blog-add-row" data-target="#sourceRows" data-template="#sourceRowTemplate"><i class="fa-solid fa-plus"></i> Add Source</button>
                     @error('sources') <div class="cms-error">{{ $message }}</div> @enderror
                     @foreach($errors->get('sources.*') as $messages)
                         <div class="cms-error">{{ $messages[0] }}</div>
@@ -275,14 +276,18 @@
                 <div class="admin-card">
                     <div class="cms-side-title">Related Posts</div>
                     @php $relatedIds = array_map('intval', (array) old('related_post_ids', $post->related_post_ids ?? [])); @endphp
-                    <select name="related_post_ids[]" multiple size="6" class="cms-input" id="relatedPosts">
-                        @foreach($otherPosts as $other)
-                            <option value="{{ $other->id }}" @selected(in_array($other->id, $relatedIds, true))>
-                                {{ $other->title }}{{ $other->isPublished() ? '' : ' (draft)' }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <p class="cms-field-hint">Ctrl/Cmd-click to pick up to {{ config('blog.max_related') }}. Drafts are skipped on the live page until published.</p>
+                    @if($otherPosts->isEmpty())
+                        <p class="blog-empty-note">No other posts yet. Once more posts exist you can link up to {{ config('blog.max_related') }} here.</p>
+                    @else
+                        <select name="related_post_ids[]" multiple size="{{ min(6, max(3, $otherPosts->count())) }}" class="cms-input" id="relatedPosts">
+                            @foreach($otherPosts as $other)
+                                <option value="{{ $other->id }}" @selected(in_array($other->id, $relatedIds, true))>
+                                    {{ $other->title }}{{ $other->isPublished() ? '' : ' (draft)' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="cms-field-hint">Ctrl/Cmd-click to pick up to {{ config('blog.max_related') }}. Drafts are skipped on the live page until published.</p>
+                    @endif
                     @error('related_post_ids') <div class="cms-error">{{ $message }}</div> @enderror
                     @error('related_post_ids.*') <div class="cms-error">{{ $message }}</div> @enderror
                 </div>
