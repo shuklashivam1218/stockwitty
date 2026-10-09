@@ -39,8 +39,11 @@ $badges = [
             </p>
 
             <h1 class="mt-6 text-[2.6rem] leading-[1.05] font-bold text-foreground sm:text-6xl lg:text-7xl">
+                {{-- The gradient word is background-clip:text, which only paints inside
+                     its box; with this tight leading the "y" descender falls below it and
+                     gets cut. Extend the box down, and pull the line back up to match. --}}
                 @foreach ($words as $i => $w)
-                    <span class="animate-fade-up-in mr-3 inline-block {{ $i === 3 ? 'text-gradient' : '' }}"
+                    <span class="animate-fade-up-in mr-3 inline-block {{ $i === 3 ? 'text-gradient -mb-[0.15em] pb-[0.15em]' : '' }}"
                           style="--fade-delay: {{ 0.15 + $i * 0.12 }}s">{{ $w }}</span>
                 @endforeach
             </h1>
