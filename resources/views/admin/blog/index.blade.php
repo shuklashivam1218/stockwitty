@@ -67,6 +67,10 @@
                                 <br><a href="{{ url($post->url()) }}" target="_blank" rel="noopener" style="font-size:12px;color:#076550;">
                                     View live <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;"></i>
                                 </a>
+                            @elseif(!$post->trashed())
+                                <br><a href="{{ route('admin.blog.posts.preview', $post->id) }}" target="_blank" rel="noopener" style="font-size:12px;color:#e65100;">
+                                    Preview draft <i class="fa-solid fa-eye" style="font-size:10px;"></i>
+                                </a>
                             @endif
                         </td>
                         <td>{{ $post->category->name ?? '—' }}</td>

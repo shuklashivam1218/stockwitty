@@ -172,6 +172,11 @@
                     </div>
                     <p class="cms-field-hint" style="margin-top:10px;"><i class="fa-solid fa-circle-info"></i> Fields marked * are only required to publish — a draft can be saved half-done.</p>
                     @error('status') <div class="cms-error">{{ $message }}</div> @enderror
+                    @if($post->exists)
+                        <a href="{{ route('admin.blog.posts.preview', $post->id) }}" target="_blank" rel="noopener" class="cms-back-link" style="margin-top:10px;margin-right:14px;">
+                            <i class="fa-solid fa-eye"></i> Preview
+                        </a>
+                    @endif
                     @if($post->exists && $post->isPublished())
                         <a href="{{ url($post->url()) }}" target="_blank" rel="noopener" class="cms-back-link" style="margin-top:10px;">
                             View live <i class="fa-solid fa-arrow-up-right-from-square"></i>
