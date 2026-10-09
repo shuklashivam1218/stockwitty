@@ -1,0 +1,30 @@
+/* Loaded inside TinyMCE's iframe (content_css) so the styled blocks look
+   roughly like the public post while writing. Public styles live with the
+   blog post layout; keep the two visually close. */
+body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.7; color: #4b5563; margin: 16px 20px; }
+h2 { font-size: 1.6rem; color: #111827; margin: 2rem 0 .75rem; }
+h3 { font-size: 1.25rem; color: #111827; margin: 1.5rem 0 .5rem; }
+h4 { font-size: 1.05rem; color: #111827; }
+a { color: #076550; }
+img { max-width: 100%; height: auto; border-radius: 12px; }
+figure { margin: 1.5rem 0; }
+figcaption { text-align: center; font-size: 12px; color: #6b7280; margin-top: 6px; }
+
+.sw-callout { border: 1px solid #a7e3cf; background: #f0fdf4; border-radius: 16px; padding: 14px 18px; margin: 1.25rem 0; font-size: 14px; }
+.sw-callout::before { content: "ⓘ Callout"; display: block; font-size: 11px; font-weight: 700; color: #076550; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+.sw-callout p { margin: .35rem 0; }
+
+.sw-pullquote { border-left: 4px solid #0ECBA1; padding-left: 18px; margin: 1.75rem 0; font-size: 1.1rem; font-weight: 600; font-style: italic; color: #111827; }
+
+.sw-checklist { list-style: none; padding: 0; display: grid; gap: 8px; }
+.sw-checklist li { border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px 14px 10px 38px; position: relative; font-size: 14px; }
+.sw-checklist li::before { content: "✓"; position: absolute; left: 14px; color: #076550; font-weight: 700; }
+
+.sw-steps { list-style: none; padding: 0; counter-reset: step; display: grid; gap: 10px; }
+.sw-steps li { counter-increment: step; border: 1px solid #e5e7eb; border-radius: 16px; padding: 14px 16px 14px 64px; position: relative; }
+.sw-steps li::before { content: counter(step); position: absolute; left: 18px; top: 8px; font-size: 2rem; font-weight: 700; color: #0ECBA1; }
+
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+td, th { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; vertical-align: top; }
+.sw-table { border-radius: 16px; overflow: hidden; }
+.sw-table tr:first-child td, .sw-table th { background: #f0fdf4; color: #076550; font-size: 12px; font-weight: 700; text-transform: uppercase; }

@@ -32,6 +32,21 @@ return [
             'AutoFormat.AutoParagraph' => true,
             'AutoFormat.RemoveEmpty'   => true,
         ],
+        // Blog post bodies (clean($html, 'blog')). Tighter than `default`: no
+        // h1 (the page has one), no inline styling beyond text alignment, and
+        // `class` only ever one of the styled-block classes in config/blog.php
+        // content_classes — keep the two lists in sync (BlogEditorConfigTest).
+        'blog' => [
+            'HTML.Doctype'             => 'HTML 4.01 Transitional',
+            'HTML.Allowed'             => 'div[class],p[class|style],br,h2,h3,h4,b,strong,i,em,u,s,sub,sup,blockquote[class],pre,code,'
+                . 'ul[class],ol[class],li,a[href|title|target],span,img[width|height|alt|src],figure,figcaption,hr,'
+                . 'table[class],thead,tbody,tr,td[colspan|rowspan],th[colspan|rowspan]',
+            'Attr.AllowedClasses'      => ['sw-callout', 'sw-pullquote', 'sw-checklist', 'sw-steps', 'sw-table'],
+            'CSS.AllowedProperties'    => 'text-align',
+            'URI.AllowedSchemes'       => ['http' => true, 'https' => true, 'mailto' => true, 'tel' => true],
+            'AutoFormat.AutoParagraph' => true,
+            'AutoFormat.RemoveEmpty'   => true,
+        ],
         'test'    => [
             'Attr.EnableID' => 'true',
         ],

@@ -99,7 +99,7 @@ class BlogPostsController extends Controller
                 ->with('lock_error', "{$lock['name']} is currently editing this post (started {$lock['since']}). Your changes were not saved.");
         }
 
-        $data = $this->validatePost($request);
+        $data = $this->validatePost($request, $post);
         $this->applyPublishState($data, $post);
 
         if ($request->hasFile('featured_image')) {
@@ -230,6 +230,11 @@ class BlogPostsController extends Controller
         return [
             'post'           => $post,
             'categories'     => BlogCategory::active()->get(),
+            'heroIcons'      => config('blog.hero_icons'),
+            'otherPosts'     => BlogPost::query()
+                ->when($post->exists, fn ($q) => $q->whereKeyNot($post->id))
+                ->orderByDesc('published_at')->orderBy('title')
+                ->get(['id', 'title', 'status']),
             'selectedStocks' => $post->exists
                 ? $post->unlistedStocks()->get(['unlisted_stocks.UL_STOCKS_FINCODE', 'unlisted_stocks.UL_STOCKS_COMPNAME'])
                 : collect(),
@@ -240,41 +245,144 @@ class BlogPostsController extends Controller
     /**
      * Drafts may be half-written; what a public page needs (summary, body,
      * category, SEO) is only required once the post is being published.
+     *
+     * Everything except `content` is plain text: it is strip_tags'd here and
+     * escaped again when rendered. `content` is the one HTML field and is
+     * stored only after the `blog` purifier profile has cleaned it.
      */
-    private function validatePost(Request $request): array
+    private function validatePost(Request $request, ?BlogPost $post = null): array
     {
+        $this->normaliseBlocks($request);
+
         $publishing = $request->input('status') === BlogPost::STATUS_PUBLISHED;
         $needed     = $publishing ? 'required' : 'nullable';
 
         $data = $request->validate([
             'title'              => 'required|string|max:255',
             'summary'            => [$needed, 'string', 'max:1000'],
+            'intro'              => 'nullable|string|max:3000',
             'content'            => [$needed, 'string'],
             'category_id'        => [$needed, 'integer', Rule::exists('blog_categories', 'id')],
             'status'             => ['required', Rule::in(BlogPost::STATUSES)],
             'is_featured'        => 'nullable|boolean',
             'featured_image'     => 'nullable|' . ImageUpload::RULES,
             'featured_image_alt' => 'nullable|string|max:255',
+            'hero_icon'          => ['nullable', Rule::in(config('blog.hero_icons'))],
+
+            'chips'              => 'nullable|array|max:' . config('blog.max_chips'),
+            'chips.*'            => 'string|max:40',
+            'takeaways'          => 'nullable|array|max:' . config('blog.max_takeaways'),
+            'takeaways.*'        => 'string|max:300',
+            'faqs'               => 'nullable|array|max:' . config('blog.max_faqs'),
+            // Tab names end up inside Alpine expressions on the public page,
+            // so they are restricted to characters that can't break out of one.
+            'faqs.*.tab'         => ['nullable', 'string', 'max:40', 'regex:/^[\pL\pN &\/-]+$/u'],
+            'faqs.*.q'           => 'required|string|max:300',
+            'faqs.*.a'           => 'required|string|max:2000',
+            'sources'            => 'nullable|array|max:' . config('blog.max_sources'),
+            'sources.*.label'    => 'required|string|max:150',
+            'sources.*.href'     => 'required|url:http,https|max:500',
+            'video_url'          => ['nullable', 'string', 'max:255', function ($attr, $value, $fail) {
+                if (static::youtubeId($value) === null) {
+                    $fail('Enter a YouTube link (youtube.com/watch?v=…, youtu.be/… or youtube.com/shorts/…).');
+                }
+            }],
+            'video_caption'      => 'nullable|string|max:200',
+            'related_post_ids'   => 'nullable|array|max:' . config('blog.max_related'),
+            'related_post_ids.*' => ['integer', Rule::exists('blog_posts', 'id')->whereNull('deleted_at'), Rule::notIn(array_filter([$post?->id]))],
+            'lead_heading'       => 'nullable|string|max:255',
+            'lead_subtext'       => 'nullable|string|max:1000',
+
             'meta_title'         => [$needed, 'string', 'max:255'],
             'meta_description'   => [$needed, 'string', 'max:500'],
             'meta_keywords'      => 'nullable|string|max:500',
             'stock_tickers'      => 'nullable|array',
             'stock_tickers.*'    => 'exists:unlisted_stocks,UL_STOCKS_FINCODE',
+        ], [
+            'faqs.*.tab.regex' => 'FAQ tab names can only use letters, numbers, spaces, &, / and -.',
         ]);
 
-        unset($data['stock_tickers'], $data['featured_image']);
-        $data['is_featured'] = $request->boolean('is_featured');
+        $videoId = static::youtubeId($data['video_url'] ?? null);
+        $data['video'] = $videoId ? ['youtube_id' => $videoId, 'caption' => $this->plain($data['video_caption'] ?? null)] : null;
+        unset($data['stock_tickers'], $data['featured_image'], $data['video_url'], $data['video_caption']);
 
-        // The body is rendered raw on the public page, so it is always stored
-        // purified; the plain-text fields end up in <title>/<meta>/cards.
-        $data['content'] = isset($data['content']) ? clean($data['content']) : null;
-        foreach (['title', 'summary', 'featured_image_alt', 'meta_title', 'meta_description', 'meta_keywords'] as $field) {
-            if (isset($data[$field])) {
-                $data[$field] = trim(strip_tags($data[$field]));
+        $data['is_featured']      = $request->boolean('is_featured');
+        $data['content']          = isset($data['content']) ? clean($data['content'], 'blog') : null;
+        $data['chips']            = $this->plainList($data['chips'] ?? []);
+        $data['takeaways']        = $this->plainList($data['takeaways'] ?? []);
+        $data['related_post_ids'] = array_values(array_unique(array_map('intval', $data['related_post_ids'] ?? []))) ?: null;
+        $data['faqs'] = array_map(fn ($f) => [
+            'tab' => $this->plain($f['tab'] ?? null) ?: 'General',
+            'q'   => $this->plain($f['q']),
+            'a'   => $this->plain($f['a']),
+        ], $data['faqs'] ?? []) ?: null;
+        $data['sources'] = array_map(fn ($s) => [
+            'label' => $this->plain($s['label']),
+            'href'  => trim($s['href']),
+        ], $data['sources'] ?? []) ?: null;
+
+        foreach (['title', 'summary', 'intro', 'featured_image_alt', 'lead_heading', 'lead_subtext', 'meta_title', 'meta_description', 'meta_keywords'] as $field) {
+            if (array_key_exists($field, $data)) {
+                $data[$field] = $this->plain($data[$field]);
             }
         }
 
         return $data;
+    }
+
+    /**
+     * The form sends chips as one comma-separated field, takeaways one per
+     * line, and FAQ/source repeater rows that may be left blank. Turn those
+     * into clean arrays before validation so errors point at real entries.
+     */
+    private function normaliseBlocks(Request $request): void
+    {
+        $split = fn (?string $text, string $pattern) => array_values(array_filter(
+            array_map('trim', preg_split($pattern, (string) $text)),
+            fn ($v) => $v !== ''
+        ));
+
+        $rows = fn (string $key, array $fields) => array_values(array_filter(
+            (array) $request->input($key, []),
+            fn ($row) => is_array($row) && collect($fields)->contains(fn ($f) => trim((string) ($row[$f] ?? '')) !== '')
+        ));
+
+        $request->merge([
+            'chips'            => $split($request->input('chips_text'), '/,/'),
+            'takeaways'        => $split($request->input('takeaways_text'), '/\R/'),
+            'faqs'             => $rows('faqs', ['q', 'a']),
+            'sources'          => $rows('sources', ['label', 'href']),
+            'related_post_ids' => array_values(array_filter((array) $request->input('related_post_ids', []))),
+        ]);
+    }
+
+    /** 11-character video id from any common YouTube URL shape, or null. */
+    public static function youtubeId(?string $url): ?string
+    {
+        if ($url === null || trim($url) === '') {
+            return null;
+        }
+
+        $pattern = '~^(?:https?://)?(?:www\.|m\.)?(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})(?:[?&#/].*)?$~';
+
+        return preg_match($pattern, trim($url), $m) ? $m[1] : null;
+    }
+
+    private function plain(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        $value = trim(strip_tags($value));
+
+        return $value === '' ? null : $value;
+    }
+
+    private function plainList(array $items): ?array
+    {
+        $items = array_values(array_filter(array_map(fn ($v) => $this->plain($v), $items)));
+
+        return $items ?: null;
     }
 
     private function applyPublishState(array &$data, ?BlogPost $post = null): void

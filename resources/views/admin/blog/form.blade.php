@@ -80,10 +80,53 @@
                 </div>
 
                 <div class="cms-field">
+                    <label>Intro</label>
+                    <textarea name="intro" rows="5" maxlength="3000" class="cms-input" placeholder="Opening paragraphs shown above the key takeaways. Leave a blank line between paragraphs.">{{ old('intro', $post->intro) }}</textarea>
+                    @error('intro') <div class="cms-error">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="cms-field">
+                    <label>Key Takeaways</label>
+                    <textarea name="takeaways_text" rows="5" class="cms-input" placeholder="One takeaway per line (up to {{ config('blog.max_takeaways') }})">{{ old('takeaways_text', implode("\n", $post->takeaways ?? [])) }}</textarea>
+                    @error('takeaways') <div class="cms-error">{{ $message }}</div> @enderror
+                    @error('takeaways.*') <div class="cms-error">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="cms-field">
                     <label>Content <span class="req" title="Required to publish">*</span></label>
                     <textarea name="content" id="post_content">{{ old('content', $post->content) }}</textarea>
-                    <p class="cms-field-hint"><i class="fa-solid fa-circle-info"></i> Use Heading 2 for sections — each one becomes an entry in the article's table of contents.</p>
+                    <p class="cms-field-hint"><i class="fa-solid fa-circle-info"></i> Use Heading 2 for sections — each becomes a table-of-contents entry. The Styles menu turns a selection into a callout, pull quote, checklist, numbered steps or comparison table.</p>
                     @error('content') <div class="cms-error">{{ $message }}</div> @enderror
+                </div>
+
+                {{-- FAQs: repeater rows. Blank rows are dropped on save. --}}
+                <div class="cms-field">
+                    <label>FAQs</label>
+                    <p class="cms-field-hint" style="margin:0 0 8px;">Shown under "Frequently asked questions" and as FAQ rich results in Google. The tab groups questions into filters.</p>
+                    <div id="faqRows" class="blog-repeater">
+                        @foreach(old('faqs', $post->faqs ?? []) as $i => $faq)
+                            @include('admin.blog.partials.faq-row', ['i' => $i, 'faq' => $faq])
+                        @endforeach
+                    </div>
+                    <button type="button" class="cms-action-btn blog-add-row" data-target="#faqRows" data-template="#faqRowTemplate"><i class="fa-solid fa-plus"></i> Add FAQ</button>
+                    @error('faqs') <div class="cms-error">{{ $message }}</div> @enderror
+                    @foreach($errors->get('faqs.*') as $messages)
+                        <div class="cms-error">{{ $messages[0] }}</div>
+                    @endforeach
+                </div>
+
+                <div class="cms-field">
+                    <label>Sources &amp; References</label>
+                    <div id="sourceRows" class="blog-repeater">
+                        @foreach(old('sources', $post->sources ?? []) as $i => $source)
+                            @include('admin.blog.partials.source-row', ['i' => $i, 'source' => $source])
+                        @endforeach
+                    </div>
+                    <button type="button" class="cms-action-btn blog-add-row" data-target="#sourceRows" data-template="#sourceRowTemplate"><i class="fa-solid fa-plus"></i> Add Source</button>
+                    @error('sources') <div class="cms-error">{{ $message }}</div> @enderror
+                    @foreach($errors->get('sources.*') as $messages)
+                        <div class="cms-error">{{ $messages[0] }}</div>
+                    @endforeach
                 </div>
 
             </div>
@@ -190,6 +233,76 @@
                 </div>
 
                 <div class="admin-card">
+                    <div class="cms-side-title">Hero &amp; Tags</div>
+                    <div class="cms-field">
+                        <label>Hero icon</label>
+                        <select name="hero_icon" class="cms-input">
+                            <option value="">— None —</option>
+                            @foreach($heroIcons as $icon)
+                                <option value="{{ $icon }}" @selected(old('hero_icon', $post->hero_icon) === $icon)>{{ $icon }}</option>
+                            @endforeach
+                        </select>
+                        <p class="cms-field-hint">Shown in the hero when there's no featured image.</p>
+                        @error('hero_icon') <div class="cms-error">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="cms-field" style="margin-bottom:0;">
+                        <label>Chips</label>
+                        <input type="text" name="chips_text" class="cms-input" maxlength="300"
+                               value="{{ old('chips_text', implode(', ', $post->chips ?? [])) }}" placeholder="Unlisted Shares, Tax, 2026">
+                        <p class="cms-field-hint">Comma-separated, up to {{ config('blog.max_chips') }}. Shown above the title.</p>
+                        @error('chips') <div class="cms-error">{{ $message }}</div> @enderror
+                        @error('chips.*') <div class="cms-error">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="cms-side-title">Video</div>
+                    <div class="cms-field">
+                        <label>YouTube link</label>
+                        <input type="url" name="video_url" class="cms-input" maxlength="255"
+                               value="{{ old('video_url', isset($post->video['youtube_id']) ? 'https://www.youtube.com/watch?v=' . $post->video['youtube_id'] : '') }}"
+                               placeholder="https://www.youtube.com/watch?v=…">
+                        @error('video_url') <div class="cms-error">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="cms-field" style="margin-bottom:0;">
+                        <label>Caption</label>
+                        <input type="text" name="video_caption" class="cms-input" maxlength="200"
+                               value="{{ old('video_caption', $post->video['caption'] ?? '') }}" placeholder="Watch: … explained simply">
+                        @error('video_caption') <div class="cms-error">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="cms-side-title">Related Posts</div>
+                    @php $relatedIds = array_map('intval', (array) old('related_post_ids', $post->related_post_ids ?? [])); @endphp
+                    <select name="related_post_ids[]" multiple size="6" class="cms-input" id="relatedPosts">
+                        @foreach($otherPosts as $other)
+                            <option value="{{ $other->id }}" @selected(in_array($other->id, $relatedIds, true))>
+                                {{ $other->title }}{{ $other->isPublished() ? '' : ' (draft)' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="cms-field-hint">Ctrl/Cmd-click to pick up to {{ config('blog.max_related') }}. Drafts are skipped on the live page until published.</p>
+                    @error('related_post_ids') <div class="cms-error">{{ $message }}</div> @enderror
+                    @error('related_post_ids.*') <div class="cms-error">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="admin-card">
+                    <div class="cms-side-title">Callback Form</div>
+                    <div class="cms-field">
+                        <label>Heading</label>
+                        <input type="text" name="lead_heading" class="cms-input" maxlength="255"
+                               value="{{ old('lead_heading', $post->lead_heading) }}" placeholder="Questions on this topic? We'll connect you.">
+                        @error('lead_heading') <div class="cms-error">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="cms-field" style="margin-bottom:0;">
+                        <label>Subtext</label>
+                        <textarea name="lead_subtext" rows="3" maxlength="1000" class="cms-input" placeholder="Leave blank for the default text">{{ old('lead_subtext', $post->lead_subtext) }}</textarea>
+                        @error('lead_subtext') <div class="cms-error">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+
+                <div class="admin-card">
                     <div class="cms-side-title">Related Unlisted Stocks</div>
                     <div class="cms-tag-picker">
                         <div class="cms-tag-chips" id="tagChips">
@@ -231,6 +344,10 @@
     </form>
     </fieldset>
 </div>
+
+{{-- New repeater rows are cloned from these; __INDEX__ is replaced in JS. --}}
+<template id="faqRowTemplate">@include('admin.blog.partials.faq-row', ['i' => '__INDEX__', 'faq' => []])</template>
+<template id="sourceRowTemplate">@include('admin.blog.partials.source-row', ['i' => '__INDEX__', 'source' => []])</template>
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('assets/css/admin/cms-form.css') }}?v={{ filemtime(public_path('assets/css/admin/cms-form.css')) }}">
@@ -309,8 +426,21 @@ $(function () {
         selector: 'textarea#post_content',
         plugins: 'preview searchreplace autolink autosave code visualblocks fullscreen image link media table charmap anchor advlist lists wordcount help quickbars',
         menubar: 'edit view insert format table',
-        toolbar: 'undo redo | blocks | bold italic underline | bullist numlist | link image table blockquote | removeformat | code fullscreen',
+        toolbar: 'undo redo | blocks styles | bold italic underline | bullist numlist | link image table | removeformat | code fullscreen',
         block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4',
+        // Only classes in config('blog.content_classes') survive the purifier,
+        // so these are the only styles offered.
+        style_formats: [
+            { title: 'Callout box',      block: 'div', classes: 'sw-callout', wrapper: true },
+            { title: 'Pull quote',       block: 'blockquote', classes: 'sw-pullquote' },
+            { title: 'Checklist',        selector: 'ul', classes: 'sw-checklist' },
+            { title: 'Numbered steps',   selector: 'ol', classes: 'sw-steps' },
+            { title: 'Comparison table', selector: 'table', classes: 'sw-table' },
+        ],
+        content_css: @json(asset('assets/css/admin/blog-editor-content.css') . '?v=' . filemtime(public_path('assets/css/admin/blog-editor-content.css'))),
+        table_default_attributes: {},
+        table_default_styles: {},
+        invalid_styles: { '*': 'color background-color font-size font-family width height' },
         height: 560,
         image_caption: true,
         quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
@@ -400,6 +530,25 @@ $(function () {
 
     $(document).on('click', function (e) {
         if (!$(e.target).closest('.cms-tag-picker').length) $('#tagSuggestions').hide();
+    });
+
+    // ── Repeaters (FAQs, sources) ──
+    let rowCounter = Date.now();
+    $(document).on('click', '.blog-add-row', function () {
+        const html = $($(this).data('template')).html().replace(/__INDEX__/g, String(rowCounter++));
+        $($(this).data('target')).append(html);
+    });
+    $(document).on('click', '.blog-remove-row', function () {
+        $(this).closest('.blog-repeater-row').remove();
+    });
+
+    $('#relatedPosts').on('change', function () {
+        const max = {{ (int) config('blog.max_related') }};
+        const picked = $(this).find('option:selected');
+        if (picked.length > max) {
+            picked.slice(max).prop('selected', false);
+            alert('You can pick up to ' + max + ' related posts.');
+        }
     });
 
     $('#postForm').on('submit', function () {
