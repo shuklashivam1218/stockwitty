@@ -29,7 +29,8 @@
   {{-- url()->current() rtrims the trailing slash, which fights the site's
        own /-terminated URL convention — build from the raw path instead so
        /wittyscore/ stays /wittyscore/ and the homepage stays "/". --}}
-  <link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}" />
+  {{-- Pages whose query string is meaningful (blog pagination/category) set their own. --}}
+  <link rel="canonical" href="@hasSection('canonical')@yield('canonical')@else{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}@endif" />
   @if ($markdownTwin)
   <link rel="alternate" type="text/markdown" href="{{ rtrim(config('app.url'), '/') . $markdownTwin }}" title="Markdown version for AI agents" />
   @endif

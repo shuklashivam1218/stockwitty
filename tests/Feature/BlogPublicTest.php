@@ -60,6 +60,75 @@ class BlogPublicTest extends TestCase
             ->assertDontSee($draft->title);
     }
 
+    /** Adds $n published posts newer than the imported ones; returns their titles, newest first. */
+    private function morePosts(int $n, ?int $categoryId = null): array
+    {
+        $titles = [];
+        foreach (range(1, $n) as $i) {
+            $titles[] = $title = sprintf('Paged post %02d', $i);
+            $this->makePost([
+                'title' => $title, 'published_at' => now()->subMinutes($n - $i),
+                'category_id' => $categoryId ?? BlogCategory::where('slug', 'basics')->value('id'),
+            ]);
+        }
+
+        return array_reverse($titles);
+    }
+
+    public function test_index_pages_nine_cards_with_featured_only_on_page_one(): void
+    {
+        $titles = $this->morePosts(12); // 7 imported (1 featured) + 12 = 18 in the grid
+
+        $page1 = $this->get('/blog/')->assertOk();
+        $page1->assertSee('Featured · Buying &amp; Selling', false)
+              ->assertSee('<span class="font-bold text-foreground">19</span> guides', false)
+              ->assertSeeInOrder(array_slice($titles, 0, 9))
+              ->assertDontSee($titles[9])
+              ->assertSee('href="' . url('/blog/?page=2') . '#posts" data-blog-nav rel="next"', false)
+              ->assertSee('aria-current="page"', false);
+        $this->assertSame(9, substr_count($page1->getContent(), '<li class="animate-fade-up-in"'));
+
+        $page2 = $this->get('/blog/?page=2')->assertOk();
+        $page2->assertDontSee('Featured ·')
+              ->assertSee($titles[9])
+              ->assertSee('<title>Unlisted Shares Blog — Page 2 | StocksWitty</title>', false)
+              ->assertSee('<link rel="canonical" href="' . rtrim(config('app.url'), '/') . '/blog/?page=2" />', false);
+        $this->assertSame(9, substr_count($page2->getContent(), '<li class="animate-fade-up-in"'));
+
+        $this->get('/blog/?page=3')->assertNotFound();
+        $this->get('/blog/')->assertSee('<link rel="canonical" href="' . rtrim(config('app.url'), '/') . '/blog/" />', false);
+    }
+
+    public function test_in_page_requests_get_just_the_listing(): void
+    {
+        $titles = $this->morePosts(12);
+
+        $res = $this->get('/blog/?page=2', ['X-Requested-With' => 'XMLHttpRequest'])->assertOk();
+        $res->assertHeader('Vary', 'X-Requested-With')
+            ->assertSee($titles[9])
+            ->assertSee('data-blog-status="Page 2 of 2"', false)
+            ->assertDontSee('<html', false)
+            ->assertDontSee('Unlisted shares, explained');
+
+        $this->get('/blog/')->assertHeader('Vary', 'X-Requested-With')->assertSee('<html', false);
+    }
+
+    public function test_category_filter_is_server_side_and_survives_paging(): void
+    {
+        $tax = BlogCategory::where('slug', 'tax')->first();
+        $this->morePosts(10, $tax->id); // 1 imported tax post + 10 = 11 → 2 pages, no featured card
+
+        $res = $this->get('/blog/?category=tax')->assertOk();
+        $res->assertDontSee('Featured ·')
+            ->assertDontSee('What Are Unlisted Shares?')
+            ->assertSee('11</span> guides in Tax', false)
+            ->assertSee('aria-current="true"', false)
+            ->assertSee('href="' . url('/blog/?category=tax&amp;page=2') . '#posts"', false);
+
+        $this->get('/blog/?category=tax&page=2')->assertOk()->assertSee('Tax on Unlisted Shares in India');
+        $this->get('/blog/?category=no-such-category')->assertNotFound();
+    }
+
     public function test_toc_comes_from_h2s_and_body_keeps_its_markup(): void
     {
         $post = $this->makePost();
