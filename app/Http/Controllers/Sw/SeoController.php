@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sw;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlogPost;
 use App\Models\UnlistedStock;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -41,13 +42,6 @@ class SeoController extends Controller
         ['path' => '/digital-silver/',                             'view' => 'sw.digital-silver.index',                        'changefreq' => 'monthly', 'priority' => '0.7'],
         ['path' => '/etf/',                                        'view' => 'sw.etf.index',                                   'changefreq' => 'monthly', 'priority' => '0.7'],
         ['path' => '/blog/',                                       'view' => 'sw.blog.index',                                  'changefreq' => 'weekly',  'priority' => '0.9'],
-        ['path' => '/blog/what-are-unlisted-shares/',              'view' => 'sw.blog.what-are-unlisted-shares',               'changefreq' => 'monthly', 'priority' => '0.7'],
-        ['path' => '/blog/how-to-buy-unlisted-shares/',            'view' => 'sw.blog.how-to-buy-unlisted-shares',             'changefreq' => 'monthly', 'priority' => '0.7'],
-        ['path' => '/blog/how-to-sell-unlisted-shares/',           'view' => 'sw.blog.how-to-sell-unlisted-shares',            'changefreq' => 'monthly', 'priority' => '0.7'],
-        ['path' => '/blog/unlisted-shares-vs-listed-shares/',      'view' => 'sw.blog.unlisted-shares-vs-listed-shares',       'changefreq' => 'monthly', 'priority' => '0.7'],
-        ['path' => '/blog/tax-on-unlisted-shares/',                'view' => 'sw.blog.tax-on-unlisted-shares',                 'changefreq' => 'monthly', 'priority' => '0.7'],
-        ['path' => '/blog/is-it-safe-to-buy-unlisted-shares/',     'view' => 'sw.blog.is-it-safe-to-buy-unlisted-shares',      'changefreq' => 'monthly', 'priority' => '0.7'],
-        ['path' => '/blog/risks-of-investing-in-unlisted-shares/', 'view' => 'sw.blog.risks-of-investing-in-unlisted-shares',  'changefreq' => 'monthly', 'priority' => '0.7'],
         ['path' => '/news/',                                       'view' => 'sw.news.index',                                  'changefreq' => 'weekly',  'priority' => '0.9'],
         ['path' => '/news/nse-ipo-sebi-noc-2026/',                 'view' => 'sw.news.nse-ipo-sebi-noc-2026',                  'changefreq' => 'weekly',  'priority' => '0.6'],
         ['path' => '/case-studies/',                               'view' => 'sw.case-studies.index',                          'changefreq' => 'weekly',  'priority' => '0.9'],
@@ -67,6 +61,18 @@ class SeoController extends Controller
                 'changefreq' => $page['changefreq'],
                 'priority'   => $page['priority'],
             ];
+        }
+
+        // Blog posts come from the database; /blog/ itself is in PAGES but dates
+        // from its newest post rather than from a view file.
+        $posts = $this->publishedPosts();
+        foreach ($urls as $i => $url) {
+            if ($url['loc'] === self::BASE_URL . '/blog/' && $posts->isNotEmpty()) {
+                $urls[$i]['lastmod'] = $posts->max('updated_at')->format('Y-m-d');
+            }
+        }
+        foreach ($posts as $post) {
+            $urls[] = ['loc' => self::BASE_URL . $post->url(), 'lastmod' => $post->updated_at->format('Y-m-d'), 'changefreq' => 'monthly', 'priority' => '0.7'];
         }
 
         foreach ($this->activeCompanies() as $company) {
@@ -97,9 +103,21 @@ class SeoController extends Controller
 
     public function llms(): Response
     {
-        $text = view('sw.seo.llms', ['companies' => $this->activeCompanies()])->render();
+        // Titles go into Markdown links in a text/plain file: no HTML escaping,
+        // but nothing that could close the [label] or start a new line either.
+        $posts = $this->publishedPosts()->map(fn ($p) => [
+            'title' => trim(preg_replace('/\s+/u', ' ', str_replace(['[', ']'], ' ', $p->title))),
+            'url'   => self::BASE_URL . $p->url(),
+        ]);
+
+        $text = view('sw.seo.llms', ['companies' => $this->activeCompanies(), 'posts' => $posts])->render();
 
         return response($text, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
+    private function publishedPosts(): Collection
+    {
+        return BlogPost::published()->orderByDesc('published_at')->get(['id', 'slug', 'title', 'published_at', 'updated_at']);
     }
 
     private function activeCompanies(): Collection

@@ -30,13 +30,9 @@ Every page listed below is also available as clean Markdown: request the same pa
 
 ## Learn
 - [Blog](https://www.stockswitty.com/blog/): guides on unlisted shares, tax & investing
-- [What are unlisted shares?](https://www.stockswitty.com/blog/what-are-unlisted-shares/)
-- [How to buy unlisted shares](https://www.stockswitty.com/blog/how-to-buy-unlisted-shares/)
-- [How to sell unlisted shares](https://www.stockswitty.com/blog/how-to-sell-unlisted-shares/)
-- [Tax on unlisted shares](https://www.stockswitty.com/blog/tax-on-unlisted-shares/)
-- [Unlisted vs listed shares](https://www.stockswitty.com/blog/unlisted-shares-vs-listed-shares/)
-- [Is it safe to buy unlisted shares?](https://www.stockswitty.com/blog/is-it-safe-to-buy-unlisted-shares/)
-- [Risks of investing in unlisted shares](https://www.stockswitty.com/blog/risks-of-investing-in-unlisted-shares/)
+@foreach ($posts as $p)
+- [{!! $p['title'] !!}]({{ $p['url'] }})
+@endforeach
 - [News](https://www.stockswitty.com/news/): IPO, unlisted & startup-funding updates
 - [Case Studies](https://www.stockswitty.com/case-studies/): honest investor journeys
 

@@ -22,7 +22,6 @@ return new class extends Migration
     {
         $posts      = $this->posts();
         $categories = DB::table('blog_categories')->pluck('id', 'name');
-        $now        = now();
 
         foreach ($posts as $p) {
             // Idempotent: never touch a slug that already exists (e.g. re-run, or edited since).
@@ -57,7 +56,7 @@ return new class extends Migration
                 'reading_minutes'    => max(1, (int) ceil(str_word_count(strip_tags($p['intro'] . ' ' . $p['content'])) / 200)),
                 'published_at'       => $publishedAt,
                 'created_at'         => $publishedAt,
-                'updated_at'         => $now,
+                'updated_at'         => Carbon::parse($p['updated_at'])->setTimezone(config('app.timezone')),
             ]);
         }
 

@@ -25,7 +25,7 @@ class BlogImportDataTest extends TestCase
         foreach ($posts as $p) {
             $at = $p['slug'];
             $this->assertMatchesRegularExpression('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $at);
-            foreach (['title', 'summary', 'content', 'category', 'meta_title', 'meta_description'] as $required) {
+            foreach (['title', 'summary', 'content', 'category', 'meta_title', 'meta_description', 'published_at', 'updated_at'] as $required) {
                 $this->assertNotEmpty($p[$required], "{$at}: {$required}");
             }
 
