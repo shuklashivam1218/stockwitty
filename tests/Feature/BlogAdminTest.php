@@ -173,6 +173,48 @@ class BlogAdminTest extends TestCase
         $this->assertNotSame($old, BlogPost::latest('id')->value('slug'));
     }
 
+    public function test_author_can_choose_the_slug_when_creating(): void
+    {
+        $user = $this->makeUser(['author' => true]);
+
+        $this->actingAsAdmin($user)
+            ->post('/admin/blog', ['title' => 'A very long working title', 'slug' => 'Short & Sweet URL!', 'status' => 'draft'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('short-sweet-url', BlogPost::latest('id')->value('slug'));
+
+        // Left blank: made from the title.
+        $this->actingAsAdmin($user)->post('/admin/blog', ['title' => 'Blank Slug Post', 'slug' => '', 'status' => 'draft']);
+        $this->assertSame('blank-slug-post', BlogPost::latest('id')->value('slug'));
+
+        $this->actingAsAdmin($user)->get('/admin/blog/create')->assertSee('id="newSlugInput"', false);
+    }
+
+    public function test_a_taken_slug_is_refused_not_renamed(): void
+    {
+        $user  = $this->makeUser(['author' => true]);
+        $taken = BlogPost::create(['title' => 'Taken', 'slug' => 'taken-' . uniqid()]);
+        $other = BlogPost::create(['title' => 'Other', 'slug' => 'other-' . uniqid()]);
+        BlogSlugRedirect::create(['old_slug' => 'retired-' . $taken->id, 'blog_post_id' => $taken->id]);
+
+        // On create, both a live slug and a redirecting old slug are refused.
+        foreach ([$taken->slug, 'retired-' . $taken->id] as $slug) {
+            $count = BlogPost::count();
+            $this->actingAsAdmin($user)->post('/admin/blog', ['title' => 'New', 'slug' => $slug, 'status' => 'draft'])
+                ->assertSessionHasErrors('slug');
+            $this->assertSame($count, BlogPost::count());
+        }
+
+        // On edit too, and nothing about the post changes.
+        $this->actingAsAdmin($user)->put("/admin/blog/{$other->id}", ['title' => 'Other renamed', 'slug' => $taken->slug, 'status' => 'draft'])
+            ->assertSessionHasErrors('slug');
+        $this->assertSame('Other', $other->fresh()->title);
+
+        // A post may take back its own old slug.
+        $this->actingAsAdmin($user)->put("/admin/blog/{$taken->id}", ['title' => 'Taken', 'slug' => 'retired-' . $taken->id, 'status' => 'draft'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('retired-' . $taken->id, $taken->fresh()->slug);
+    }
+
     public function test_list_publish_button_refuses_incomplete_drafts(): void
     {
         $user = $this->makeUser(['author' => true]);

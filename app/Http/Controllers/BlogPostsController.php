@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Admin CRUD for blog posts, ported from unlisted-stocks' CmsArticleController.
@@ -57,7 +58,10 @@ class BlogPostsController extends Controller
     {
         $data = $this->validatePost($request);
 
-        $data['slug']       = $this->uniqueSlug($data['title']);
+        // A slug typed by the author is used as-is (or refused if taken);
+        // left blank, one is made from the title with a -2/-3 suffix if needed.
+        $chosen             = $this->requestedSlug($request);
+        $data['slug']       = $chosen ?? $this->uniqueSlug($data['title']);
         $data['created_by'] = session('uid');
         $this->applyPublishState($data);
 
@@ -102,18 +106,21 @@ class BlogPostsController extends Controller
         $data = $this->validatePost($request, $post);
         $this->applyPublishState($data, $post);
 
+        // The URL only changes through its own field — editing the title never
+        // touches it, so published links and rankings stay put. Checked before
+        // any upload so a refused slug doesn't leave an orphaned image behind.
+        $newSlug = $this->requestedSlug($request, $post);
+        $newSlug = $newSlug !== $post->slug ? $newSlug : null;
+
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $this->storeFeaturedImage($request);
             ImageUpload::delete($post->featured_image);
         }
 
-        DB::transaction(function () use ($request, $post, $data) {
-            // The URL only changes through its own field — editing the title
-            // never touches it, so published links and rankings stay put.
-            $newSlug = Str::slug((string) $request->input('slug', ''));
-            if ($newSlug !== '' && $newSlug !== $post->slug) {
-                $data['slug'] = $this->uniqueSlug($newSlug, $post->id);
-                $this->rememberOldSlug($post, $data['slug']);
+        DB::transaction(function () use ($request, $post, $data, $newSlug) {
+            if ($newSlug) {
+                $data['slug'] = $newSlug;
+                $this->rememberOldSlug($post, $newSlug);
             }
 
             $post->update($data);
@@ -414,6 +421,29 @@ class BlogPostsController extends Controller
         } catch (ImageUploadException $e) {
             throw $e->forField('featured_image');
         }
+    }
+
+    /**
+     * The slug the author typed, normalised — or null if the field was left
+     * blank. Refused (not silently suffixed) when another post has it now or
+     * used to have it, so the author always knows the exact URL they get.
+     */
+    private function requestedSlug(Request $request, ?BlogPost $post = null): ?string
+    {
+        $request->validate(['slug' => 'nullable|string|max:200']);
+
+        $slug = Str::slug((string) $request->input('slug', ''));
+        if ($slug === '') {
+            return null;
+        }
+
+        if ($this->slugTaken($slug, $post?->id)) {
+            throw ValidationException::withMessages([
+                'slug' => "/blog/{$slug}/ is already used by another post (or redirects to one). Pick a different URL.",
+            ]);
+        }
+
+        return $slug;
     }
 
     /** A slug no other post uses now or used to use (so old links keep redirecting correctly). */

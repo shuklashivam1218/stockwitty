@@ -49,10 +49,25 @@
 
                 <div class="cms-field">
                     <label>Title <span class="req">*</span></label>
-                    <input type="text" name="title" value="{{ old('title', $post->title) }}" required maxlength="255"
+                    <input type="text" name="title" id="titleInput" value="{{ old('title', $post->title) }}" required maxlength="255"
                            class="cms-input" placeholder="Post title">
                     @error('title') <div class="cms-error">{{ $message }}</div> @enderror
                 </div>
+
+                @unless($post->exists)
+                {{-- New post: the slug follows the title until it's typed in by hand. --}}
+                <div class="cms-field">
+                    <label>URL Slug</label>
+                    <input type="text" name="slug" id="newSlugInput" value="{{ old('slug') }}" maxlength="200"
+                           class="cms-input" placeholder="Filled in from the title — or type your own" autocomplete="off">
+                    <p class="cms-field-hint">
+                        <i class="fa-solid fa-link"></i>
+                        stockswitty.com/blog/<strong id="newSlugPreview">{{ old('slug') ? \Illuminate\Support\Str::slug(old('slug')) : 'your-post-title' }}</strong>/
+                    </p>
+                    <p class="cms-field-hint">Lowercase letters, numbers and hyphens. Pick it carefully — once the post is live, the URL should not change.</p>
+                    @error('slug') <div class="cms-error">{{ $message }}</div> @enderror
+                </div>
+                @endunless
 
                 @if($post->exists)
                 <div class="cms-field">
@@ -489,9 +504,39 @@ $(function () {
             $(this).text('Cancel');
         }
     });
+    // Same shape as Str::slug for the common case; the server has the final say.
+    function toSlug(text) {
+        return text.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
+            .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 200);
+    }
+
     $('#slugInput').on('input', function () {
-        $('#slugPreview').text($(this).val().toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+        $('#slugPreview').text(toSlug($(this).val()));
     });
+
+    // New post: follow the title until the slug is edited by hand; clearing it
+    // hands control back to the title.
+    const $newSlug = $('#newSlugInput');
+    if ($newSlug.length) {
+        let slugTouched = $newSlug.val().trim() !== '';
+        const showPreview = function () {
+            $('#newSlugPreview').text(toSlug($newSlug.val()) || 'your-post-title');
+        };
+        $('#titleInput').on('input', function () {
+            if (!slugTouched) {
+                $newSlug.val(toSlug($(this).val()));
+                showPreview();
+            }
+        });
+        $newSlug.on('input', function () {
+            slugTouched = $(this).val().trim() !== '';
+            showPreview();
+        });
+        $newSlug.on('blur', function () {
+            if ($(this).val().trim() !== '') $(this).val(toSlug($(this).val()));
+            showPreview();
+        });
+    }
 
     // ── Featured image preview ──
     $('#featuredInput').on('change', function () {
