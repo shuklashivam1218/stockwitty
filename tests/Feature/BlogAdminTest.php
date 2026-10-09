@@ -8,6 +8,7 @@ use App\Models\BlogPost;
 use App\Models\BlogSlugRedirect;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
@@ -147,7 +148,7 @@ class BlogAdminTest extends TestCase
         $alice = $this->makeUser(['author' => true]);
         $bob   = $this->makeUser(['author' => true]);
         $post  = BlogPost::create(['title' => 'Stale', 'slug' => 'stale-' . uniqid()]);
-        \DB::table('blog_posts')->where('id', $post->id)->update(['locked_by' => $alice->uid, 'locked_at' => now()->subMinutes(10)]);
+        DB::table('blog_posts')->where('id', $post->id)->update(['locked_by' => $alice->uid, 'locked_at' => now()->subMinutes(10)]);
 
         $this->actingAsAdmin($bob)->put("/admin/blog/{$post->id}", ['title' => 'Bob saved', 'status' => 'draft'])
             ->assertSessionMissing('lock_error');
