@@ -202,6 +202,59 @@ class UnlistedStockEditorTest extends TestCase
         $this->assertSame(\Illuminate\Support\Str::slug($new), $stock->fresh()->UL_STOCKS_SLUG);
     }
 
+    public function test_price_list_feeds_the_existing_price_endpoints(): void
+    {
+        $stock   = $this->makeStock();
+        $fincode = $stock->UL_STOCKS_FINCODE;
+        DB::table('unlisted_price_data')->insert([
+            ['UL_PD_FINCODE' => $fincode, 'UL_PD_DATE' => '2026-06-19 18:30:00', 'UL_PD_BID_PRICE' => 2065, 'UL_PD_INVALID_FLAG' => 0],
+            ['UL_PD_FINCODE' => $fincode, 'UL_PD_DATE' => '2026-05-01 00:00:00', 'UL_PD_BID_PRICE' => 1900, 'UL_PD_INVALID_FLAG' => 1],
+        ]);
+
+        $this->actingAsAgent($this->makeUser(['unlisted' => ['leads' => true]]))
+            ->getJson("/admin/unlisted/stocks/{$fincode}/prices")->assertForbidden();
+
+        $rows = $this->actingAsAgent()->getJson("/admin/unlisted/stocks/{$fincode}/prices")
+            ->assertOk()->assertJsonPath('total', 2)->json('rows');
+        $this->assertSame(['19 Jun 2026', '01 May 2026'], array_column($rows, 'label'));
+        $this->assertSame([true, false], array_column($rows, 'valid'));
+
+        // The page sends `key` back URL-encoded, exactly like this.
+        $key = rawurlencode($rows[0]['key']);
+        $this->actingAsAgent()->patchJson("/admin/unlisted/stocks/{$fincode}/price/{$key}", ['UL_PD_BID_PRICE' => 2100])->assertOk();
+        $this->actingAsAgent()->deleteJson("/admin/unlisted/stocks/{$fincode}/price/{$key}")->assertOk()->assertJsonPath('invalid', true);
+
+        $row = DB::table('unlisted_price_data')->where('UL_PD_FINCODE', $fincode)->where('UL_PD_DATE', '2026-06-19 18:30:00')->first();
+        $this->assertEquals(2100, $row->UL_PD_BID_PRICE);
+        $this->assertEquals(1, $row->UL_PD_INVALID_FLAG);
+    }
+
+    public function test_financials_list_feeds_the_existing_financials_endpoints(): void
+    {
+        $stock   = $this->makeStock();
+        $fincode = $stock->UL_STOCKS_FINCODE;
+        $this->actingAsAgent()->postJson("/admin/unlisted/stocks/{$fincode}/financials", [
+            'UL_FIN_Period_end' => 202503, 'UL_FIN_Type' => 'C', 'UL_FIN_No_months' => 12,
+            'UL_FIN_Unit' => 10000000, 'UL_FIN_NET_SALES' => 500,
+        ])->assertOk();
+
+        $this->actingAsAgent()->get("/admin/unlisted/stocks/{$fincode}/edit")
+            ->assertOk()->assertSee('Price History')->assertSee('Add period');
+
+        $rows = $this->actingAsAgent()->getJson("/admin/unlisted/stocks/{$fincode}/financials")->assertOk()->json();
+        $this->assertSame([[
+            'periodEnd' => 202503, 'label' => '2025-03', 'type' => 'C', 'months' => 12,
+            'unit' => '10000000 (1 Crore)', 'active' => true,
+        ]], $rows);
+
+        $key = "{$rows[0]['periodEnd']}/{$rows[0]['type']}/{$rows[0]['months']}";
+        $this->actingAsAgent()->getJson("/admin/unlisted/stocks/{$fincode}/financials/{$key}/edit")
+            ->assertOk()->assertJsonPath('UL_FIN_NET_SALES', 500);
+        $this->actingAsAgent()->deleteJson("/admin/unlisted/stocks/{$fincode}/financials/{$key}")
+            ->assertOk()->assertJsonPath('status', '0');
+        $this->assertFalse($this->actingAsAgent()->getJson("/admin/unlisted/stocks/{$fincode}/financials")->json('0.active'));
+    }
+
     public function test_a_bad_field_saves_nothing(): void
     {
         $stock   = $this->makeStock();

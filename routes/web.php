@@ -153,6 +153,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.update');
 
+    Route::get('/unlisted/stocks/{fincode}/prices', [UnlistedStockEditorController::class, 'prices'])
+        ->whereNumber('fincode')
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.prices');
+
+    Route::get('/unlisted/stocks/{fincode}/financials', [UnlistedStockEditorController::class, 'financials'])
+        ->whereNumber('fincode')
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.financials');
+
     Route::post('/unlisted/stocks/{fincode}/toggle',[UnlistedStocksController::class, 'toggleStockStatus'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.toggle');

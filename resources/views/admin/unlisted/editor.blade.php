@@ -20,6 +20,8 @@
     $nav = [
         'basics'      => ['Basics', true],
         'profile'     => ['Company Profile', $filled['profile']],
+        'prices'      => ['Price', $filled['prices']],
+        'financials'  => ['Financials', $filled['financials']],
         'witty-score' => ['WittyScore', $filled['witty_score']],
         'insights'    => ['Insights', $filled['insights']],
         'thesis'      => ['Thesis', $filled['thesis']],
@@ -287,6 +289,9 @@
                     <textarea name="UL_STOCKS_ABOUT" id="profileEditor" class="se-rich" data-upload="about">{{ $v('UL_STOCKS_ABOUT') }}</textarea>
                 </section>
 
+                @include('admin.unlisted.partials.editor-prices')
+                @include('admin.unlisted.partials.editor-financials')
+
                 {{-- ── WittyScore (unlisted_witty_scores) ───────────────── --}}
                 <section class="admin-card se-section" id="witty-score">
                     <div class="se-section-head">
@@ -550,6 +555,32 @@
 @push('scripts')
 <script src="{{ asset('js/tinymce_6.1.2/tinymce.min.js') }}"></script>
 <script>
+// Shared by the Price and Financials sections. Defined at load time, before
+// any of the sections' ready handlers run.
+window.seLiveSwitch = function (checked, on, off) {
+    return $('<label class="se-switch">').append(
+        $('<input type="checkbox">').prop('checked', !!checked),
+        $('<span class="se-switch-track">'),
+        $('<span class="se-switch-label">').append(
+            $('<span class="se-on">').text(on || 'Active'),
+            $('<span class="se-off">').text(off || 'Inactive')
+        )
+    );
+};
+window.sePager = function ($el, page, lastPage, total, go) {
+    $el.empty();
+    if (lastPage <= 1) return;
+    const btn = function (label, target, disabled) {
+        return $('<button type="button" class="se-page-btn">').text(label).prop('disabled', disabled)
+            .on('click', function () { go(target); });
+    };
+    $el.append(
+        btn('‹ Newer', page - 1, page <= 1),
+        $('<span class="se-page-info">').text('Page ' + page + ' of ' + lastPage + ' · ' + total + ' total'),
+        btn('Older ›', page + 1, page >= lastPage)
+    );
+};
+
 $(function () {
     const CSRF        = $('meta[name="csrf-token"]').attr('content');
     const UPLOAD_URLS = {
@@ -566,7 +597,17 @@ $(function () {
         dirty = true;
         $('#unsavedNote').addClass('show');
     }
-    $form.on('input change', markDirty);
+    // Price and Financials save on their own, so typing there isn't "unsaved".
+    $form.on('input change', function (e) {
+        if (!$(e.target).closest('[data-live]').length) markDirty();
+    });
+    // Enter inside those sections runs that section's button instead of
+    // submitting the whole page.
+    $form.on('keydown', '[data-live] input, [data-live] select', function (e) {
+        if (e.key !== 'Enter' || $(this).hasClass('se-inline-input')) return;
+        e.preventDefault();
+        $(this).closest('[data-live]').find('[data-enter]:visible').first().trigger('click');
+    });
     $form.on('submit', function () {
         submitting = true;
         tinymce.triggerSave();

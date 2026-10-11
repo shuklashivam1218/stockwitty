@@ -9,12 +9,15 @@ use App\Models\UnlistedAbout;
 use App\Models\UnlistedAboutExtra;
 use App\Models\UnlistedCompanyInsight;
 use App\Models\UnlistedFaq;
+use App\Models\UnlistedFinancials;
+use App\Models\UnlistedPriceData;
 use App\Models\UnlistedSeoMeta;
 use App\Models\UnlistedStock;
 use App\Models\UnlistedThesis;
 use App\Models\UnlistedWittyScore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -33,6 +36,15 @@ class UnlistedStockEditorController extends Controller
     public const DEMAT      = ['NSDL' => 'NSDL', 'CDSL' => 'CDSL', 'Both' => 'Both (NSDL/CDSL)'];
     public const MONTHS     = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     public const FAQ_PAGES  = ['overview' => 'Company page', 'about' => 'About page', 'thesis' => 'Thesis page'];
+    public const UNITS      = [
+        1        => '1 (One)',
+        100      => '100 (Hundred)',
+        1000     => '1000 (Thousand)',
+        10000    => '10000 (10 Thousand)',
+        100000   => '100000 (1 Lakh)',
+        1000000  => '1000000 (10 Lakh)',
+        10000000 => '10000000 (1 Crore)',
+    ];
 
     /**
      * Single-row content tables: key => [model, column prefix, editable fields].
@@ -74,7 +86,11 @@ class UnlistedStockEditorController extends Controller
 
         // $filled drives the green dots in the jump nav: which sections have content.
         $sections = [];
-        $filled   = ['profile' => filled($stock->UL_STOCKS_ABOUT)];
+        $filled   = [
+            'profile'    => filled($stock->UL_STOCKS_ABOUT),
+            'prices'     => UnlistedPriceData::where('UL_PD_FINCODE', $fincode)->exists(),
+            'financials' => UnlistedFinancials::where('UL_FIN_FINCODE', $fincode)->exists(),
+        ];
         foreach (self::SECTIONS as $key => [$model, $prefix, $fields]) {
             $row            = $this->latestRow($model, $prefix, $fincode);
             $sections[$key] = $row;
@@ -131,6 +147,79 @@ class UnlistedStockEditorController extends Controller
 
         return redirect()->route('admin.unlisted.stocks.edit', $stock->UL_STOCKS_FINCODE)
             ->with('success', 'All changes saved.');
+    }
+
+    /**
+     * Price history for the editor's Price section, newest first. `key` is the
+     * raw stored date — the existing edit/validity endpoints address rows by it.
+     */
+    public function prices(string $fincode)
+    {
+        $this->authorizeStocks();
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $page = UnlistedPriceData::where('UL_PD_FINCODE', $fincode)
+            ->orderByDesc('UL_PD_DATE')
+            ->paginate(10, ['UL_PD_DATE', 'UL_PD_BID_PRICE', 'UL_PD_INVALID_FLAG']);
+
+        return response()->json([
+            'rows' => collect($page->items())->map(fn ($p) => [
+                'key'   => $p->UL_PD_DATE,
+                'date'  => Carbon::parse($p->UL_PD_DATE)->format('Y-m-d'),
+                'label' => Carbon::parse($p->UL_PD_DATE)->format('d M Y'),
+                'price' => $p->UL_PD_BID_PRICE,
+                'valid' => !$p->UL_PD_INVALID_FLAG,
+            ]),
+            'page'     => $page->currentPage(),
+            'lastPage' => $page->lastPage(),
+            'total'    => $page->total(),
+        ]);
+    }
+
+    /** Every financial period for the editor's Financials section, newest first. */
+    public function financials(string $fincode)
+    {
+        $this->authorizeStocks();
+        UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
+
+        $rows = UnlistedFinancials::where('UL_FIN_FINCODE', $fincode)
+            ->orderByDesc('UL_FIN_Period_end')
+            ->orderBy('UL_FIN_Type')
+            ->orderByDesc('UL_FIN_No_months')
+            ->get(['UL_FIN_Period_end', 'UL_FIN_Type', 'UL_FIN_No_months', 'UL_FIN_Unit', 'UL_FIN_STATUS']);
+
+        return response()->json($rows->map(fn ($f) => [
+            'periodEnd' => (int) $f->UL_FIN_Period_end,
+            'label'     => self::periodLabel((int) $f->UL_FIN_Period_end),
+            'type'      => $f->UL_FIN_Type,
+            'months'    => (int) $f->UL_FIN_No_months,
+            'unit'      => self::UNITS[(int) $f->UL_FIN_Unit] ?? ($f->UL_FIN_Unit ?: null),
+            'active'    => $f->UL_FIN_STATUS === '1',
+        ]));
+    }
+
+    /** Quarter ends from now back 15 years, as stored in UL_FIN_Period_end (YYYYMM). */
+    public static function periodOptions(): array
+    {
+        $year    = (int) now()->format('Y');
+        $month   = (int) now()->format('m');
+        $options = [];
+
+        for ($y = $year; $y >= $year - 15; $y--) {
+            foreach ([12, 9, 6, 3] as $q) {
+                if ($y === $year && $q > $month) {
+                    continue;
+                }
+                $options[$y * 100 + $q] = self::periodLabel($y * 100 + $q);
+            }
+        }
+
+        return $options;
+    }
+
+    public static function periodLabel(int $periodEnd): string
+    {
+        return intdiv($periodEnd, 100) . '-' . str_pad((string) ($periodEnd % 100), 2, '0', STR_PAD_LEFT);
     }
 
     /** Same gate as the stocks dashboard: user master, or the unlisted_stocks sub-privilege. */
