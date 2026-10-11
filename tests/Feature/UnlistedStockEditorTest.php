@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Helpers\Privilege;
+use App\Models\StockArticle;
 use App\Models\UnlistedFaq;
 use App\Models\UnlistedStock;
-use App\Models\UnlistedThesis;
 use App\Models\UnlistedWittyScore;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -66,11 +66,7 @@ class UnlistedStockEditorTest extends TestCase
         return $overrides + [
             'UL_STOCKS_COMPNAME' => 'Editor Test Co',
             'UL_STOCKS_STATUS'   => '1',
-            'UL_WS_ACTIVE'       => '1',
             'UL_CI_ACTIVE'       => '1',
-            'UL_THESIS_ACTIVE'   => '1',
-            'UL_ABX_ACTIVE'      => '1',
-            'UL_ABOUT_ACTIVE'    => '1',
             'UL_SEO_ACTIVE'      => '1',
         ];
     }
@@ -102,14 +98,17 @@ class UnlistedStockEditorTest extends TestCase
             'UL_STOCKS_COMPNAME'     => 'Renamed Co',
             'UL_STOCKS_TAG'          => 'Hot',
             'UL_STOCKS_ABOUT'        => '<p>Profile</p>',
-            'UL_WS_FINANCIAL_HEALTH' => '7.5',
-            'UL_THESIS_CONTENT'      => '<p>Why we like it</p>',
-            'UL_THESIS_ACTIVE'       => '0',
+            'UL_CI_AI_SUMMARY'       => 'Thirty-second summary.',
             'UL_SEO_COMPANY_TITLE'   => 'Buy Renamed Co shares',
+            // A stale form still sending the moved sections: none of it is written.
+            'UL_WS_FINANCIAL_HEALTH' => '7.5',
+            'UL_THESIS_CONTENT'      => '<p>Old thesis box</p>',
+            'UL_CI_TLDR'             => 'Old thesis TL;DR',
+            'UL_SEO_ABOUT_TITLE'     => 'Old about meta',
             'faqs' => [
-                ['target' => 'overview', 'q' => 'What is it?', 'a' => 'A company.', 'active' => '1'],
-                ['target' => 'thesis', 'tab' => 'Risks', 'q' => 'Is it risky?', 'active' => '0'],
-                ['target' => 'overview', 'q' => '', 'a' => ''], // blank row: dropped, not an error
+                ['q' => 'What is it?', 'a' => 'A company.', 'active' => '1'],
+                ['tab' => 'Risks', 'q' => 'Is it risky?', 'active' => '0'],
+                ['q' => '', 'a' => ''], // blank row: dropped, not an error
             ],
         ]))->assertRedirect("/admin/unlisted/stocks/{$fincode}/edit")->assertSessionHasNoErrors();
 
@@ -118,71 +117,80 @@ class UnlistedStockEditorTest extends TestCase
         $this->assertSame('Hot', $stock->UL_STOCKS_TAG);
         $this->assertSame('<p>Profile</p>', $stock->UL_STOCKS_ABOUT);
 
-        $this->assertEquals(7.5, UnlistedWittyScore::where('UL_WS_FINCODE', $fincode)->value('UL_WS_FINANCIAL_HEALTH'));
+        $insight = DB::table('unlisted_company_insights')->where('UL_CI_FINCODE', $fincode)->first();
+        $this->assertSame('Thirty-second summary.', $insight->UL_CI_AI_SUMMARY);
+        $this->assertNull($insight->UL_CI_TLDR);
 
-        $thesis = UnlistedThesis::where('UL_THESIS_FINCODE', $fincode)->firstOrFail();
-        $this->assertSame('<p>Why we like it</p>', $thesis->UL_THESIS_CONTENT);
-        $this->assertSame('0', $thesis->UL_THESIS_ACTIVE);
+        $seo = DB::table('unlisted_seo_meta')->where('UL_SEO_FINCODE', $fincode)->first();
+        $this->assertSame('Buy Renamed Co shares', $seo->UL_SEO_COMPANY_TITLE);
+        $this->assertNull($seo->UL_SEO_ABOUT_TITLE);
 
-        $this->assertSame('Buy Renamed Co shares', DB::table('unlisted_seo_meta')->where('UL_SEO_FINCODE', $fincode)->value('UL_SEO_COMPANY_TITLE'));
-
-        // Sections left empty never get a row.
-        $this->assertFalse(DB::table('unlisted_company_insights')->where('UL_CI_FINCODE', $fincode)->exists());
-        $this->assertFalse(DB::table('unlisted_about_extra')->where('UL_ABX_FINCODE', $fincode)->exists());
-        $this->assertFalse(DB::table('unlisted_about')->where('UL_ABOUT_FINCODE', $fincode)->exists());
+        // About / Thesis / WittyScore are CMS pages now; the stock editor never touches them.
+        $this->assertFalse(UnlistedWittyScore::where('UL_WS_FINCODE', $fincode)->exists());
+        $this->assertFalse(DB::table('unlisted_thesis')->where('UL_THESIS_FINCODE', $fincode)->exists());
 
         $faqs = UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)->orderBy('UL_FAQ_SORT_ORDER')->get();
         $this->assertCount(2, $faqs);
         $this->assertSame(['What is it?', 'Is it risky?'], $faqs->pluck('UL_FAQ_QUESTION')->all());
         $this->assertSame(['1', '0'], $faqs->pluck('UL_FAQ_ACTIVE')->all());
+        $this->assertSame(['overview', 'overview'], $faqs->pluck('UL_FAQ_TARGET')->all());
         $this->assertSame('Risks', $faqs[1]->UL_FAQ_TAB);
+
+        // The editor no longer carries the sections that moved to the CMS.
+        $this->actingAsAgent()->get("/admin/unlisted/stocks/{$fincode}/edit")
+            ->assertOk()->assertSee('Insights')
+            ->assertDontSee('Investment Thesis')->assertDontSee('Old About')->assertDontSee('name="UL_WS_VALUATION"', false);
     }
 
     public function test_switches_turn_a_saved_section_and_the_stock_off(): void
     {
         $stock   = $this->makeStock();
         $fincode = $stock->UL_STOCKS_FINCODE;
-        UnlistedWittyScore::insert(['UL_WS_FINCODE' => $fincode, 'UL_WS_VALUATION' => 6, 'UL_WS_ACTIVE' => '1']);
+        DB::table('unlisted_company_insights')->insert(['UL_CI_FINCODE' => $fincode, 'UL_CI_AI_SUMMARY' => 'Summary', 'UL_CI_ACTIVE' => '1']);
 
         $this->actingAsAgent()->put("/admin/unlisted/stocks/{$fincode}", $this->form([
             'UL_STOCKS_STATUS' => '0',
-            'UL_WS_ACTIVE'     => '0',
-            'UL_WS_VALUATION'  => '6',
+            'UL_CI_ACTIVE'     => '0',
+            'UL_CI_AI_SUMMARY' => 'Summary',
         ]))->assertSessionHasNoErrors();
 
         $this->assertSame('0', $stock->fresh()->UL_STOCKS_STATUS);
-        $this->assertSame(1, UnlistedWittyScore::where('UL_WS_FINCODE', $fincode)->count());
-        $this->assertSame('0', UnlistedWittyScore::where('UL_WS_FINCODE', $fincode)->value('UL_WS_ACTIVE'));
+        $this->assertSame(1, DB::table('unlisted_company_insights')->where('UL_CI_FINCODE', $fincode)->count());
+        $this->assertSame('0', DB::table('unlisted_company_insights')->where('UL_CI_FINCODE', $fincode)->value('UL_CI_ACTIVE'));
     }
 
-    public function test_faq_rows_on_the_page_are_the_full_list(): void
+    public function test_faq_rows_on_the_page_are_the_company_page_list(): void
     {
         $stock   = $this->makeStock();
         $fincode = $stock->UL_STOCKS_FINCODE;
         $other   = $this->makeStock(['UL_STOCKS_COMPNAME' => 'Someone Else']);
 
         $keep   = UnlistedFaq::create(['UL_FAQ_FINCODE' => $fincode, 'UL_FAQ_TARGET' => 'overview', 'UL_FAQ_QUESTION' => 'Old Q', 'UL_FAQ_SORT_ORDER' => 1, 'UL_FAQ_ACTIVE' => '1']);
-        $drop   = UnlistedFaq::create(['UL_FAQ_FINCODE' => $fincode, 'UL_FAQ_TARGET' => 'about', 'UL_FAQ_QUESTION' => 'Gone', 'UL_FAQ_SORT_ORDER' => 2, 'UL_FAQ_ACTIVE' => '1']);
+        $drop   = UnlistedFaq::create(['UL_FAQ_FINCODE' => $fincode, 'UL_FAQ_TARGET' => 'overview', 'UL_FAQ_QUESTION' => 'Gone', 'UL_FAQ_SORT_ORDER' => 2, 'UL_FAQ_ACTIVE' => '1']);
+        // An old FAQ aimed at the About page: not shown here, never touched.
+        $aboutQ = UnlistedFaq::create(['UL_FAQ_FINCODE' => $fincode, 'UL_FAQ_TARGET' => 'about', 'UL_FAQ_QUESTION' => 'About Q', 'UL_FAQ_SORT_ORDER' => 1, 'UL_FAQ_ACTIVE' => '1']);
         $theirs = UnlistedFaq::create(['UL_FAQ_FINCODE' => $other->UL_STOCKS_FINCODE, 'UL_FAQ_TARGET' => 'overview', 'UL_FAQ_QUESTION' => 'Not yours', 'UL_FAQ_SORT_ORDER' => 1, 'UL_FAQ_ACTIVE' => '1']);
+
+        $this->actingAsAgent()->get("/admin/unlisted/stocks/{$fincode}/edit")->assertSee('Old Q')->assertDontSee('About Q');
 
         $this->actingAsAgent()->put("/admin/unlisted/stocks/{$fincode}", $this->form([
             'faqs' => [
-                ['target' => 'overview', 'q' => 'Brand new', 'active' => '1'],
-                ['id' => $keep->UL_FAQ_ID, 'target' => 'thesis', 'q' => 'Old Q, edited', 'active' => '1'],
-                // Another stock's FAQ id is ignored: it becomes a new row here, theirs is untouched.
-                ['id' => $theirs->UL_FAQ_ID, 'target' => 'overview', 'q' => 'Tampered', 'active' => '1'],
+                ['q' => 'Brand new', 'active' => '1'],
+                ['id' => $keep->UL_FAQ_ID, 'q' => 'Old Q, edited', 'active' => '1'],
+                // Another stock's FAQ id (or the About one) is ignored: it becomes a new row here.
+                ['id' => $theirs->UL_FAQ_ID, 'q' => 'Tampered', 'active' => '1'],
             ],
         ]))->assertSessionHasNoErrors();
 
         $this->assertNull(UnlistedFaq::find($drop->UL_FAQ_ID));
         $keep->refresh();
         $this->assertSame('Old Q, edited', $keep->UL_FAQ_QUESTION);
-        $this->assertSame('thesis', $keep->UL_FAQ_TARGET);
         $this->assertSame(2, (int) $keep->UL_FAQ_SORT_ORDER);
         $this->assertSame('Not yours', $theirs->fresh()->UL_FAQ_QUESTION);
+        $this->assertSame('About Q', $aboutQ->fresh()->UL_FAQ_QUESTION);
         $this->assertSame(
             ['Brand new', 'Old Q, edited', 'Tampered'],
-            UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)->orderBy('UL_FAQ_SORT_ORDER')->pluck('UL_FAQ_QUESTION')->all()
+            UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)->where('UL_FAQ_TARGET', 'overview')->orderBy('UL_FAQ_SORT_ORDER')->pluck('UL_FAQ_QUESTION')->all()
         );
     }
 
@@ -267,10 +275,10 @@ class UnlistedStockEditorTest extends TestCase
         $response = $this->actingAsAgent($user)->post('/admin/unlisted/stocks', [
             'UL_STOCKS_COMPNAME' => $name,
             'UL_STOCKS_STATUS'   => '0',
-            'UL_WS_ACTIVE'       => '1',
-            'UL_WS_VALUATION'    => '8',
+            'UL_CI_ACTIVE'       => '1',
+            'UL_CI_AI_SUMMARY'   => 'New company summary.',
             'UL_SEO_ACTIVE'      => '1',
-            'faqs' => [['target' => 'overview', 'q' => 'First question?', 'active' => '1']],
+            'faqs' => [['q' => 'First question?', 'active' => '1']],
         ])->assertSessionHasNoErrors();
 
         $stock = UnlistedStock::where('UL_STOCKS_COMPNAME', $name)->firstOrFail();
@@ -280,7 +288,7 @@ class UnlistedStockEditorTest extends TestCase
         $this->assertSame('unlisted', $stock->UL_STOCKS_COMPNAME_TYPE);
         $this->assertSame((string) $user->uid, (string) $stock->UL_STOCKS_INSERT_BY);
         $this->assertSame('Yes', $stock->UL_STOCKS_Qtr_Data_Publish);
-        $this->assertEquals(8, UnlistedWittyScore::where('UL_WS_FINCODE', $stock->UL_STOCKS_FINCODE)->value('UL_WS_VALUATION'));
+        $this->assertSame('New company summary.', DB::table('unlisted_company_insights')->where('UL_CI_FINCODE', $stock->UL_STOCKS_FINCODE)->value('UL_CI_AI_SUMMARY'));
         $this->assertFalse(DB::table('unlisted_seo_meta')->where('UL_SEO_FINCODE', $stock->UL_STOCKS_FINCODE)->exists());
         $this->assertSame(1, UnlistedFaq::where('UL_FAQ_FINCODE', $stock->UL_STOCKS_FINCODE)->count());
 
@@ -310,7 +318,9 @@ class UnlistedStockEditorTest extends TestCase
         $tag    = uniqid();
         $live   = $this->makeStock(['UL_STOCKS_COMPNAME' => "Dash Live {$tag}", 'UL_STOCKS_ABOUT' => '<p>x</p>']);
         $hidden = $this->makeStock(['UL_STOCKS_COMPNAME' => "Dash Hidden {$tag}", 'UL_STOCKS_STATUS' => '0']);
-        UnlistedThesis::insert(['UL_THESIS_FINCODE' => $live->UL_STOCKS_FINCODE, 'UL_THESIS_CONTENT' => '<p>t</p>', 'UL_THESIS_ACTIVE' => '0']);
+        // CMS pages: a published About and a draft Thesis.
+        StockArticle::create(['ul_stocks_fincode' => $live->UL_STOCKS_FINCODE, 'type' => 'about', 'title' => 'A', 'status' => 'published', 'published_at' => now()]);
+        StockArticle::create(['ul_stocks_fincode' => $live->UL_STOCKS_FINCODE, 'type' => 'thesis', 'title' => 'T']);
         DB::table('unlisted_price_data')->insert(['UL_PD_FINCODE' => $live->UL_STOCKS_FINCODE, 'UL_PD_DATE' => '2026-10-01', 'UL_PD_BID_PRICE' => 123.5, 'UL_PD_INVALID_FLAG' => 0]);
 
         $this->actingAsAgent()->get('/admin/unlisted?search=' . $tag)
@@ -319,7 +329,9 @@ class UnlistedStockEditorTest extends TestCase
             ->assertSee("/admin/unlisted/stocks/{$live->UL_STOCKS_FINCODE}/edit")
             ->assertSee('&#8377;123.50', false)
             ->assertSee('title="Profile: live on the site"', false)
-            ->assertSee('title="Thesis: saved but switched off"', false)
+            ->assertSee('title="About: live on the site"', false)
+            ->assertSee('title="Thesis: saved but not live (switched off, or a draft)"', false)
+            ->assertSee('title="WittyScore: not filled in yet"', false)
             ->assertSee('title="SEO: not filled in yet"', false)
             ->assertDontSee('ptf-icon-edit');
 
@@ -357,14 +369,14 @@ class UnlistedStockEditorTest extends TestCase
         $fincode = $stock->UL_STOCKS_FINCODE;
 
         $this->actingAsAgent()->put("/admin/unlisted/stocks/{$fincode}", $this->form([
-            'UL_STOCKS_COMPNAME'  => 'Should Not Stick',
-            'UL_THESIS_CONTENT'   => '<p>Nope</p>',
-            'UL_WS_VALUATION'     => '11',
-            'faqs'                => [['target' => 'overview', 'q' => '', 'a' => 'Answer without a question']],
-        ]))->assertSessionHasErrors(['UL_WS_VALUATION', 'faqs.0.q']);
+            'UL_STOCKS_COMPNAME'   => 'Should Not Stick',
+            'UL_CI_AI_SUMMARY'     => 'Nope',
+            'UL_SEO_COMPANY_TITLE' => str_repeat('x', 256),
+            'faqs'                 => [['q' => '', 'a' => 'Answer without a question']],
+        ]))->assertSessionHasErrors(['UL_SEO_COMPANY_TITLE', 'faqs.0.q']);
 
         $this->assertSame('Editor Test Co', $stock->fresh()->UL_STOCKS_COMPNAME);
-        $this->assertFalse(UnlistedThesis::where('UL_THESIS_FINCODE', $fincode)->exists());
+        $this->assertFalse(DB::table('unlisted_company_insights')->where('UL_CI_FINCODE', $fincode)->exists());
         $this->assertFalse(UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)->exists());
     }
 }

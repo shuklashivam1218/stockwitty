@@ -18,16 +18,20 @@ use Illuminate\Support\Str;
  */
 class UnlistedStocksController extends Controller implements HasMiddleware
 {
-    /** Content chips on the dashboard: label => [table, fincode column, "live" SQL expression]. */
+    /**
+     * Content chips on the dashboard: label => [table, fincode column, "live"
+     * SQL expression, extra where]. About / Thesis / WittyScore are the
+     * stock's CMS pages: live once published, "off" while a draft.
+     */
     private const CONTENT = [
-        'Price'      => ['unlisted_price_data', 'UL_PD_FINCODE', 'UL_PD_INVALID_FLAG = 0'],
-        'Financials' => ['unlisted_financials', 'UL_FIN_FINCODE', "UL_FIN_STATUS = '1'"],
-        'WittyScore' => ['unlisted_witty_scores', 'UL_WS_FINCODE', "UL_WS_ACTIVE = '1'"],
-        'Insights'   => ['unlisted_company_insights', 'UL_CI_FINCODE', "UL_CI_ACTIVE = '1'"],
-        'Thesis'     => ['unlisted_thesis', 'UL_THESIS_FINCODE', "UL_THESIS_ACTIVE = '1'"],
-        'About'      => ['unlisted_about_extra', 'UL_ABX_FINCODE', "UL_ABX_ACTIVE = '1'"],
-        'FAQs'       => ['unlisted_faqs', 'UL_FAQ_FINCODE', "UL_FAQ_ACTIVE = '1'"],
-        'SEO'        => ['unlisted_seo_meta', 'UL_SEO_FINCODE', "UL_SEO_ACTIVE = '1'"],
+        'Price'      => ['unlisted_price_data', 'UL_PD_FINCODE', 'UL_PD_INVALID_FLAG = 0', []],
+        'Financials' => ['unlisted_financials', 'UL_FIN_FINCODE', "UL_FIN_STATUS = '1'", []],
+        'Insights'   => ['unlisted_company_insights', 'UL_CI_FINCODE', "UL_CI_ACTIVE = '1'", []],
+        'FAQs'       => ['unlisted_faqs', 'UL_FAQ_FINCODE', "UL_FAQ_ACTIVE = '1'", ['UL_FAQ_TARGET' => 'overview']],
+        'SEO'        => ['unlisted_seo_meta', 'UL_SEO_FINCODE', "UL_SEO_ACTIVE = '1'", []],
+        'About'      => ['stock_articles', 'ul_stocks_fincode', "status = 'published'", ['type' => 'about', 'deleted_at' => null]],
+        'Thesis'     => ['stock_articles', 'ul_stocks_fincode', "status = 'published'", ['type' => 'thesis', 'deleted_at' => null]],
+        'WittyScore' => ['stock_articles', 'ul_stocks_fincode', "status = 'published'", ['type' => 'wittyscore', 'deleted_at' => null]],
     ];
 
     public static function middleware(): array
@@ -96,8 +100,9 @@ class UnlistedStocksController extends Controller implements HasMiddleware
     {
         $status = [];
 
-        foreach (self::CONTENT as $label => [$table, $column, $live]) {
+        foreach (self::CONTENT as $label => [$table, $column, $live, $where]) {
             $rows = DB::table($table)
+                ->where($where)
                 ->whereIn($column, $fincodes)
                 ->groupBy($column)
                 ->selectRaw("{$column} as fincode, MAX({$live}) as live")
@@ -393,15 +398,6 @@ class UnlistedStocksController extends Controller implements HasMiddleware
             ->update(['UL_FIN_STATUS' => $newStatus, 'UL_FIN_UPDATE_TIME' => now()]);
 
         return response()->json(['success' => true, 'status' => $newStatus]);
-    }
-
-    public function uploadThesisImage(Request $request, string $fincode)
-    {
-        $request->validate(['file' => 'required|' . ImageUpload::RULES]);
-
-        $path = ImageUpload::store($request->file('file'), 'unlisted-thesis-images', 'thesis_' . $fincode);
-
-        return response()->json(['location' => ImageUpload::url($path)]);
     }
 
     public function uploadAboutImage(Request $request, string $fincode)

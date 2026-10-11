@@ -5,11 +5,6 @@
 <div class="blog-repeater-row se-faq-row @unless($faqActive) is-inactive @endunless">
     <input type="hidden" name="faqs[{{ $i }}][id]" value="{{ $faq['id'] ?? '' }}">
     <div class="se-faq-top">
-        <select name="faqs[{{ $i }}][target]" class="cms-input" title="Which page this FAQ shows on">
-            @foreach($faqPages as $value => $label)
-                <option value="{{ $value }}" @selected(($faq['target'] ?? 'overview') === $value)>{{ $label }}</option>
-            @endforeach
-        </select>
         <input type="text" name="faqs[{{ $i }}][tab]" value="{{ $faq['tab'] ?? '' }}" maxlength="60"
                class="cms-input" placeholder="Tab (optional)">
         <input type="text" name="faqs[{{ $i }}][q]" value="{{ $faq['q'] ?? '' }}" maxlength="500"
@@ -17,7 +12,6 @@
     </div>
     <textarea name="faqs[{{ $i }}][a]" rows="3" class="cms-input" placeholder="Answer">{{ $faq['a'] ?? '' }}</textarea>
     @error("faqs.$i.q") <div class="cms-error">{{ $message }}</div> @enderror
-    @error("faqs.$i.target") <div class="cms-error">{{ $message }}</div> @enderror
     <div class="se-faq-foot">
         @include('admin.unlisted.partials.editor-switch', ['name' => "faqs[$i][active]", 'checked' => $faqActive])
         <div class="se-faq-tools">

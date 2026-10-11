@@ -5,8 +5,9 @@
 @php
     use App\Http\Controllers\UnlistedStockEditorController as Editor;
 
-    $chipLabels = ['Profile', 'Price', 'Financials', 'WittyScore', 'Insights', 'Thesis', 'About', 'FAQs', 'SEO'];
-    $chipTitles = ['on' => 'live on the site', 'off' => 'saved but switched off', 'none' => 'not filled in yet'];
+    // Company-page content first, then the stock's CMS pages.
+    $chipLabels = ['Profile', 'Price', 'Financials', 'Insights', 'FAQs', 'SEO', 'About', 'Thesis', 'WittyScore'];
+    $chipTitles = ['on' => 'live on the site', 'off' => 'saved but not live (switched off, or a draft)', 'none' => 'not filled in yet'];
 @endphp
 
 @section('content')
@@ -48,7 +49,7 @@
 
         <div class="sl-legend">
             <span><i class="sl-chip-dot on"></i> Live</span>
-            <span><i class="sl-chip-dot off"></i> Saved, switched off</span>
+            <span><i class="sl-chip-dot off"></i> Saved, not live</span>
             <span><i class="sl-chip-dot none"></i> Empty</span>
         </div>
 

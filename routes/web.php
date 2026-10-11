@@ -203,10 +203,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.financials.delete');
 
-    Route::post('/unlisted/stocks/{fincode}/thesis/upload-image', [UnlistedStocksController::class, 'uploadThesisImage'])
-        ->middleware('privilege:unlisted')
-        ->name('unlisted.stocks.thesis.upload');
-
     Route::post('/unlisted/stocks/{fincode}/about/upload-image', [UnlistedStocksController::class, 'uploadAboutImage'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.about.upload');

@@ -69,7 +69,7 @@ textarea.cms-input { resize:vertical; }
 
 /* FAQ repeater rows */
 .se-faq-row { padding:12px 12px 12px 12px; }
-.se-faq-top { display:grid;grid-template-columns:170px 160px 1fr;gap:8px; }
+.se-faq-top { display:grid;grid-template-columns:180px 1fr;gap:8px; }
 @media (max-width: 900px) { .se-faq-top { grid-template-columns:1fr; } }
 .se-faq-foot { display:flex;align-items:center;justify-content:space-between;gap:10px; }
 .se-faq-tools { display:flex;gap:4px; }
