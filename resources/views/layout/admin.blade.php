@@ -128,7 +128,12 @@
             @endif
 
             @if(!empty($priv['author']) || !empty($priv['reviewer']))
-            <li class="{{ request()->is('admin/cms*', 'admin/blog*') ? 'mm-active' : '' }}">
+            @php
+                // Edit URLs carry only the id, so the open stock page tells us its type.
+                $_stockPageType = request()->route('type')
+                    ?? ((isset($article) && $article instanceof \App\Models\StockArticle) ? $article->type : null);
+            @endphp
+            <li class="{{ request()->is('admin/cms*', 'admin/blog*', 'admin/stock-pages*') ? 'mm-active' : '' }}">
                 <a href="javascript:;" class="has-arrow">
                     <div class="parent-icon"><i class="fa-solid fa-file-lines"></i></div>
                     <div class="menu-title">CMS</div>
@@ -142,6 +147,12 @@
                            class="{{ request()->is('admin/blog/categories') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Blog Categories
                     </a></li>
+                    @foreach(\App\Models\StockArticle::TYPES as $_type => $_meta)
+                    <li><a href="{{ route('admin.stock-articles.index', $_type) }}"
+                           class="{{ request()->is('admin/stock-pages*') && $_stockPageType === $_type ? 'active' : '' }}">
+                        <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>{{ $_meta['label'] }}
+                    </a></li>
+                    @endforeach
                     <li><a href="{{ url('/admin/blog/profile') }}"
                            class="{{ request()->is('admin/blog/profile') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>My Author Profile

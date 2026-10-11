@@ -12,6 +12,7 @@ use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\UnlistedReportController;
 use App\Http\Controllers\CmsPagesController;
 use App\Http\Controllers\BlogPostsController;
+use App\Http\Controllers\StockArticlesController;
 use App\Http\Controllers\BlogCategoriesController;
 use App\Http\Controllers\BlogAuthorProfileController;
 use App\Http\Controllers\Sw\BlogController;
@@ -323,5 +324,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/{id}',                [BlogPostsController::class, 'trash'])->whereNumber('id')->name('posts.trash');
         Route::post('/{id}/restore',          [BlogPostsController::class, 'restore'])->whereNumber('id')->name('posts.restore');
         Route::delete('/{id}/force',          [BlogPostsController::class, 'forceDelete'])->whereNumber('id')->name('posts.force-delete');
+    });
+
+    // ── Stock pages (About / Thesis / WittyScore per stock) ── same CMS privilege as the blog ──
+    // List and create are per type; everything else addresses the article by id.
+    Route::prefix('/stock-pages')->name('stock-articles.')->middleware('privilege:author,reviewer')->group(function () {
+        $types = implode('|', array_keys(\App\Models\StockArticle::TYPES));
+
+        Route::post('/upload-image',          [StockArticlesController::class, 'uploadContentImage'])->name('upload-image');
+        Route::get('/{type}',                 [StockArticlesController::class, 'index'])->where('type', $types)->name('index');
+        Route::get('/{type}/create',          [StockArticlesController::class, 'create'])->where('type', $types)->name('create');
+        Route::post('/{type}',                [StockArticlesController::class, 'store'])->where('type', $types)->name('store');
+
+        Route::get('/{id}/edit',              [StockArticlesController::class, 'edit'])->whereNumber('id')->name('edit');
+        Route::put('/{id}',                   [StockArticlesController::class, 'update'])->whereNumber('id')->name('update');
+        Route::post('/{id}/heartbeat',        [StockArticlesController::class, 'heartbeat'])->whereNumber('id')->name('heartbeat');
+        Route::post('/{id}/release-lock',     [StockArticlesController::class, 'releaseLock'])->whereNumber('id')->name('release-lock');
+        Route::post('/{id}/publish-toggle',   [StockArticlesController::class, 'publishToggle'])->whereNumber('id')->name('publish-toggle');
+        Route::delete('/{id}',                [StockArticlesController::class, 'trash'])->whereNumber('id')->name('trash');
+        Route::post('/{id}/restore',          [StockArticlesController::class, 'restore'])->whereNumber('id')->name('restore');
+        Route::delete('/{id}/force',          [StockArticlesController::class, 'forceDelete'])->whereNumber('id')->name('force-delete');
     });
 });
