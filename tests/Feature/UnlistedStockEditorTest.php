@@ -255,6 +255,56 @@ class UnlistedStockEditorTest extends TestCase
         $this->assertFalse($this->actingAsAgent()->getJson("/admin/unlisted/stocks/{$fincode}/financials")->json('0.active'));
     }
 
+    public function test_new_stock_is_created_from_the_same_page(): void
+    {
+        $this->actingAsAgent($this->makeUser(['unlisted' => ['leads' => true]]))->get('/admin/unlisted/stocks/create')->assertForbidden();
+        $this->actingAsAgent()->get('/admin/unlisted/stocks/create')
+            ->assertOk()->assertSee('Create stock')->assertSee('Create the stock first');
+        $this->actingAsAgent()->get('/admin/unlisted')->assertOk()->assertSee('/admin/unlisted/stocks/create');
+
+        $name = 'Brand New Co ' . uniqid();
+        $user = $this->makeUser(['unlisted' => ['unlisted_stocks' => true]]);
+        $response = $this->actingAsAgent($user)->post('/admin/unlisted/stocks', [
+            'UL_STOCKS_COMPNAME' => $name,
+            'UL_STOCKS_STATUS'   => '0',
+            'UL_WS_ACTIVE'       => '1',
+            'UL_WS_VALUATION'    => '8',
+            'UL_SEO_ACTIVE'      => '1',
+            'faqs' => [['target' => 'overview', 'q' => 'First question?', 'active' => '1']],
+        ])->assertSessionHasNoErrors();
+
+        $stock = UnlistedStock::where('UL_STOCKS_COMPNAME', $name)->firstOrFail();
+        $response->assertRedirect("/admin/unlisted/stocks/{$stock->UL_STOCKS_FINCODE}/edit");
+        $this->assertSame(\Illuminate\Support\Str::slug($name), $stock->UL_STOCKS_SLUG);
+        $this->assertSame('0', $stock->UL_STOCKS_STATUS);
+        $this->assertSame('unlisted', $stock->UL_STOCKS_COMPNAME_TYPE);
+        $this->assertSame((string) $user->uid, (string) $stock->UL_STOCKS_INSERT_BY);
+        $this->assertSame('Yes', $stock->UL_STOCKS_Qtr_Data_Publish);
+        $this->assertEquals(8, UnlistedWittyScore::where('UL_WS_FINCODE', $stock->UL_STOCKS_FINCODE)->value('UL_WS_VALUATION'));
+        $this->assertFalse(DB::table('unlisted_seo_meta')->where('UL_SEO_FINCODE', $stock->UL_STOCKS_FINCODE)->exists());
+        $this->assertSame(1, UnlistedFaq::where('UL_FAQ_FINCODE', $stock->UL_STOCKS_FINCODE)->count());
+
+        // Same name again: the slug gets a suffix instead of colliding.
+        $this->actingAsAgent()->post('/admin/unlisted/stocks', ['UL_STOCKS_COMPNAME' => $name])->assertSessionHasNoErrors();
+        $this->assertTrue(UnlistedStock::where('UL_STOCKS_SLUG', $stock->UL_STOCKS_SLUG . '-2')->exists());
+    }
+
+    public function test_new_stock_with_a_taken_slug_is_refused(): void
+    {
+        $taken = $this->makeStock();
+        $name  = 'Refused Co ' . uniqid();
+
+        $this->actingAsAgent()->post('/admin/unlisted/stocks', [
+            'UL_STOCKS_COMPNAME' => $name,
+            'UL_STOCKS_SLUG'     => $taken->UL_STOCKS_SLUG,
+        ])->assertSessionHasErrors('UL_STOCKS_SLUG');
+
+        $this->actingAsAgent()->post('/admin/unlisted/stocks', ['UL_STOCKS_COMPNAME' => ''])
+            ->assertSessionHasErrors('UL_STOCKS_COMPNAME');
+
+        $this->assertFalse(UnlistedStock::where('UL_STOCKS_COMPNAME', $name)->exists());
+    }
+
     public function test_a_bad_field_saves_nothing(): void
     {
         $stock   = $this->makeStock();

@@ -231,7 +231,6 @@
      library itself has to be present in the DOM earlier than the stack. --}}
 <script src="{{ asset('js/tinymce_6.1.2/tinymce.min.js') }}"></script>
 
-@include('admin.unlisted.stocks-modal')
 @include('admin.unlisted.industry-modal')
 @include('admin.unlisted.overview-modal', ['industries' => $industries])
 @include('admin.unlisted.price-modal')

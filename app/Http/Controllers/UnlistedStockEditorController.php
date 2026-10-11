@@ -121,6 +121,48 @@ class UnlistedStockEditorController extends Controller
         ]);
     }
 
+    /**
+     * The same page, empty. New stocks start inactive so a half-filled company
+     * page never goes live by accident; prices and financials unlock once the
+     * stock exists.
+     */
+    public function create()
+    {
+        $this->authorizeStocks();
+
+        return view('admin.unlisted.editor', [
+            'stock'      => new UnlistedStock(['UL_STOCKS_STATUS' => '0']),
+            'sections'   => array_fill_keys(array_keys(self::SECTIONS), null),
+            'filled'     => array_fill_keys(['profile', 'prices', 'financials', 'faqs', ...array_keys(self::SECTIONS)], false),
+            'faqs'       => [],
+            'industries' => $this->industries(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $this->authorizeStocks();
+
+        $data = $this->validateStock($request);
+        $slug = $this->requestedSlug($request);
+        $this->attachLogo($request, $data, $slug);
+
+        $stock = DB::transaction(function () use ($request, $data, $slug) {
+            $stock = UnlistedStock::create($data['stock'] + [
+                'UL_STOCKS_SLUG'          => $slug,
+                'UL_STOCKS_COMPNAME_TYPE' => 'unlisted',
+                'UL_STOCKS_INSERT_BY'     => session('uid'),
+            ]);
+            $this->saveSections($request, $data, $stock->UL_STOCKS_FINCODE);
+            $this->syncFaqs($data['faqs'], $stock->UL_STOCKS_FINCODE);
+
+            return $stock;
+        });
+
+        return redirect()->route('admin.unlisted.stocks.edit', $stock->UL_STOCKS_FINCODE)
+            ->with('success', 'Stock created. You can now add its prices and financials below.');
+    }
+
     public function update(Request $request, string $fincode)
     {
         $this->authorizeStocks();
@@ -128,16 +170,7 @@ class UnlistedStockEditorController extends Controller
         $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
         $data  = $this->validateStock($request);
         $slug  = $this->requestedSlug($request, $stock);
-
-        // Uploaded before the transaction so a bad file fails validation
-        // without leaving half the sections saved.
-        if ($request->hasFile('logo')) {
-            try {
-                $data['stock']['UL_STOCKS_LOGO_LINK'] = ImageUpload::replace($request->file('logo'), 'company-logo', $slug, allowSvg: true);
-            } catch (ImageUploadException $e) {
-                throw $e->forField('logo');
-            }
-        }
+        $this->attachLogo($request, $data, $slug);
 
         DB::transaction(function () use ($request, $stock, $data, $slug) {
             $stock->update($data['stock'] + ['UL_STOCKS_SLUG' => $slug]);
@@ -355,26 +388,60 @@ class UnlistedStockEditorController extends Controller
     }
 
     /**
-     * The slug only changes when the agent unlocks and edits it. A taken slug
-     * is refused rather than silently suffixed, so the URL is never a surprise.
+     * Uploaded before the transaction so a bad file fails validation without
+     * leaving half the sections saved.
      */
-    private function requestedSlug(Request $request, UnlistedStock $stock): string
+    private function attachLogo(Request $request, array &$data, string $slug): void
+    {
+        if (!$request->hasFile('logo')) {
+            return;
+        }
+
+        try {
+            $data['stock']['UL_STOCKS_LOGO_LINK'] = ImageUpload::replace($request->file('logo'), 'company-logo', $slug, allowSvg: true);
+        } catch (ImageUploadException $e) {
+            throw $e->forField('logo');
+        }
+    }
+
+    /**
+     * A typed slug is used as-is, or refused if another stock has it, so the
+     * URL is never a surprise. Left blank: an existing stock keeps its slug,
+     * a new one gets one made from the name (with -2, -3… if needed).
+     */
+    private function requestedSlug(Request $request, ?UnlistedStock $stock = null): string
     {
         $request->validate(['UL_STOCKS_SLUG' => 'nullable|string|max:255']);
 
         $slug = Str::slug((string) $request->input('UL_STOCKS_SLUG', ''));
-        if ($slug === '' || $slug === $stock->UL_STOCKS_SLUG) {
+        if ($stock && ($slug === '' || $slug === $stock->UL_STOCKS_SLUG)) {
             return $stock->UL_STOCKS_SLUG;
+        }
+        if ($slug === '') {
+            return $this->uniqueSlug($request->input('UL_STOCKS_COMPNAME'));
         }
 
         $taken = UnlistedStock::where('UL_STOCKS_SLUG', $slug)
-            ->where('UL_STOCKS_FINCODE', '!=', $stock->UL_STOCKS_FINCODE)
+            ->when($stock, fn ($q) => $q->where('UL_STOCKS_FINCODE', '!=', $stock->UL_STOCKS_FINCODE))
             ->exists();
 
         if ($taken) {
             throw ValidationException::withMessages([
                 'UL_STOCKS_SLUG' => "/unlisted-shares/{$slug}/ is already used by another stock. Pick a different URL.",
             ]);
+        }
+
+        return $slug;
+    }
+
+    private function uniqueSlug(string $name): string
+    {
+        $base = Str::slug($name) ?: 'stock';
+        $slug = $base;
+        $n    = 2;
+
+        while (UnlistedStock::where('UL_STOCKS_SLUG', $slug)->exists()) {
+            $slug = $base . '-' . $n++;
         }
 
         return $slug;

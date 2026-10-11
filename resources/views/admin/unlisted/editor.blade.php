@@ -1,9 +1,18 @@
 @extends('layout.admin')
 
-@section('title', 'Edit ' . $stock->UL_STOCKS_COMPNAME . ' | Unlisted Stocks | Admin | StocksWitty')
+@section('title', ($stock->exists ? 'Edit ' . $stock->UL_STOCKS_COMPNAME : 'New Stock') . ' | Unlisted Stocks | Admin | StocksWitty')
 
 @php
     use App\Http\Controllers\UnlistedStockEditorController as Editor;
+
+    // Same page creates a stock; prices and financials need it to exist first.
+    $isNew = !$stock->exists;
+    // Built here, not inside @json() below: a multi-line array in a Blade
+    // directive's parentheses compiles to broken PHP.
+    $uploadUrls = $isNew ? null : [
+        'thesis' => route('admin.unlisted.stocks.thesis.upload', $stock->UL_STOCKS_FINCODE),
+        'about'  => route('admin.unlisted.stocks.about.upload', $stock->UL_STOCKS_FINCODE),
+    ];
 
     // Value for a field: the agent's last submit if validation bounced it, else what's saved.
     $v = fn (string $field, $row = null) => old($field, $row ? $row->$field : $stock->$field);
@@ -65,10 +74,11 @@
         'UL_ABX_SWOT_OPPORTUNITIES' => 'Opportunities',
         'UL_ABX_SWOT_THREATS'       => 'Threats',
     ];
+    $slugShown = $stock->UL_STOCKS_SLUG ?? 'company-slug';
     $seoPages = [
-        'COMPANY' => ['Company page', '/unlisted-shares/' . $stock->UL_STOCKS_SLUG . '/'],
-        'ABOUT'   => ['About page', '/unlisted-shares/' . $stock->UL_STOCKS_SLUG . '/about/'],
-        'THESIS'  => ['Thesis page', '/unlisted-shares/' . $stock->UL_STOCKS_SLUG . '/thesis/'],
+        'COMPANY' => ['Company page', '/unlisted-shares/' . $slugShown . '/'],
+        'ABOUT'   => ['About page', '/unlisted-shares/' . $slugShown . '/about/'],
+        'THESIS'  => ['Thesis page', '/unlisted-shares/' . $slugShown . '/thesis/'],
     ];
 @endphp
 
@@ -76,12 +86,14 @@
 <div class="admin-main">
 
     <div class="se-head">
-        <h1 class="admin-page-title">{{ $stock->UL_STOCKS_COMPNAME }}</h1>
+        <h1 class="admin-page-title">{{ $isNew ? 'New Stock' : $stock->UL_STOCKS_COMPNAME }}</h1>
         <div class="se-head-links">
             <a href="{{ route('admin.unlisted') }}" class="cms-back-link"><i class="fa-solid fa-arrow-left"></i> All stocks</a>
-            <a href="{{ route('sw.unlisted-shares.company', $stock->UL_STOCKS_SLUG) }}" target="_blank" rel="noopener" class="cms-back-link">
-                View live page <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
+            @unless($isNew)
+                <a href="{{ route('sw.unlisted-shares.company', $stock->UL_STOCKS_SLUG) }}" target="_blank" rel="noopener" class="cms-back-link">
+                    View live page <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            @endunless
         </div>
     </div>
 
@@ -96,9 +108,10 @@
         </div>
     @endif
 
-    <form id="stockForm" method="POST" action="{{ route('admin.unlisted.stocks.update', $stock->UL_STOCKS_FINCODE) }}" enctype="multipart/form-data">
+    <form id="stockForm" method="POST" enctype="multipart/form-data"
+          action="{{ $isNew ? route('admin.unlisted.stocks.store') : route('admin.unlisted.stocks.update', $stock->UL_STOCKS_FINCODE) }}">
         @csrf
-        @method('PUT')
+        @unless($isNew) @method('PUT') @endunless
 
         <div class="cms-form-grid">
 
@@ -122,10 +135,21 @@
                     <div class="se-grid se-grid-2">
                         <div class="cms-field">
                             <label>Company name <span class="req">*</span></label>
-                            <input type="text" name="UL_STOCKS_COMPNAME" value="{{ $v('UL_STOCKS_COMPNAME') }}" maxlength="255" required
+                            <input type="text" name="UL_STOCKS_COMPNAME" id="nameInput" value="{{ $v('UL_STOCKS_COMPNAME') }}" maxlength="255" required @if($isNew) autofocus @endif
                                    class="cms-input @error('UL_STOCKS_COMPNAME') is-invalid @enderror">
                             @error('UL_STOCKS_COMPNAME') <div class="cms-error">{{ $message }}</div> @enderror
                         </div>
+                        @if($isNew)
+                        {{-- New stock: the slug follows the name until it's typed in by hand. --}}
+                        <div class="cms-field">
+                            <label>URL slug</label>
+                            <input type="text" name="UL_STOCKS_SLUG" id="newSlugInput" value="{{ old('UL_STOCKS_SLUG') }}" maxlength="255" autocomplete="off"
+                                   class="cms-input @error('UL_STOCKS_SLUG') is-invalid @enderror" placeholder="Filled in from the name — or type your own">
+                            <p class="cms-field-hint">/unlisted-shares/<strong id="newSlugPreview">{{ old('UL_STOCKS_SLUG') ? \Illuminate\Support\Str::slug(old('UL_STOCKS_SLUG')) : 'company-name' }}</strong>/</p>
+                            <p class="cms-field-hint">Pick it carefully — once the page is live, the URL should not change.</p>
+                            @error('UL_STOCKS_SLUG') <div class="cms-error">{{ $message }}</div> @enderror
+                        </div>
+                        @else
                         <div class="cms-field">
                             <label>URL slug</label>
                             <div class="cms-slug-row">
@@ -142,6 +166,7 @@
                             </p>
                             @error('UL_STOCKS_SLUG') <div class="cms-error">{{ $message }}</div> @enderror
                         </div>
+                        @endif
                     </div>
 
                     <div class="se-grid se-grid-4">
@@ -289,8 +314,17 @@
                     <textarea name="UL_STOCKS_ABOUT" id="profileEditor" class="se-rich" data-upload="about">{{ $v('UL_STOCKS_ABOUT') }}</textarea>
                 </section>
 
-                @include('admin.unlisted.partials.editor-prices')
-                @include('admin.unlisted.partials.editor-financials')
+                @if($isNew)
+                    @foreach(['prices' => ['fa-indian-rupee-sign', 'Price History'], 'financials' => ['fa-chart-column', 'Financials']] as $id => [$icon, $title])
+                        <section class="admin-card se-section se-locked" id="{{ $id }}">
+                            <h2 class="se-section-title"><i class="fa-solid {{ $icon }}"></i> {{ $title }}</h2>
+                            <p class="se-section-sub"><i class="fa-solid fa-lock"></i> Create the stock first — this unlocks as soon as you save.</p>
+                        </section>
+                    @endforeach
+                @else
+                    @include('admin.unlisted.partials.editor-prices')
+                    @include('admin.unlisted.partials.editor-financials')
+                @endif
 
                 {{-- ── WittyScore (unlisted_witty_scores) ───────────────── --}}
                 <section class="admin-card se-section" id="witty-score">
@@ -517,9 +551,17 @@
                             'title' => 'Inactive hides the whole stock from the public site',
                         ])
                     </div>
-                    <button type="submit" class="cms-submit-btn" id="saveBtn"><i class="fa-solid fa-floppy-disk"></i> Save all changes</button>
+                    @if($isNew)
+                        <button type="submit" class="cms-submit-btn" id="saveBtn"><i class="fa-solid fa-plus"></i> Create stock</button>
+                    @else
+                        <button type="submit" class="cms-submit-btn" id="saveBtn"><i class="fa-solid fa-floppy-disk"></i> Save all changes</button>
+                    @endif
                     <p class="se-unsaved" id="unsavedNote"><i class="fa-solid fa-circle-exclamation"></i> You have unsaved changes.</p>
-                    <p class="cms-field-hint" style="margin-top:10px;"><i class="fa-solid fa-circle-info"></i> One click saves every section on this page. Ctrl + S works too.</p>
+                    @if($isNew)
+                        <p class="cms-field-hint" style="margin-top:10px;"><i class="fa-solid fa-circle-info"></i> Only the company name is required. New stocks start inactive — switch it on when the page is ready.</p>
+                    @else
+                        <p class="cms-field-hint" style="margin-top:10px;"><i class="fa-solid fa-circle-info"></i> One click saves every section on this page. Ctrl + S works too.</p>
+                    @endif
                 </div>
 
                 <div class="admin-card">
@@ -531,12 +573,14 @@
                     @error('logo') <div class="cms-error">{{ $message }}</div> @enderror
                 </div>
 
+                @unless($isNew)
                 <div class="admin-card">
                     <div class="cms-side-title">Stock Info</div>
                     <div class="cms-info-row"><span class="cms-info-label">Fincode</span><span class="cms-info-value">{{ $stock->UL_STOCKS_FINCODE }}</span></div>
                     <div class="cms-info-row"><span class="cms-info-label">Added</span><span class="cms-info-value">{{ $stock->UL_STOCKS_INSERT_TIME?->format('d M Y') ?? '—' }}</span></div>
                     <div class="cms-info-row"><span class="cms-info-label">Last updated</span><span class="cms-info-value">{{ $stock->UL_STOCKS_UPDATE_TIME?->format('d M Y, h:i A') ?? '—' }}</span></div>
                 </div>
+                @endunless
 
             </div>
         </div>
@@ -583,10 +627,8 @@ window.sePager = function ($el, page, lastPage, total, go) {
 
 $(function () {
     const CSRF        = $('meta[name="csrf-token"]').attr('content');
-    const UPLOAD_URLS = {
-        thesis: @json(route('admin.unlisted.stocks.thesis.upload', $stock->UL_STOCKS_FINCODE)),
-        about:  @json(route('admin.unlisted.stocks.about.upload', $stock->UL_STOCKS_FINCODE)),
-    };
+    // Upload endpoints are per stock, so images can only go in once it exists.
+    const UPLOAD_URLS = @json($uploadUrls);
     const $form = $('#stockForm');
 
     // ── Unsaved-changes guard: one Save covers the whole page, so leaving
@@ -627,6 +669,10 @@ $(function () {
     function uploader(kind) {
         return function (blobInfo) {
             return new Promise(function (resolve, reject) {
+                if (!UPLOAD_URLS) {
+                    reject({ message: 'Create the stock first, then add images.', remove: true });
+                    return;
+                }
                 const fd = new FormData();
                 fd.append('file', blobInfo.blob(), blobInfo.filename());
                 fd.append('_token', CSRF);
@@ -696,6 +742,22 @@ $(function () {
         }
     });
     $('#slugInput').on('input', function () { $('#slugPreview').text(toSlug($(this).val())); });
+
+    // New stock: follow the name until the slug is typed by hand; clearing it
+    // hands control back to the name.
+    const $newSlug = $('#newSlugInput');
+    if ($newSlug.length) {
+        let slugTouched = $newSlug.val().trim() !== '';
+        const showPreview = function () { $('#newSlugPreview').text(toSlug($newSlug.val()) || 'company-name'); };
+        $('#nameInput').on('input', function () {
+            if (!slugTouched) { $newSlug.val(toSlug($(this).val())); showPreview(); }
+        });
+        $newSlug.on('input', function () { slugTouched = $(this).val().trim() !== ''; showPreview(); });
+        $newSlug.on('blur', function () {
+            if ($(this).val().trim() !== '') $(this).val(toSlug($(this).val()));
+            showPreview();
+        });
+    }
 
     // ── WittyScore overall, same weights as the public formula ──
     function recalcOverall() {

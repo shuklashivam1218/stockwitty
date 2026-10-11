@@ -82,14 +82,14 @@
                 <ul>
                     @if(!empty($_ul['unlisted_stocks']))
                     <li><a href="{{ url('/admin/unlisted') }}"
-                           class="{{ request()->is('admin/unlisted') ? 'active' : '' }}">
+                           class="{{ request()->is('admin/unlisted', 'admin/unlisted/stocks/*') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-dot me-1" style="font-size:8px;"></i>Stocks
                     </a></li>
                     @if(request()->is('admin/unlisted'))
                     <li class="sidebar-action-group">
-                        <button id="stocksNavBtn" class="sidebar-action-btn">
+                        <a href="{{ route('admin.unlisted.stocks.create') }}" class="sidebar-action-btn" style="text-decoration:none;">
                             <i class="fa-solid fa-plus"></i> Add Stock
-                        </button>
+                        </a>
                         <button id="industryNavBtn" class="sidebar-action-btn">
                             <i class="fa-solid fa-industry"></i> Add Industry
                         </button>

@@ -135,7 +135,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('privilege:unlisted')
         ->name('unlisted');
 
-    Route::post('/unlisted/stocks', [UnlistedStocksController::class, 'storeStock'])
+    Route::get('/unlisted/stocks/create', [UnlistedStockEditorController::class, 'create'])
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.create');
+
+    Route::post('/unlisted/stocks', [UnlistedStockEditorController::class, 'store'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.store');
 

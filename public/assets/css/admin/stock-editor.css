@@ -126,3 +126,7 @@ textarea.cms-input { resize:vertical; }
 .se-fin-grid legend { float:none;width:auto;font-size:11px;font-weight:800;color:#076550;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;padding:0; }
 .se-fin-grid .cms-field { margin-bottom:10px; }
 .se-fin-grid .cms-field label { font-size:11px; }
+
+/* Create mode: Price & Financials wait until the stock exists */
+.se-locked { background:#fafbfc;border-style:dashed; }
+.se-locked .se-section-sub { margin-top:8px;display:flex;align-items:center;gap:6px; }
