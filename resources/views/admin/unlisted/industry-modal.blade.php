@@ -194,7 +194,7 @@
     var STORE_URL = '{{ route("admin.unlisted.industries.store") }}';
     var CSRF      = $('meta[name="csrf-token"]').attr('content');
 
-    $('#industryNavBtn').on('click', function () {
+    $(document).on('click', '#industryNavBtn, .js-add-industry', function () {
         $('#industryOverlay').addClass('open');
         $('#indNameInput').focus();
     });

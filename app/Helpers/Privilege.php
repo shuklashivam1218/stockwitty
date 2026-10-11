@@ -22,4 +22,13 @@ class Privilege
 
         return $key === null ? static::$cache : data_get(static::$cache, $key);
     }
+
+    /**
+     * Unlisted stock data — the dashboard, the editor and every stock endpoint.
+     * Routes also sit behind privilege:unlisted, so this narrows that down.
+     */
+    public static function canManageStocks(): bool
+    {
+        return !empty(static::get('user_master')) || !empty(static::get('unlisted.unlisted_stocks'));
+    }
 }

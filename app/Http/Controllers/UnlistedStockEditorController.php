@@ -16,6 +16,7 @@ use App\Models\UnlistedStock;
 use App\Models\UnlistedThesis;
 use App\Models\UnlistedWittyScore;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -29,8 +30,13 @@ use Illuminate\Validation\ValidationException;
  * Each content section still lives in its own table with its own active flag,
  * exactly as the public company pages read them.
  */
-class UnlistedStockEditorController extends Controller
+class UnlistedStockEditorController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [fn ($request, $next) => Privilege::canManageStocks() ? $next($request) : abort(403)];
+    }
+
     public const CATEGORIES = ['startup_funding' => 'Startup Funding', 'pre_ipo' => 'Pre IPO', 'delisted' => 'Delisted'];
     public const TAGS       = ['Pre-IPO', 'Trending', 'Unicorn', 'Hot', 'New'];
     public const DEMAT      = ['NSDL' => 'NSDL', 'CDSL' => 'CDSL', 'Both' => 'Both (NSDL/CDSL)'];
@@ -80,8 +86,6 @@ class UnlistedStockEditorController extends Controller
 
     public function edit(string $fincode)
     {
-        $this->authorizeStocks();
-
         $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
 
         // $filled drives the green dots in the jump nav: which sections have content.
@@ -128,8 +132,6 @@ class UnlistedStockEditorController extends Controller
      */
     public function create()
     {
-        $this->authorizeStocks();
-
         return view('admin.unlisted.editor', [
             'stock'      => new UnlistedStock(['UL_STOCKS_STATUS' => '0']),
             'sections'   => array_fill_keys(array_keys(self::SECTIONS), null),
@@ -141,8 +143,6 @@ class UnlistedStockEditorController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeStocks();
-
         $data = $this->validateStock($request);
         $slug = $this->requestedSlug($request);
         $this->attachLogo($request, $data, $slug);
@@ -165,8 +165,6 @@ class UnlistedStockEditorController extends Controller
 
     public function update(Request $request, string $fincode)
     {
-        $this->authorizeStocks();
-
         $stock = UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
         $data  = $this->validateStock($request);
         $slug  = $this->requestedSlug($request, $stock);
@@ -188,7 +186,6 @@ class UnlistedStockEditorController extends Controller
      */
     public function prices(string $fincode)
     {
-        $this->authorizeStocks();
         UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
 
         $page = UnlistedPriceData::where('UL_PD_FINCODE', $fincode)
@@ -212,7 +209,6 @@ class UnlistedStockEditorController extends Controller
     /** Every financial period for the editor's Financials section, newest first. */
     public function financials(string $fincode)
     {
-        $this->authorizeStocks();
         UnlistedStock::where('UL_STOCKS_FINCODE', $fincode)->firstOrFail();
 
         $rows = UnlistedFinancials::where('UL_FIN_FINCODE', $fincode)
@@ -253,14 +249,6 @@ class UnlistedStockEditorController extends Controller
     public static function periodLabel(int $periodEnd): string
     {
         return intdiv($periodEnd, 100) . '-' . str_pad((string) ($periodEnd % 100), 2, '0', STR_PAD_LEFT);
-    }
-
-    /** Same gate as the stocks dashboard: user master, or the unlisted_stocks sub-privilege. */
-    private function authorizeStocks(): void
-    {
-        if (empty(Privilege::get('user_master')) && empty(Privilege::get('unlisted.unlisted_stocks'))) {
-            abort(403);
-        }
     }
 
     private function latestRow(string $model, string $prefix, $fincode)

@@ -130,3 +130,44 @@ textarea.cms-input { resize:vertical; }
 /* Create mode: Price & Financials wait until the stock exists */
 .se-locked { background:#fafbfc;border-style:dashed; }
 .se-locked .se-section-sub { margin-top:8px;display:flex;align-items:center;gap:6px; }
+
+/* ── Dashboard list (/admin/unlisted) ─────────────────────── */
+.sl-head { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px; }
+.sl-head .admin-page-title { margin:0; }
+.sl-head-actions { display:flex;gap:10px;flex-wrap:wrap;align-items:center; }
+.sl-head-actions .cms-action-btn { padding:9px 14px;font-size:13px;display:inline-flex;align-items:center;gap:6px; }
+.sl-toolbar { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:10px; }
+.sl-count { display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:10px;background:rgba(0,0,0,.07);font-size:11px;text-align:center; }
+.cms-status-tab.active .sl-count { background:rgba(255,255,255,.25); }
+.sl-search { display:flex;gap:6px;align-items:center; }
+.sl-search .cms-search-input { min-width:260px; }
+@media (max-width: 600px) { .sl-search, .sl-search .cms-search-input { min-width:0;width:100%; } }
+.sl-clear { font-size:12.5px;color:#666;margin-left:4px; }
+.sl-legend { display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:#888;margin-bottom:12px; }
+.sl-legend span { display:inline-flex;align-items:center;gap:5px; }
+.sl-chip-dot { width:9px;height:9px;border-radius:3px;display:inline-block; }
+.sl-chip-dot.on, .sl-chip.on { background:#e3f4ec;color:#0b6b4c; }
+.sl-chip-dot.on { background:#22a06b; }
+.sl-chip-dot.off, .sl-chip.off { background:#fff4e0;color:#a35d00; }
+.sl-chip-dot.off { background:#f0a43a; }
+.sl-chip-dot.none, .sl-chip.none { background:#f1f3f5;color:#a5adb7; }
+.sl-chip-dot.none { background:#d5dae0; }
+
+.sl-table td { vertical-align:middle; }
+.sl-company { display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;min-width:220px; }
+.sl-company:hover strong { color:#076550; }
+.sl-company strong { display:block;font-size:13.5px;color:#1a1a1a; }
+.sl-company small { display:block;font-size:11.5px;color:#94a3b8;margin-top:1px; }
+.sl-logo { width:34px;height:34px;flex-shrink:0;border-radius:8px;object-fit:contain;background:#fff;border:1px solid #eef0f2;padding:3px; }
+.sl-logo-blank { display:inline-flex;align-items:center;justify-content:center;background:#e8f5f1;color:#076550;font-weight:800;font-size:14px;border:none; }
+.sl-price { white-space:nowrap;font-weight:700;color:#1a1a1a; }
+.sl-price small { display:block;font-weight:400;font-size:11px;color:#94a3b8; }
+.sl-muted { color:#cbd5e1;font-weight:400; }
+.sl-chips { display:flex;flex-wrap:wrap;gap:4px;max-width:420px; }
+.sl-chip { font-size:10.5px;font-weight:700;padding:3px 7px;border-radius:5px;white-space:nowrap;cursor:default; }
+.sl-actions { white-space:nowrap;text-align:right; }
+.sl-actions .cms-action-btn { display:inline-flex;align-items:center;gap:6px; }
+.sl-live-link { display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin-left:4px;border-radius:6px;color:#94a3b8;font-size:12px; }
+.sl-live-link:hover { background:#f4f4f4;color:#076550; }
+.sl-empty { text-align:center;color:#999;padding:36px !important; }
+.sl-empty i { display:block;font-size:24px;margin-bottom:8px; }

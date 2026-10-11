@@ -305,6 +305,52 @@ class UnlistedStockEditorTest extends TestCase
         $this->assertFalse(UnlistedStock::where('UL_STOCKS_COMPNAME', $name)->exists());
     }
 
+    public function test_dashboard_lists_searches_and_shows_what_is_filled(): void
+    {
+        $tag    = uniqid();
+        $live   = $this->makeStock(['UL_STOCKS_COMPNAME' => "Dash Live {$tag}", 'UL_STOCKS_ABOUT' => '<p>x</p>']);
+        $hidden = $this->makeStock(['UL_STOCKS_COMPNAME' => "Dash Hidden {$tag}", 'UL_STOCKS_STATUS' => '0']);
+        UnlistedThesis::insert(['UL_THESIS_FINCODE' => $live->UL_STOCKS_FINCODE, 'UL_THESIS_CONTENT' => '<p>t</p>', 'UL_THESIS_ACTIVE' => '0']);
+        DB::table('unlisted_price_data')->insert(['UL_PD_FINCODE' => $live->UL_STOCKS_FINCODE, 'UL_PD_DATE' => '2026-10-01', 'UL_PD_BID_PRICE' => 123.5, 'UL_PD_INVALID_FLAG' => 0]);
+
+        $this->actingAsAgent()->get('/admin/unlisted?search=' . $tag)
+            ->assertOk()
+            ->assertSee("Dash Live {$tag}")->assertSee("Dash Hidden {$tag}")
+            ->assertSee("/admin/unlisted/stocks/{$live->UL_STOCKS_FINCODE}/edit")
+            ->assertSee('&#8377;123.50', false)
+            ->assertSee('title="Profile: live on the site"', false)
+            ->assertSee('title="Thesis: saved but switched off"', false)
+            ->assertSee('title="SEO: not filled in yet"', false)
+            ->assertDontSee('ptf-icon-edit');
+
+        $this->actingAsAgent()->get('/admin/unlisted?status=inactive&search=' . $tag)
+            ->assertSee("Dash Hidden {$tag}")->assertDontSee("Dash Live {$tag}");
+        $this->actingAsAgent()->get('/admin/unlisted?status=active&search=' . $tag)
+            ->assertSee("Dash Live {$tag}")->assertDontSee("Dash Hidden {$tag}");
+        $this->actingAsAgent()->get('/admin/unlisted?search=' . $hidden->UL_STOCKS_FINCODE)
+            ->assertSee("Dash Hidden {$tag}");
+    }
+
+    public function test_stock_endpoints_need_the_stocks_privilege_and_old_modal_routes_are_gone(): void
+    {
+        $stock   = $this->makeStock();
+        $fincode = $stock->UL_STOCKS_FINCODE;
+        $leads   = $this->makeUser(['unlisted' => ['leads' => true]]);
+
+        $this->actingAsAgent($leads)->postJson("/admin/unlisted/stocks/{$fincode}/price", ['UL_PD_DATE' => '2026-10-01', 'UL_PD_BID_PRICE' => 1])->assertForbidden();
+        $this->actingAsAgent($leads)->postJson("/admin/unlisted/stocks/{$fincode}/toggle")->assertForbidden();
+        $this->actingAsAgent($leads)->postJson("/admin/unlisted/stocks/{$fincode}/financials", ['UL_FIN_Period_end' => 202503, 'UL_FIN_Type' => 'C', 'UL_FIN_No_months' => 12])->assertForbidden();
+        $this->actingAsAgent($leads)->postJson('/admin/unlisted/industries', ['name' => 'Nope'])->assertForbidden();
+        $this->assertSame('1', $stock->fresh()->UL_STOCKS_STATUS);
+        $this->assertFalse(DB::table('unlisted_price_data')->where('UL_PD_FINCODE', $fincode)->exists());
+
+        $this->actingAsAgent()->postJson("/admin/unlisted/stocks/{$fincode}/toggle")->assertOk()->assertJsonPath('status', '0');
+
+        foreach (['overview', 'thesis', 'about', 'witty-score', 'about-extra', 'seo', 'insights', 'faqs-list'] as $old) {
+            $this->actingAsAgent()->get("/admin/unlisted/stocks/{$fincode}/{$old}")->assertNotFound();
+        }
+    }
+
     public function test_a_bad_field_saves_nothing(): void
     {
         $stock   = $this->makeStock();
