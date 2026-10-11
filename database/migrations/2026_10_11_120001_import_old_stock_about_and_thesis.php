@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Carries the old rich-text About (unlisted_about) and Thesis (unlisted_thesis)
@@ -21,6 +22,11 @@ return new class extends Migration
         $now = now();
 
         foreach (self::SOURCES as $type => [$table, $p, $titleSuffix, $icon]) {
+            // The next migration drops these tables; nothing to carry over without them.
+            if (!Schema::hasTable($table)) {
+                continue;
+            }
+
             // The newest row per stock is the live one, as the old editor saved it.
             $latest = DB::table($table)
                 ->selectRaw("{$p}_FINCODE as fincode, MAX({$p}_ID) as id")

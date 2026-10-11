@@ -117,17 +117,12 @@ class UnlistedStockEditorTest extends TestCase
         $this->assertSame('Hot', $stock->UL_STOCKS_TAG);
         $this->assertSame('<p>Profile</p>', $stock->UL_STOCKS_ABOUT);
 
-        $insight = DB::table('unlisted_company_insights')->where('UL_CI_FINCODE', $fincode)->first();
-        $this->assertSame('Thirty-second summary.', $insight->UL_CI_AI_SUMMARY);
-        $this->assertNull($insight->UL_CI_TLDR);
+        $this->assertSame('Thirty-second summary.', DB::table('unlisted_company_insights')->where('UL_CI_FINCODE', $fincode)->value('UL_CI_AI_SUMMARY'));
+        $this->assertSame('Buy Renamed Co shares', DB::table('unlisted_seo_meta')->where('UL_SEO_FINCODE', $fincode)->value('UL_SEO_COMPANY_TITLE'));
 
-        $seo = DB::table('unlisted_seo_meta')->where('UL_SEO_FINCODE', $fincode)->first();
-        $this->assertSame('Buy Renamed Co shares', $seo->UL_SEO_COMPANY_TITLE);
-        $this->assertNull($seo->UL_SEO_ABOUT_TITLE);
-
-        // About / Thesis / WittyScore are CMS pages now; the stock editor never touches them.
+        // About / Thesis / WittyScore are CMS pages now; the stale fields above
+        // were ignored (their columns and tables are gone) and no pillar row appeared.
         $this->assertFalse(UnlistedWittyScore::where('UL_WS_FINCODE', $fincode)->exists());
-        $this->assertFalse(DB::table('unlisted_thesis')->where('UL_THESIS_FINCODE', $fincode)->exists());
 
         $faqs = UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)->orderBy('UL_FAQ_SORT_ORDER')->get();
         $this->assertCount(2, $faqs);
