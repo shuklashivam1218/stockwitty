@@ -38,4 +38,10 @@ class UnlistedStock extends Model
         'UL_STOCKS_ABOUT',
         'UL_STOCKS_INSERT_BY',
     ];
+
+    /** About, Thesis and WittyScore pages written in the CMS. */
+    public function articles()
+    {
+        return $this->hasMany(StockArticle::class, 'ul_stocks_fincode', 'UL_STOCKS_FINCODE');
+    }
 }
