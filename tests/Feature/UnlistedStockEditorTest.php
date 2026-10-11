@@ -324,10 +324,11 @@ class UnlistedStockEditorTest extends TestCase
             ->assertSee("/admin/unlisted/stocks/{$live->UL_STOCKS_FINCODE}/edit")
             ->assertSee('&#8377;123.50', false)
             ->assertSee('title="Profile: live on the site"', false)
-            ->assertSee('title="About: live on the site"', false)
-            ->assertSee('title="Thesis: saved but not live (switched off, or a draft)"', false)
-            ->assertSee('title="WittyScore: not filled in yet"', false)
             ->assertSee('title="SEO: not filled in yet"', false)
+            // CMS pages are tracked in the CMS, not on this dashboard.
+            ->assertDontSee('title="About:', false)
+            ->assertDontSee('title="Thesis:', false)
+            ->assertDontSee('title="WittyScore:', false)
             ->assertDontSee('ptf-icon-edit');
 
         $this->actingAsAgent()->get('/admin/unlisted?status=inactive&search=' . $tag)

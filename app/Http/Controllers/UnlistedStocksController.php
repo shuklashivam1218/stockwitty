@@ -19,9 +19,9 @@ use Illuminate\Support\Str;
 class UnlistedStocksController extends Controller implements HasMiddleware
 {
     /**
-     * Content chips on the dashboard: label => [table, fincode column, "live"
-     * SQL expression, extra where]. About / Thesis / WittyScore are the
-     * stock's CMS pages: live once published, "off" while a draft.
+     * Content chips on the dashboard — the company page's own content only
+     * (About / Thesis / WittyScore are CMS pages, tracked there):
+     * label => [table, fincode column, "live" SQL expression, extra where].
      */
     private const CONTENT = [
         'Price'      => ['unlisted_price_data', 'UL_PD_FINCODE', 'UL_PD_INVALID_FLAG = 0', []],
@@ -29,9 +29,6 @@ class UnlistedStocksController extends Controller implements HasMiddleware
         'Insights'   => ['unlisted_company_insights', 'UL_CI_FINCODE', "UL_CI_ACTIVE = '1'", []],
         'FAQs'       => ['unlisted_faqs', 'UL_FAQ_FINCODE', "UL_FAQ_ACTIVE = '1'", ['UL_FAQ_TARGET' => 'overview']],
         'SEO'        => ['unlisted_seo_meta', 'UL_SEO_FINCODE', "UL_SEO_ACTIVE = '1'", []],
-        'About'      => ['stock_articles', 'ul_stocks_fincode', "status = 'published'", ['type' => 'about', 'deleted_at' => null]],
-        'Thesis'     => ['stock_articles', 'ul_stocks_fincode', "status = 'published'", ['type' => 'thesis', 'deleted_at' => null]],
-        'WittyScore' => ['stock_articles', 'ul_stocks_fincode', "status = 'published'", ['type' => 'wittyscore', 'deleted_at' => null]],
     ];
 
     public static function middleware(): array
