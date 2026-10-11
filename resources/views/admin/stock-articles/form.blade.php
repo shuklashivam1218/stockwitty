@@ -18,14 +18,14 @@
         <h1 class="admin-page-title">
             {{ $isNew ? 'New ' . $label . ' Page' : $label . ' — ' . ($article->stock->UL_STOCKS_COMPNAME ?? '') }}
         </h1>
-        <a href="{{ route('admin.stock-articles.index', $type) }}" class="cms-back-link"><i class="fa-solid fa-arrow-left"></i> All {{ $label }} pages</a>
+        <a href="{{ route('admin.stock-articles.index', ['type' => $type]) }}" class="cms-back-link"><i class="fa-solid fa-arrow-left"></i> All {{ $label }} pages</a>
     </div>
 
     @include('admin.articles.banners', ['noun' => 'page'])
 
     <fieldset id="postFieldset" @if($lockedBy) disabled @endif style="border:none;padding:0;margin:0;">
     <form id="postForm" method="POST"
-          action="{{ $isNew ? route('admin.stock-articles.store', $type) : route('admin.stock-articles.update', $article->id) }}"
+          action="{{ $isNew ? route('admin.stock-articles.store') : route('admin.stock-articles.update', $article->id) }}"
           enctype="multipart/form-data">
         @csrf
         @unless($isNew) @method('PUT') @endunless
@@ -36,6 +36,17 @@
             <div class="admin-card cms-main-col">
 
                 @if($isNew)
+                    <div class="cms-field">
+                        <label>Page type <span class="req">*</span></label>
+                        <select name="type" id="typeSelect" class="cms-input" data-create-url="{{ route('admin.stock-articles.create') }}">
+                            @foreach(StockArticle::TYPES as $key => $meta)
+                                <option value="{{ $key }}" @selected($type === $key)>{{ $meta['label'] }} — /unlisted-shares/company/{{ $key }}/</option>
+                            @endforeach
+                        </select>
+                        <p class="cms-field-hint">Changing it reloads the stock list below.</p>
+                        @error('type') <div class="cms-error">{{ $message }}</div> @enderror
+                    </div>
+
                     <div class="cms-field">
                         <label>Stock <span class="req">*</span></label>
                         @if($availableStocks->isEmpty())
@@ -55,6 +66,11 @@
                         @error('ul_stocks_fincode') <div class="cms-error">{{ $message }}</div> @enderror
                     </div>
                 @else
+                    <div class="cms-field">
+                        <label>Page type</label>
+                        <div class="cms-input cms-input-locked">{{ $label }}</div>
+                    </div>
+
                     <div class="cms-field">
                         <label>Stock</label>
                         <div class="cms-input cms-input-locked">{{ $article->stock->UL_STOCKS_COMPNAME ?? '—' }}</div>
@@ -140,6 +156,13 @@
 ])
 <script>
 $(function () {
+    // New page: the stock list depends on the page type, so switching reloads it.
+    $('#typeSelect').on('change', function () {
+        const url = new URL($(this).data('create-url'), window.location.origin);
+        url.searchParams.set('type', $(this).val());
+        window.location = url.toString();
+    });
+
     // New page: the title follows the chosen stock until it's typed by hand.
     const TITLE_SUFFIX = @json(StockArticle::TYPES[$type]['title']);
     const $title = $('#titleInput');

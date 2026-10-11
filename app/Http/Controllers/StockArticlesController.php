@@ -33,12 +33,17 @@ class StockArticlesController extends Controller
         'UL_WS_LIQUIDITY_SAFETY' => 'Liquidity & Safety',
     ];
 
-    public function index(Request $request, string $type)
+    /** One list for all three page types; ?type= narrows it to one. */
+    public function index(Request $request)
     {
+        $type   = $this->typeFrom($request);
         $status = $request->query('status', '');
         $search = trim((string) $request->query('search', ''));
 
-        $query = StockArticle::ofType($type)->with('stock', 'author')->orderByDesc('updated_at');
+        $query = StockArticle::query()
+            ->when($type, fn ($q) => $q->ofType($type))
+            ->with('stock', 'author')
+            ->orderByDesc('updated_at');
 
         if ($status === 'trash') {
             $query->onlyTrashed();
@@ -54,19 +59,18 @@ class StockArticlesController extends Controller
 
         return view('admin.stock-articles.index', [
             'type'     => $type,
-            'label'    => StockArticle::typeLabel($type),
             'articles' => $query->paginate(20)->withQueryString(),
             'status'   => $status,
             'search'   => $search,
-            'coverage' => [
-                'published' => StockArticle::ofType($type)->published()->count(),
-                'stocks'    => UnlistedStock::where('UL_STOCKS_STATUS', '1')->count(),
-            ],
+            // How many active stocks have each page live.
+            'live'     => StockArticle::published()->selectRaw('type, COUNT(*) as n')->groupBy('type')->pluck('n', 'type'),
+            'stocks'   => UnlistedStock::where('UL_STOCKS_STATUS', '1')->count(),
         ]);
     }
 
-    public function create(Request $request, string $type)
+    public function create(Request $request)
     {
+        $type    = $this->typeFrom($request) ?? StockArticle::TYPE_ABOUT;
         $article = new StockArticle([
             'type'              => $type,
             'hero_icon'         => StockArticle::TYPES[$type]['icon'],
@@ -82,12 +86,17 @@ class StockArticlesController extends Controller
         ]);
     }
 
-    public function store(Request $request, string $type)
+    public function store(Request $request)
     {
         $request->validate([
+            'type'              => ['required', Rule::in(array_keys(StockArticle::TYPES))],
             'ul_stocks_fincode' => ['required', 'integer', Rule::exists('unlisted_stocks', 'UL_STOCKS_FINCODE')],
-        ], ['ul_stocks_fincode.required' => 'Pick the stock this page is for.']);
+        ], [
+            'type.required'              => 'Pick the page type.',
+            'ul_stocks_fincode.required' => 'Pick the stock this page is for.',
+        ]);
 
+        $type     = $request->input('type');
         $fincode  = $request->integer('ul_stocks_fincode');
         $existing = StockArticle::withTrashed()->ofType($type)->where('ul_stocks_fincode', $fincode)->first();
         if ($existing) {
@@ -149,6 +158,14 @@ class StockArticlesController extends Controller
         });
 
         return redirect()->route('admin.stock-articles.edit', $article->id)->with('success', 'Page updated.');
+    }
+
+    /** A valid ?type= / type input, or null. */
+    private function typeFrom(Request $request): ?string
+    {
+        $type = (string) $request->input('type', '');
+
+        return array_key_exists($type, StockArticle::TYPES) ? $type : null;
     }
 
     protected function findArticle(int $id, bool $trashed = false): Model

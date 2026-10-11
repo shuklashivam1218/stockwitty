@@ -327,14 +327,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     // ── Stock pages (About / Thesis / WittyScore per stock) ── same CMS privilege as the blog ──
-    // List and create are per type; everything else addresses the article by id.
+    // One list for all three types (filtered by ?type=); pages are addressed by id.
     Route::prefix('/stock-pages')->name('stock-articles.')->middleware('privilege:author,reviewer')->group(function () {
-        $types = implode('|', array_keys(\App\Models\StockArticle::TYPES));
-
+        Route::get('/',                       [StockArticlesController::class, 'index'])->name('index');
+        Route::get('/create',                 [StockArticlesController::class, 'create'])->name('create');
+        Route::post('/',                      [StockArticlesController::class, 'store'])->name('store');
         Route::post('/upload-image',          [StockArticlesController::class, 'uploadContentImage'])->name('upload-image');
-        Route::get('/{type}',                 [StockArticlesController::class, 'index'])->where('type', $types)->name('index');
-        Route::get('/{type}/create',          [StockArticlesController::class, 'create'])->where('type', $types)->name('create');
-        Route::post('/{type}',                [StockArticlesController::class, 'store'])->where('type', $types)->name('store');
 
         Route::get('/{id}/edit',              [StockArticlesController::class, 'edit'])->whereNumber('id')->name('edit');
         Route::put('/{id}',                   [StockArticlesController::class, 'update'])->whereNumber('id')->name('update');

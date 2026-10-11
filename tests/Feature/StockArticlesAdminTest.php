@@ -69,21 +69,21 @@ class StockArticlesAdminTest extends TestCase
 
     public function test_only_authors_and_reviewers_get_in(): void
     {
-        $this->get('/admin/stock-pages/thesis')->assertRedirect(route('login'));
+        $this->get('/admin/stock-pages?type=thesis')->assertRedirect(route('login'));
 
         foreach ([['admin' => true], ['unlisted' => ['unlisted_stocks' => true]]] as $priv) {
-            $this->actingAsEditor($this->makeUser($priv))->get('/admin/stock-pages/thesis')->assertForbidden();
+            $this->actingAsEditor($this->makeUser($priv))->get('/admin/stock-pages')->assertForbidden();
         }
 
         foreach (['about', 'thesis', 'wittyscore'] as $type) {
-            $this->actingAsEditor()->get("/admin/stock-pages/{$type}")->assertOk();
-            $this->actingAsEditor($this->makeUser(['reviewer' => true]))->get("/admin/stock-pages/{$type}/create")->assertOk();
+            $this->actingAsEditor()->get("/admin/stock-pages?type={$type}")->assertOk();
+            $this->actingAsEditor($this->makeUser(['reviewer' => true]))->get("/admin/stock-pages/create?type={$type}")->assertOk()->assertSee('Page type');
         }
         $this->actingAsEditor()->get('/admin/stock-pages/nonsense')->assertNotFound();
 
-        // The CMS menu lists the three page types under the blog links.
+        // One CMS menu item covers all three page types.
         $this->actingAsEditor()->get('/admin/blog')
-            ->assertSee('/admin/stock-pages/about')->assertSee('/admin/stock-pages/thesis')->assertSee('/admin/stock-pages/wittyscore');
+            ->assertSee('About / Thesis / WittyScore')->assertSee('/admin/stock-pages"', false)->assertDontSee('/admin/stock-pages/thesis"', false);
     }
 
     public function test_draft_for_a_stock_then_publish(): void
@@ -92,10 +92,10 @@ class StockArticlesAdminTest extends TestCase
         $stock   = $this->makeStock();
         $fincode = $stock->UL_STOCKS_FINCODE;
 
-        $this->actingAsEditor()->get('/admin/stock-pages/thesis/create?stock=' . $fincode)
+        $this->actingAsEditor()->get('/admin/stock-pages/create?type=thesis&stock=' . $fincode)
             ->assertOk()->assertSee('Page Test Co');
 
-        $this->actingAsEditor($author)->post('/admin/stock-pages/thesis', [
+        $this->actingAsEditor($author)->post('/admin/stock-pages', ['type' => 'thesis', 
             'ul_stocks_fincode' => $fincode, 'title' => 'Draft thesis', 'status' => 'draft',
             'chips_text' => 'Unlisted, Energy', 'faqs' => [['tab' => 'Basics', 'q' => 'Q?', 'a' => 'A.'], ['q' => '', 'a' => '']],
         ])->assertRedirect()->assertSessionHasNoErrors();
@@ -120,30 +120,30 @@ class StockArticlesAdminTest extends TestCase
         $this->assertStringNotContainsString('<script', $article->content);
         $this->assertStringNotContainsString('onclick', $article->content);
 
-        $this->actingAsEditor()->get('/admin/stock-pages/thesis?status=published')->assertSee('Page Test Co');
+        $this->actingAsEditor()->get('/admin/stock-pages?type=thesis&status=published')->assertSee('Page Test Co');
     }
 
     public function test_one_page_per_stock_per_type(): void
     {
         $stock = $this->makeStock();
-        $this->actingAsEditor()->post('/admin/stock-pages/about', ['ul_stocks_fincode' => $stock->UL_STOCKS_FINCODE, 'title' => 'One', 'status' => 'draft']);
-        $this->actingAsEditor()->post('/admin/stock-pages/thesis', ['ul_stocks_fincode' => $stock->UL_STOCKS_FINCODE, 'title' => 'Other type', 'status' => 'draft'])
+        $this->actingAsEditor()->post('/admin/stock-pages', ['type' => 'about', 'ul_stocks_fincode' => $stock->UL_STOCKS_FINCODE, 'title' => 'One', 'status' => 'draft']);
+        $this->actingAsEditor()->post('/admin/stock-pages', ['type' => 'thesis', 'ul_stocks_fincode' => $stock->UL_STOCKS_FINCODE, 'title' => 'Other type', 'status' => 'draft'])
             ->assertSessionHasNoErrors();
 
-        $this->actingAsEditor()->post('/admin/stock-pages/about', ['ul_stocks_fincode' => $stock->UL_STOCKS_FINCODE, 'title' => 'Two', 'status' => 'draft'])
+        $this->actingAsEditor()->post('/admin/stock-pages', ['type' => 'about', 'ul_stocks_fincode' => $stock->UL_STOCKS_FINCODE, 'title' => 'Two', 'status' => 'draft'])
             ->assertSessionHasErrors('ul_stocks_fincode');
 
         // A trashed page still holds the slot: restore it rather than start again.
         $about = StockArticle::where('ul_stocks_fincode', $stock->UL_STOCKS_FINCODE)->where('type', 'about')->sole();
         $this->actingAsEditor()->deleteJson("/admin/stock-pages/{$about->id}")->assertOk();
-        $this->actingAsEditor()->post('/admin/stock-pages/about', ['ul_stocks_fincode' => $stock->UL_STOCKS_FINCODE, 'title' => 'Three', 'status' => 'draft'])
+        $this->actingAsEditor()->post('/admin/stock-pages', ['type' => 'about', 'ul_stocks_fincode' => $stock->UL_STOCKS_FINCODE, 'title' => 'Three', 'status' => 'draft'])
             ->assertSessionHasErrors('ul_stocks_fincode');
-        $this->actingAsEditor()->get('/admin/stock-pages/about/create')->assertDontSee('value="' . $stock->UL_STOCKS_FINCODE . '"', false);
+        $this->actingAsEditor()->get('/admin/stock-pages/create?type=about')->assertDontSee('value="' . $stock->UL_STOCKS_FINCODE . '"', false);
 
         $this->actingAsEditor()->postJson("/admin/stock-pages/{$about->id}/restore")->assertOk();
         $this->assertFalse($about->fresh()->trashed());
 
-        $this->actingAsEditor()->post('/admin/stock-pages/about', ['title' => 'No stock', 'status' => 'draft'])->assertSessionHasErrors('ul_stocks_fincode');
+        $this->actingAsEditor()->post('/admin/stock-pages', ['type' => 'about', 'title' => 'No stock', 'status' => 'draft'])->assertSessionHasErrors('ul_stocks_fincode');
     }
 
     public function test_wittyscore_page_saves_the_pillar_scores(): void
@@ -152,7 +152,7 @@ class StockArticlesAdminTest extends TestCase
         $stock   = $this->makeStock();
         $fincode = $stock->UL_STOCKS_FINCODE;
 
-        $this->actingAsEditor($editor)->post('/admin/stock-pages/wittyscore', [
+        $this->actingAsEditor($editor)->post('/admin/stock-pages', ['type' => 'wittyscore', 
             'ul_stocks_fincode' => $fincode, 'title' => 'Score', 'status' => 'draft',
             'UL_WS_FINANCIAL_HEALTH' => '7.5', 'UL_WS_VALUATION' => '6',
         ])->assertSessionHasNoErrors();
@@ -177,7 +177,7 @@ class StockArticlesAdminTest extends TestCase
         $this->assertNull($score->fresh()->UL_WS_VALUATION);
 
         // Other page types never touch the scores.
-        $this->actingAsEditor($editor)->post('/admin/stock-pages/thesis', [
+        $this->actingAsEditor($editor)->post('/admin/stock-pages', ['type' => 'thesis', 
             'ul_stocks_fincode' => $fincode, 'title' => 'T', 'status' => 'draft', 'UL_WS_FINANCIAL_HEALTH' => '1',
         ])->assertSessionHasNoErrors();
         $this->assertEquals(8, $score->fresh()->UL_WS_FINANCIAL_HEALTH);

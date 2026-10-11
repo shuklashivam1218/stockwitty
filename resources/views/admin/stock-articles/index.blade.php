@@ -1,20 +1,28 @@
 @extends('layout.admin')
 
-@section('title', $label . ' Pages | CMS | Admin | StocksWitty')
+@php
+    use App\Models\StockArticle;
+    $typeLabel = $type ? StockArticle::typeLabel($type) : null;
+@endphp
+
+@section('title', 'About / Thesis / WittyScore | CMS | Admin | StocksWitty')
 
 @section('content')
 <div class="admin-main">
 
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div>
-            <h1 class="admin-page-title" style="margin-bottom:4px;">{{ $label }} Pages</h1>
+            <h1 class="admin-page-title" style="margin-bottom:4px;">About / Thesis / WittyScore</h1>
             <p style="margin:0 0 20px;font-size:13px;color:#64748b;">
-                One per stock, shown at /unlisted-shares/<em>company</em>/{{ $type }}/ —
-                <strong>{{ $coverage['published'] }}</strong> of {{ $coverage['stocks'] }} active stocks have one live.
+                Each stock's About, Thesis and WittyScore pages, at /unlisted-shares/<em>company</em>/about/, /thesis/ and /wittyscore/.
+                Live for {{ $stocks }} active stocks:
+                @foreach(StockArticle::TYPES as $key => $meta)
+                    <strong>{{ $meta['label'] }} {{ $live[$key] ?? 0 }}</strong>@unless($loop->last) · @endunless
+                @endforeach
             </p>
         </div>
-        <a href="{{ route('admin.stock-articles.create', $type) }}" class="cms-new-btn">
-            <i class="fa-solid fa-plus"></i> New {{ $label }} Page
+        <a href="{{ route('admin.stock-articles.create', array_filter(['type' => $type])) }}" class="cms-new-btn">
+            <i class="fa-solid fa-plus"></i> New {{ $typeLabel ? $typeLabel . ' ' : '' }}Page
         </a>
     </div>
 
@@ -24,17 +32,29 @@
 
     <div class="admin-card">
 
+        {{-- Page type, then status: the three page types live in this one list. --}}
+        <div class="cms-status-tabs" style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f1f1f1;">
+            @foreach(['' => 'All pages'] + array_map(fn ($m) => $m['label'], StockArticle::TYPES) as $key => $tab)
+                <a href="{{ route('admin.stock-articles.index', array_filter(['type' => $key, 'status' => $status, 'search' => $search])) }}"
+                   class="cms-status-tab {{ (string) $type === (string) $key ? 'active' : '' }}">
+                    {{ $tab }}
+                </a>
+            @endforeach
+        </div>
+
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
             <div class="cms-status-tabs">
                 @foreach(['' => 'All', 'draft' => 'Draft', 'published' => 'Published', 'trash' => 'Trash'] as $key => $tab)
                     <a href="{{ route('admin.stock-articles.index', array_filter(['type' => $type, 'status' => $key, 'search' => $search])) }}"
-                       class="cms-status-tab {{ $status === $key ? 'active' : '' }}">
+                       class="cms-status-tab {{ $status === $key ? 'active' : '' }}"
+                       style="font-size:12.5px;padding:5px 12px;">
                         {{ $tab }}
                     </a>
                 @endforeach
             </div>
 
-            <form method="GET" action="{{ route('admin.stock-articles.index', $type) }}" style="display:flex;gap:6px;">
+            <form method="GET" action="{{ route('admin.stock-articles.index') }}" style="display:flex;gap:6px;">
+                @if($type) <input type="hidden" name="type" value="{{ $type }}"> @endif
                 <input type="hidden" name="status" value="{{ $status }}">
                 <input type="text" name="search" value="{{ $search }}" placeholder="Search by company or title..." class="cms-search-input">
                 <button type="submit" class="cms-search-btn" aria-label="Search"><i class="fa-solid fa-search"></i></button>
@@ -46,6 +66,7 @@
                 <thead>
                     <tr>
                         <th>Company</th>
+                        <th>Page</th>
                         <th>Title</th>
                         <th>Author</th>
                         <th>Status</th>
@@ -64,6 +85,7 @@
                                 </a>
                             @endif
                         </td>
+                        <td><span class="admin-badge badge-admin">{{ StockArticle::typeLabel($article->type) }}</span></td>
                         <td>{{ $article->title }}</td>
                         <td>{{ $article->author->name ?? '—' }}</td>
                         <td>
@@ -93,10 +115,10 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" style="text-align:center;color:#aaa;padding:32px">
-                            No {{ strtolower($label) }} pages found.
+                        <td colspan="7" style="text-align:center;color:#aaa;padding:32px">
+                            No {{ $typeLabel ? strtolower($typeLabel) . ' ' : '' }}pages found.
                             @if($status === '' && $search === '')
-                                <a href="{{ route('admin.stock-articles.create', $type) }}">Write the first one</a>
+                                <a href="{{ route('admin.stock-articles.create', array_filter(['type' => $type])) }}">Write the first one</a>
                             @endif
                         </td>
                     </tr>
