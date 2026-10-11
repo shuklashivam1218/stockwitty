@@ -113,6 +113,10 @@
                                 {{ $stock->UL_STOCKS_COMPNAME }}
                                 <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;color:#94a3b8;margin-left:4px;"></i>
                             </a>
+                            <a href="{{ route('admin.unlisted.stocks.edit', $stock->UL_STOCKS_FINCODE) }}"
+                               style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:6px;background:#e8f5f1;color:#076550;font-size:11px;font-weight:700;text-decoration:none;">
+                                Edit
+                            </a>
                         </td>
                         <td style="white-space:nowrap;font-size:13px;font-weight:600;color:#1a1a1a">
                             @php $lp = $latestPrices->get($stock->UL_STOCKS_FINCODE); @endphp

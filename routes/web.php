@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UnlistedLeadsController;
 use App\Http\Controllers\UnlistedStocksController;
+use App\Http\Controllers\UnlistedStockEditorController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UnlistedOrdersController;
 use App\Http\Controllers\UserDashboardController;
@@ -142,7 +143,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('privilege:unlisted')
         ->name('unlisted.industries.store');
 
-    Route::post('/unlisted/stocks/{fincode}/toggle', [UnlistedStocksController::class, 'toggleStockStatus'])
+    Route::get('/unlisted/stocks/{fincode}/edit', [UnlistedStockEditorController::class, 'edit'])
+        ->whereNumber('fincode')
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.edit');
+
+    Route::put('/unlisted/stocks/{fincode}', [UnlistedStockEditorController::class, 'update'])
+        ->whereNumber('fincode')
+        ->middleware('privilege:unlisted')
+        ->name('unlisted.stocks.update');
+
+    Route::post('/unlisted/stocks/{fincode}/toggle',[UnlistedStocksController::class, 'toggleStockStatus'])
         ->middleware('privilege:unlisted')
         ->name('unlisted.stocks.toggle');
 
