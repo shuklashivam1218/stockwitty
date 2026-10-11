@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Sw;
 
 use App\Http\Controllers\Controller;
-use App\Models\UnlistedAboutExtra;
 use App\Models\UnlistedCompanyInsight;
 use App\Models\UnlistedFaq;
 use App\Models\UnlistedSeoMeta;
 use App\Models\UnlistedStock;
-use App\Models\UnlistedThesis;
 use App\Models\UnlistedWittyScore;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -212,11 +210,6 @@ class CompanyController extends Controller
             ->orderByDesc('UL_CI_ID')
             ->first();
 
-        $aboutExtra = UnlistedAboutExtra::where('UL_ABX_FINCODE', $fincode)
-            ->where('UL_ABX_ACTIVE', '1')
-            ->orderByDesc('UL_ABX_ID')
-            ->first();
-
         $overviewFaqs = UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)
             ->where('UL_FAQ_TARGET', 'overview')
             ->where('UL_FAQ_ACTIVE', '1')
@@ -260,93 +253,8 @@ class CompanyController extends Controller
             'weekChange' => $weekChange, 'weekChangePct' => $weekChangePct,
             'priceAsOf' => $priceData?->UL_PD_DATE, 'revenueTrend' => $revenueTrend,
             'financialTables' => $financialTables, 'wittyScore' => $wittyScore, 'insight' => $insight,
-            'aboutExtra' => $aboutExtra, 'overviewFaqs' => $overviewFaqs, 'numShares' => $numShares,
+            'overviewFaqs' => $overviewFaqs, 'numShares' => $numShares,
             'unit' => $unit,
-        ]);
-    }
-
-    public function about(string $slug)
-    {
-        $stock   = $this->findStock($slug);
-        $fincode = $stock->UL_STOCKS_FINCODE;
-
-        $extra = UnlistedAboutExtra::where('UL_ABX_FINCODE', $fincode)
-            ->where('UL_ABX_ACTIVE', '1')
-            ->orderByDesc('UL_ABX_ID')
-            ->first();
-
-        $aboutFaqs = UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)
-            ->where('UL_FAQ_TARGET', 'about')
-            ->where('UL_FAQ_ACTIVE', '1')
-            ->orderBy('UL_FAQ_SORT_ORDER')
-            ->get()
-            ->groupBy(fn ($f) => $f->UL_FAQ_TAB ?: 'General');
-
-        return view('sw.unlisted-shares.company.about', [
-            'stock' => $stock, 'seo' => $this->seoMeta($fincode),
-            'verticals'    => UnlistedAboutExtra::parsePairs($extra?->UL_ABX_VERTICALS),
-            'revenue'      => UnlistedAboutExtra::parsePairs($extra?->UL_ABX_REVENUE_SEGMENTS),
-            'products'     => UnlistedAboutExtra::parsePairs($extra?->UL_ABX_PRODUCTS_SERVICES),
-            'history'      => UnlistedAboutExtra::parseHistory($extra?->UL_ABX_HISTORY),
-            'sources'      => UnlistedAboutExtra::parseSources($extra?->UL_ABX_SOURCES),
-            'strengths'    => UnlistedAboutExtra::parseLines($extra?->UL_ABX_SWOT_STRENGTHS),
-            'weaknesses'   => UnlistedAboutExtra::parseLines($extra?->UL_ABX_SWOT_WEAKNESSES),
-            'opportunities' => UnlistedAboutExtra::parseLines($extra?->UL_ABX_SWOT_OPPORTUNITIES),
-            'threats'      => UnlistedAboutExtra::parseLines($extra?->UL_ABX_SWOT_THREATS),
-            'overview'      => $extra?->UL_ABX_OVERVIEW,
-            'operations'    => $extra?->UL_ABX_OPERATIONS,
-            'geography'     => $extra?->UL_ABX_GEOGRAPHY,
-            'industryPos'   => $extra?->UL_ABX_INDUSTRY_POSITION,
-            'shareholding'  => $extra?->UL_ABX_SHAREHOLDING,
-            'investorInterest' => $extra?->UL_ABX_INVESTOR_INTEREST,
-            'marketLandscape'  => $extra?->UL_ABX_MARKET_LANDSCAPE,
-            'competitive'      => $extra?->UL_ABX_COMPETITIVE_STRENGTH,
-            'aboutFaqs' => $aboutFaqs,
-        ]);
-    }
-
-    public function thesis(string $slug)
-    {
-        $stock   = $this->findStock($slug);
-        $fincode = $stock->UL_STOCKS_FINCODE;
-
-        $thesis = UnlistedThesis::where('UL_THESIS_FINCODE', $fincode)
-            ->where('UL_THESIS_ACTIVE', '1')
-            ->orderByDesc('UL_THESIS_ID')
-            ->first();
-
-        $insight = UnlistedCompanyInsight::where('UL_CI_FINCODE', $fincode)
-            ->where('UL_CI_ACTIVE', '1')
-            ->orderByDesc('UL_CI_ID')
-            ->first();
-
-        $wittyScore = UnlistedWittyScore::where('UL_WS_FINCODE', $fincode)
-            ->where('UL_WS_ACTIVE', '1')
-            ->orderByDesc('UL_WS_ID')
-            ->first();
-
-        $thesisFaqs = UnlistedFaq::where('UL_FAQ_FINCODE', $fincode)
-            ->where('UL_FAQ_TARGET', 'thesis')
-            ->where('UL_FAQ_ACTIVE', '1')
-            ->orderBy('UL_FAQ_SORT_ORDER')
-            ->get();
-
-        $fixImageSrc = fn (?string $html) => $html
-            ? preg_replace('/src="(?!https?:\/\/|\/)/', 'src="/', $html)
-            : null;
-
-        return view('sw.unlisted-shares.company.thesis', [
-            'stock' => $stock, 'seo' => $this->seoMeta($fincode),
-            'thesisHtml'  => $fixImageSrc($thesis?->UL_THESIS_CONTENT),
-            'wittyScore'  => $wittyScore,
-            'tldr'        => $insight?->UL_CI_TLDR,
-            'bullCase'    => UnlistedCompanyInsight::parseLines($insight?->UL_CI_BULL_CASE),
-            'bearCase'    => UnlistedCompanyInsight::parseLines($insight?->UL_CI_BEAR_CASE),
-            'suitsIf'     => UnlistedCompanyInsight::parseLines($insight?->UL_CI_SUITS_IF),
-            'notSuitsIf'  => UnlistedCompanyInsight::parseLines($insight?->UL_CI_NOT_SUITS_IF),
-            'risks'       => UnlistedCompanyInsight::parsePairs($insight?->UL_CI_RISKS),
-            'verdictLong' => $insight?->UL_CI_VERDICT_LONG,
-            'thesisFaqs'  => $thesisFaqs,
         ]);
     }
 

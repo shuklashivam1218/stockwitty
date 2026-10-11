@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogSlugRedirect;
-use App\Support\HtmlToc;
+use App\Support\ArticlePage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -120,63 +120,18 @@ class BlogController extends Controller
 
     private function page(BlogPost $post): array
     {
-        $reserved = array_filter([
-            $post->sources ? 'sources' : null,
-            $post->faqs ? 'faq' : null,
-            'related',
-        ]);
-        ['toc' => $toc, 'html' => $body] = HtmlToc::build((string) $post->content, $reserved);
-
-        $related = $post->relatedPosts()->map(fn ($r) => [
-            'title'    => $r->title,
-            'href'     => $r->url(),
-            'category' => $r->category->name ?? 'Blog',
-            'read'     => $r->readLabel(),
-        ])->all();
-
-        if ($post->sources) {
-            $toc[] = ['id' => 'sources', 'label' => 'Sources & references'];
-        }
-        if ($post->faqs) {
-            $toc[] = ['id' => 'faq', 'label' => 'FAQ'];
-        }
-
-        $author   = $post->author;
         $category = $post->category->name ?? null;
 
-        return [
-            'post'       => $post,
-            'metaTitle'  => $this->metaTitle($post),
-            'metaDesc'   => $post->meta_description ?: $post->summary,
-            'crumbs'     => array_values(array_filter([
+        return ArticlePage::data(
+            $post,
+            crumbs: array_values(array_filter([
                 ['label' => 'Home', 'href' => '/'],
                 ['label' => 'Blog', 'href' => '/blog/'],
                 $category ? ['label' => $category, 'href' => '/blog/'] : null,
                 ['label' => Str::limit($post->title, 48)],
             ])),
-            'chips'      => $post->chips ?: array_filter([$category]),
-            'authorLine' => $author ? trim($author->name . ($author->author_designation ? ' · ' . $author->author_designation : '')) : 'StocksWitty Research',
-            'author'     => $author,
-            'dateLabel'  => $post->published_at?->format('d M Y') ?? 'Draft',
-            'hero'       => $post->featured_image
-                ? ['src' => asset($post->featured_image), 'alt' => $post->featured_image_alt ?: $post->title]
-                : null,
-            'introParas' => array_values(array_filter(array_map('trim', preg_split('/\R\s*\R/', (string) $post->intro)))),
-            'toc'        => $toc,
-            'body'       => $body,
-            'related'    => $related,
-            'leadForm'   => [
-                'heading' => $post->lead_heading ?: self::DEFAULT_LEAD['heading'],
-                'subtext' => $post->lead_subtext ?: self::DEFAULT_LEAD['subtext'],
-            ],
-            'preview'    => false,
-        ];
-    }
-
-    private function metaTitle(BlogPost $post): string
-    {
-        $title = $post->meta_title ?: $post->title;
-
-        return str_contains($title, 'StocksWitty') ? $title : $title . ' | StocksWitty';
+            chips: [$category],
+            lead: self::DEFAULT_LEAD,
+        );
     }
 }

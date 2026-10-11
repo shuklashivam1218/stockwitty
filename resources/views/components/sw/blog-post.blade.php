@@ -153,6 +153,9 @@
             </x-sw.reveal>
             @endif
 
+            {{-- Optional block above the body (a stock's WittyScore page puts its score breakdown here). --}}
+            {{ $slot }}
+
             <div class="sw-article">{!! $body !!}</div>
 
             @if ($sources)

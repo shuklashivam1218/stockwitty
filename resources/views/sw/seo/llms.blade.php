@@ -15,9 +15,10 @@ Every page listed below is also available as clean Markdown: request the same pa
 - [Why StocksWitty](https://www.stockswitty.com/why-witty/)
 - [Contact](https://www.stockswitty.com/contact/): email, New Delhi office address, map and business hours
 
-## Unlisted company research ({{ $companies->count() }} companies, each with price, profile /about/ and thesis /thesis/)
+## Unlisted company research ({{ $companies->count() }} companies, each with live price; About, Thesis and WittyScore pages listed where published)
 @foreach ($companies as $company)
-- [{{ $company->UL_STOCKS_COMPNAME }}](https://www.stockswitty.com/unlisted-shares/{{ $company->UL_STOCKS_SLUG }}/)
+- [{{ $company->UL_STOCKS_COMPNAME }}](https://www.stockswitty.com/unlisted-shares/{{ $company->UL_STOCKS_SLUG }}/)@foreach ($stockPages->get($company->UL_STOCKS_FINCODE, collect())->sortBy(fn ($p) => array_search($p->type, array_keys(\App\Models\StockArticle::TYPES))) as $page) · [{{ \App\Models\StockArticle::typeLabel($page->type) }}](https://www.stockswitty.com{{ $page->url() }})@endforeach
+
 @endforeach
 
 ## Products

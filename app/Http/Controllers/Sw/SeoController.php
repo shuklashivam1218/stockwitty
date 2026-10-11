@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Sw;
 
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
+use App\Models\StockArticle;
 use App\Models\UnlistedStock;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -79,9 +80,13 @@ class SeoController extends Controller
             $path    = "/unlisted-shares/{$company->UL_STOCKS_SLUG}/";
             $lastmod = $company->UL_STOCKS_UPDATE_TIME?->format('Y-m-d') ?? now()->toDateString();
 
-            $urls[] = ['loc' => self::BASE_URL . $path,           'lastmod' => $lastmod, 'changefreq' => 'weekly',  'priority' => '0.8'];
-            $urls[] = ['loc' => self::BASE_URL . $path . 'about/',  'lastmod' => $lastmod, 'changefreq' => 'monthly', 'priority' => '0.6'];
-            $urls[] = ['loc' => self::BASE_URL . $path . 'thesis/', 'lastmod' => $lastmod, 'changefreq' => 'monthly', 'priority' => '0.6'];
+            $urls[] = ['loc' => self::BASE_URL . $path, 'lastmod' => $lastmod, 'changefreq' => 'weekly', 'priority' => '0.8'];
+        }
+
+        // A stock's About / Thesis / WittyScore pages only once published —
+        // until then the URL is a noindex "being written" page.
+        foreach ($this->publishedStockPages() as $page) {
+            $urls[] = ['loc' => self::BASE_URL . $page->url(), 'lastmod' => $page->updated_at->format('Y-m-d'), 'changefreq' => 'monthly', 'priority' => '0.6'];
         }
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
@@ -110,7 +115,11 @@ class SeoController extends Controller
             'url'   => self::BASE_URL . $p->url(),
         ]);
 
-        $text = view('sw.seo.llms', ['companies' => $this->activeCompanies(), 'posts' => $posts])->render();
+        $text = view('sw.seo.llms', [
+            'companies'  => $this->activeCompanies(),
+            'stockPages' => $this->publishedStockPages()->groupBy('ul_stocks_fincode'),
+            'posts'      => $posts,
+        ])->render();
 
         return response($text, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
     }
@@ -124,7 +133,16 @@ class SeoController extends Controller
     {
         return UnlistedStock::where('UL_STOCKS_STATUS', '1')
             ->orderBy('UL_STOCKS_COMPNAME')
-            ->get(['UL_STOCKS_SLUG', 'UL_STOCKS_COMPNAME', 'UL_STOCKS_UPDATE_TIME']);
+            ->get(['UL_STOCKS_FINCODE', 'UL_STOCKS_SLUG', 'UL_STOCKS_COMPNAME', 'UL_STOCKS_UPDATE_TIME']);
+    }
+
+    /** Published About / Thesis / WittyScore pages of active stocks. */
+    private function publishedStockPages(): Collection
+    {
+        return StockArticle::published()
+            ->whereHas('stock', fn ($q) => $q->where('UL_STOCKS_STATUS', '1'))
+            ->with('stock:UL_STOCKS_FINCODE,UL_STOCKS_SLUG')
+            ->get(['id', 'ul_stocks_fincode', 'type', 'updated_at']);
     }
 
     private function viewLastMod(string $view): string

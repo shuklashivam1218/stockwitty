@@ -95,6 +95,11 @@
                         </span>
                     </div>
                     @include('admin.articles.publish-buttons', ['article' => $article, 'noun' => 'page'])
+                    @unless($isNew)
+                        <a href="{{ route('admin.stock-articles.preview', $article->id) }}" target="_blank" rel="noopener" class="cms-back-link" style="margin-top:10px;margin-right:14px;">
+                            <i class="fa-solid fa-eye"></i> Preview
+                        </a>
+                    @endunless
                     @if(!$isNew && $article->isPublished())
                         <a href="{{ url($article->url()) }}" target="_blank" rel="noopener" class="cms-back-link" style="margin-top:10px;">
                             View live <i class="fa-solid fa-arrow-up-right-from-square"></i>

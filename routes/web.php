@@ -19,6 +19,7 @@ use App\Http\Controllers\Sw\BlogController;
 use App\Http\Controllers\Sw\CompanyController;
 use App\Http\Controllers\Sw\HomeController;
 use App\Http\Controllers\Sw\SeoController;
+use App\Http\Controllers\Sw\StockPageController;
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 Route::get('/login', function () {
@@ -42,8 +43,10 @@ Route::get('/llms.txt', [SeoController::class, 'llms'])->name('llms');
 Route::get('/unlisted-shares/', [CompanyController::class, 'directory'])->name('sw.unlisted-shares');
 
 Route::get('/unlisted-shares/{slug}/', [CompanyController::class, 'index'])->name('sw.unlisted-shares.company');
-Route::get('/unlisted-shares/{slug}/about/', [CompanyController::class, 'about'])->name('sw.unlisted-shares.company.about');
-Route::get('/unlisted-shares/{slug}/thesis/', [CompanyController::class, 'thesis'])->name('sw.unlisted-shares.company.thesis');
+// Each stock's About / Thesis / WittyScore page, written in the CMS (stock_articles).
+Route::get('/unlisted-shares/{slug}/about/', [StockPageController::class, 'show'])->defaults('type', 'about')->name('sw.unlisted-shares.company.about');
+Route::get('/unlisted-shares/{slug}/thesis/', [StockPageController::class, 'show'])->defaults('type', 'thesis')->name('sw.unlisted-shares.company.thesis');
+Route::get('/unlisted-shares/{slug}/wittyscore/', [StockPageController::class, 'show'])->defaults('type', 'wittyscore')->name('sw.unlisted-shares.company.wittyscore');
 
 Route::view('/listed/', 'sw.listed.index')->name('sw.listed');
 Route::view('/listed/reliance/', 'sw.listed.reliance')->name('sw.listed.reliance');
@@ -336,6 +339,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/upload-image',          [StockArticlesController::class, 'uploadContentImage'])->name('upload-image');
 
         Route::get('/{id}/edit',              [StockArticlesController::class, 'edit'])->whereNumber('id')->name('edit');
+        Route::get('/{id}/preview',           [StockPageController::class, 'preview'])->whereNumber('id')->name('preview');
         Route::put('/{id}',                   [StockArticlesController::class, 'update'])->whereNumber('id')->name('update');
         Route::post('/{id}/heartbeat',        [StockArticlesController::class, 'heartbeat'])->whereNumber('id')->name('heartbeat');
         Route::post('/{id}/release-lock',     [StockArticlesController::class, 'releaseLock'])->whereNumber('id')->name('release-lock');
