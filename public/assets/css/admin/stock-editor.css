@@ -158,8 +158,11 @@ textarea.cms-input { resize:vertical; }
 .sl-company:hover strong { color:#076550; }
 .sl-company strong { display:block;font-size:13.5px;color:#1a1a1a; }
 .sl-company small { display:block;font-size:11.5px;color:#94a3b8;margin-top:1px; }
-.sl-logo { width:34px;height:34px;flex-shrink:0;border-radius:8px;object-fit:contain;background:#fff;border:1px solid #eef0f2;padding:3px; }
-.sl-logo-blank { display:inline-flex;align-items:center;justify-content:center;background:#e8f5f1;color:#076550;font-weight:800;font-size:14px;border:none; }
+.sl-logo {
+    position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex-shrink:0;
+    border-radius:8px;background:#e8f5f1;color:#076550;font-weight:800;font-size:14px;overflow:hidden;
+}
+.sl-logo img { position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:3px;background:#fff;border:1px solid #eef0f2;border-radius:8px; }
 .sl-price { white-space:nowrap;font-weight:700;color:#1a1a1a; }
 .sl-price small { display:block;font-weight:400;font-size:11px;color:#94a3b8; }
 .sl-muted { color:#cbd5e1;font-weight:400; }

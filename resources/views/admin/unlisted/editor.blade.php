@@ -566,7 +566,7 @@
 
                 <div class="admin-card">
                     <div class="cms-side-title">Logo</div>
-                    <img src="{{ $stock->UL_STOCKS_LOGO_LINK ? asset($stock->UL_STOCKS_LOGO_LINK) : '' }}" alt="" id="logoPreview" class="se-logo-preview"
+                    <img src="{{ $stock->UL_STOCKS_LOGO_LINK ? asset($stock->UL_STOCKS_LOGO_LINK) : '' }}" alt="" id="logoPreview" class="se-logo-preview" onerror="this.style.display='none'"
                          @unless($stock->UL_STOCKS_LOGO_LINK) style="display:none;" @endunless>
                     <input type="file" name="logo" id="logoInput" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="cms-input @error('logo') is-invalid @enderror">
                     <p class="cms-field-hint">PNG, JPG, WEBP or SVG, up to 2 MB.</p>

@@ -75,11 +75,13 @@
                         <tr>
                             <td>
                                 <a href="{{ $editUrl }}" class="sl-company">
-                                    @if($stock->UL_STOCKS_LOGO_LINK)
-                                        <img src="{{ asset($stock->UL_STOCKS_LOGO_LINK) }}" alt="" class="sl-logo" loading="lazy">
-                                    @else
-                                        <span class="sl-logo sl-logo-blank">{{ mb_strtoupper(mb_substr($stock->UL_STOCKS_COMPNAME ?? '?', 0, 1)) }}</span>
-                                    @endif
+                                    {{-- The initial sits underneath; a logo that fails to load removes itself and reveals it. --}}
+                                    <span class="sl-logo">
+                                        {{ mb_strtoupper(mb_substr($stock->UL_STOCKS_COMPNAME ?? '?', 0, 1)) }}
+                                        @if($stock->UL_STOCKS_LOGO_LINK)
+                                            <img src="{{ asset($stock->UL_STOCKS_LOGO_LINK) }}" alt="" loading="lazy" onerror="this.remove()">
+                                        @endif
+                                    </span>
                                     <span>
                                         <strong>{{ $stock->UL_STOCKS_COMPNAME }}</strong>
                                         <small>#{{ $fc }} · /{{ $stock->UL_STOCKS_SLUG }}/</small>
