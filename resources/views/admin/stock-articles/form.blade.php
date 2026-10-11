@@ -49,20 +49,15 @@
 
                     <div class="cms-field">
                         <label>Stock <span class="req">*</span></label>
-                        @if($availableStocks->isEmpty())
-                            <p class="blog-empty-note">Every stock already has a {{ strtolower($label) }} page — find it in the list to edit it.</p>
-                        @else
-                            <select name="ul_stocks_fincode" id="stockSelect" class="cms-input" required>
-                                <option value="">— Choose the company —</option>
-                                @foreach($availableStocks as $s)
-                                    <option value="{{ $s->UL_STOCKS_FINCODE }}" data-name="{{ $s->UL_STOCKS_COMPNAME }}"
-                                            @selected((int) old('ul_stocks_fincode', $article->ul_stocks_fincode) === (int) $s->UL_STOCKS_FINCODE)>
-                                        {{ $s->UL_STOCKS_COMPNAME }}{{ $s->UL_STOCKS_STATUS === '1' ? '' : ' (inactive)' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="cms-field-hint">Only stocks without a {{ strtolower($label) }} page are listed. The page goes live at /unlisted-shares/<em>company</em>/{{ $type }}/.</p>
-                        @endif
+                        {{-- Search-as-you-type picker: 10 stocks per request, more on scroll. --}}
+                        <div class="sp-combo" id="stockCombo" data-url="{{ route('admin.stock-articles.stocks', ['type' => $type]) }}">
+                            <input type="hidden" name="ul_stocks_fincode" id="stockValue" value="{{ $selectedStock?->UL_STOCKS_FINCODE }}">
+                            <input type="text" id="stockSearch" class="cms-input @error('ul_stocks_fincode') is-invalid @enderror" autocomplete="off"
+                                   value="{{ $selectedStock?->UL_STOCKS_COMPNAME }}" placeholder="Search the company by name…"
+                                   role="combobox" aria-expanded="false" aria-controls="stockOptions">
+                            <ul class="sp-combo-list" id="stockOptions" role="listbox" hidden></ul>
+                        </div>
+                        <p class="cms-field-hint">Only stocks without a {{ strtolower($label) }} page show up. The page goes live at /unlisted-shares/<em>company</em>/{{ $type }}/.</p>
                         @error('ul_stocks_fincode') <div class="cms-error">{{ $message }}</div> @enderror
                     </div>
                 @else
@@ -168,10 +163,99 @@ $(function () {
     const $title = $('#titleInput');
     let titleTouched = $title.val().trim() !== '';
     $title.on('input', function () { titleTouched = $(this).val().trim() !== ''; });
-    $('#stockSelect').on('change', function () {
-        const name = $(this).find('option:selected').data('name');
-        if (!titleTouched && name) $title.val(name + ': ' + TITLE_SUFFIX);
-    });
+
+    // ── Stock picker: searches the server as you type, 10 at a time, and
+    // loads the next 10 when the list is scrolled to the bottom. Names are
+    // set with .text(), never put into HTML strings. ──
+    (function () {
+        const $combo = $('#stockCombo');
+        if (!$combo.length) return;
+
+        const URL_BASE = $combo.data('url');
+        const $search  = $('#stockSearch');
+        const $value   = $('#stockValue');
+        const $list    = $('#stockOptions');
+        let term = null, page = 1, more = false, loading = false, request = null, timer = null, chosenName = $search.val();
+
+        function open()  { $list.prop('hidden', false); $search.attr('aria-expanded', 'true'); }
+        function close() { $list.prop('hidden', true);  $search.attr('aria-expanded', 'false'); }
+
+        function load(reset) {
+            if (loading && !reset) return;
+            if (reset) { page = 1; if (request) request.abort(); }
+            loading = true;
+            $list.find('.sp-combo-status').remove();
+            $list.append($('<li class="sp-combo-status">').text('Loading…'));
+            open();
+
+            request = $.getJSON(URL_BASE, { term: term, page: page })
+                .done(function (res) {
+                    if (reset) $list.empty();
+                    $list.find('.sp-combo-status').remove();
+                    res.items.forEach(function (s) {
+                        $('<li class="sp-combo-option" role="option">')
+                            .attr('data-fincode', s.fincode).attr('data-name', s.name)
+                            .text(s.name + (s.active ? '' : ' (inactive)'))
+                            .toggleClass('is-selected', String(s.fincode) === String($value.val()))
+                            .appendTo($list);
+                    });
+                    if (!$list.children('.sp-combo-option').length) {
+                        $list.append($('<li class="sp-combo-status">').text(term ? 'No stock matches "' + term + '".' : 'Every stock already has this page.'));
+                    }
+                    more = res.more;
+                    page += 1;
+                })
+                .fail(function (xhr) {
+                    if (xhr.statusText !== 'abort') $list.find('.sp-combo-status').text('Could not load stocks.');
+                })
+                .always(function () { loading = false; });
+        }
+
+        function choose($opt) {
+            const name = $opt.data('name');
+            $value.val($opt.data('fincode'));
+            $search.val(name).removeClass('is-invalid');
+            chosenName = name;
+            close();
+            if (!titleTouched) $title.val(name + ': ' + TITLE_SUFFIX);
+        }
+
+        $search.on('focus', function () {
+            if (term === null) { term = ''; load(true); } else { open(); }
+        });
+        $search.on('input', function () {
+            $value.val('');                       // typing un-picks the stock until one is chosen
+            clearTimeout(timer);
+            timer = setTimeout(function () { term = $search.val().trim(); load(true); }, 250);
+        });
+        $search.on('keydown', function (e) {
+            const $opts = $list.children('.sp-combo-option');
+            let i = $opts.index($opts.filter('.is-active'));
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                open();
+                i = e.key === 'ArrowDown' ? Math.min(i + 1, $opts.length - 1) : Math.max(i - 1, 0);
+                $opts.removeClass('is-active').eq(i).addClass('is-active')[0]?.scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'Enter') {
+                e.preventDefault();               // never submit the form from the picker
+                if (i >= 0) choose($opts.eq(i));
+            } else if (e.key === 'Escape') {
+                close();
+            }
+        });
+        $list.on('mousedown', '.sp-combo-option', function (e) {
+            e.preventDefault();                   // keep focus so blur doesn't close first
+            choose($(this));
+        });
+        $list.on('scroll', function () {
+            if (more && !loading && this.scrollTop + this.clientHeight >= this.scrollHeight - 30) load(false);
+        });
+        $search.on('blur', function () {
+            setTimeout(close, 150);
+            // Left half-typed: put back the stock that is still selected (or clear).
+            if (!$value.val()) { $search.val(''); chosenName = ''; } else { $search.val(chosenName); }
+        });
+    })();
 
     // WittyScore: overall from the same weights as the public formula.
     function recalcOverall() {

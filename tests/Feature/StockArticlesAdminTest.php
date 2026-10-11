@@ -146,6 +146,34 @@ class StockArticlesAdminTest extends TestCase
         $this->actingAsEditor()->post('/admin/stock-pages', ['type' => 'about', 'title' => 'No stock', 'status' => 'draft'])->assertSessionHasErrors('ul_stocks_fincode');
     }
 
+    public function test_stock_picker_searches_ten_at_a_time(): void
+    {
+        $tag = 'Picker' . uniqid();
+        $stocks = collect(range(1, 13))->map(fn ($i) => $this->makeStock(sprintf('%s %02d', $tag, $i)));
+        StockArticle::create(['ul_stocks_fincode' => $stocks[0]->UL_STOCKS_FINCODE, 'type' => 'thesis', 'title' => 'Taken']);
+        StockArticle::create(['ul_stocks_fincode' => $stocks[1]->UL_STOCKS_FINCODE, 'type' => 'thesis', 'title' => 'Trashed'])->delete();
+
+        $this->actingAsEditor($this->makeUser(['unlisted' => ['unlisted_stocks' => true]]))
+            ->getJson('/admin/stock-pages/stocks?type=thesis')->assertForbidden();
+
+        $first = $this->actingAsEditor()->getJson('/admin/stock-pages/stocks?type=thesis&term=' . $tag)->assertOk();
+        $this->assertCount(10, $first->json('items'));
+        $this->assertTrue($first->json('more'));
+        $this->assertSame("{$tag} 03", $first->json('items.0.name'));   // 01 has a thesis, 02's is in the trash
+
+        $second = $this->actingAsEditor()->getJson('/admin/stock-pages/stocks?type=thesis&page=2&term=' . $tag)->assertOk();
+        $this->assertSame([], array_diff(["{$tag} 13"], array_column($second->json('items'), 'name')));
+        $this->assertFalse($second->json('more'));
+
+        // A different type still offers the stock that has a thesis.
+        $about = $this->actingAsEditor()->getJson('/admin/stock-pages/stocks?type=about&term=' . urlencode("{$tag} 01"))->json('items');
+        $this->assertSame(["{$tag} 01"], array_column($about, 'name'));
+
+        // The create page no longer lists every stock up front.
+        $this->actingAsEditor()->get('/admin/stock-pages/create?type=thesis')
+            ->assertOk()->assertSee('stockSearch')->assertDontSee("{$tag} 05");
+    }
+
     public function test_wittyscore_page_saves_the_pillar_scores(): void
     {
         $editor  = $this->makeUser(['author' => true]);

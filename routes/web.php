@@ -331,6 +331,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('/stock-pages')->name('stock-articles.')->middleware('privilege:author,reviewer')->group(function () {
         Route::get('/',                       [StockArticlesController::class, 'index'])->name('index');
         Route::get('/create',                 [StockArticlesController::class, 'create'])->name('create');
+        Route::get('/stocks',                 [StockArticlesController::class, 'stockOptions'])->name('stocks');
         Route::post('/',                      [StockArticlesController::class, 'store'])->name('store');
         Route::post('/upload-image',          [StockArticlesController::class, 'uploadContentImage'])->name('upload-image');
 

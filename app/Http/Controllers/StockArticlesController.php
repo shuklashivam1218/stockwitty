@@ -71,19 +71,46 @@ class StockArticlesController extends Controller
     public function create(Request $request)
     {
         $type    = $this->typeFrom($request) ?? StockArticle::TYPE_ABOUT;
-        $article = new StockArticle([
-            'type'              => $type,
-            'hero_icon'         => StockArticle::TYPES[$type]['icon'],
-            'ul_stocks_fincode' => $request->integer('stock') ?: null,
-        ]);
+        $fincode = (int) old('ul_stocks_fincode', $request->integer('stock')) ?: null;
+        $article = new StockArticle(['type' => $type, 'hero_icon' => StockArticle::TYPES[$type]['icon']]);
 
-        return view('admin.stock-articles.form', $this->formData($article) + [
-            // Stocks that don't have this page yet; trashed ones still count — restore those instead.
-            'availableStocks' => UnlistedStock::query()
-                ->whereNotIn('UL_STOCKS_FINCODE', StockArticle::withTrashed()->ofType($type)->select('ul_stocks_fincode'))
-                ->orderBy('UL_STOCKS_COMPNAME')
-                ->get(['UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME', 'UL_STOCKS_STATUS']),
+        // A stock handed in (?stock= or a bounced submit) starts selected, if it can still get this page.
+        $selected = $fincode
+            ? $this->stocksWithoutPage($type)->where('UL_STOCKS_FINCODE', $fincode)->first(['UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME'])
+            : null;
+
+        return view('admin.stock-articles.form', $this->formData($article) + ['selectedStock' => $selected]);
+    }
+
+    /**
+     * The stock picker's search: stocks that can still get a page of this
+     * type, matching the typed name, 10 at a time.
+     */
+    public function stockOptions(Request $request)
+    {
+        $type = $this->typeFrom($request) ?? StockArticle::TYPE_ABOUT;
+        $term = trim((string) $request->query('term', ''));
+
+        $page = $this->stocksWithoutPage($type)
+            ->when($term !== '', fn ($q) => $q->where('UL_STOCKS_COMPNAME', 'like', '%' . $term . '%'))
+            ->orderBy('UL_STOCKS_COMPNAME')
+            ->simplePaginate(10, ['UL_STOCKS_FINCODE', 'UL_STOCKS_COMPNAME', 'UL_STOCKS_STATUS']);
+
+        return response()->json([
+            'items' => collect($page->items())->map(fn ($s) => [
+                'fincode' => $s->UL_STOCKS_FINCODE,
+                'name'    => $s->UL_STOCKS_COMPNAME,
+                'active'  => $s->UL_STOCKS_STATUS === '1',
+            ]),
+            'more'  => $page->hasMorePages(),
         ]);
+    }
+
+    /** Stocks without a page of this type; a trashed page still counts — restore it instead. */
+    private function stocksWithoutPage(string $type)
+    {
+        return UnlistedStock::query()
+            ->whereNotIn('UL_STOCKS_FINCODE', StockArticle::withTrashed()->ofType($type)->select('ul_stocks_fincode'));
     }
 
     public function store(Request $request)
